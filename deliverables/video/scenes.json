@@ -1,0 +1,71 @@
+{
+  "drift": 0.015,
+  "scenes": [
+    {
+      "id": "s01",
+      "file": "scenes/s01-title.html",
+      "duration": 2.5,
+      "sfx": []
+    },
+    {
+      "id": "s02",
+      "file": "scenes/s02-c02.html",
+      "duration": 3.5,
+      "sfx": [],
+      "in": {
+        "type": "zoom-in",
+        "dur": 0.5
+      }
+    },
+    {
+      "id": "s03",
+      "file": "scenes/s03-c03.html",
+      "duration": 5.5,
+      "sfx": [],
+      "in": {
+        "type": "zoom-out",
+        "dur": 0.5
+      }
+    },
+    {
+      "id": "s04",
+      "file": "scenes/s04-c04.html",
+      "duration": 5,
+      "sfx": [],
+      "in": {
+        "type": "zoom-in",
+        "dur": 0.5
+      }
+    },
+    {
+      "id": "s05",
+      "file": "scenes/s05-c05.html",
+      "duration": 6,
+      "sfx": [],
+      "in": {
+        "type": "zoom-out",
+        "dur": 0.5
+      }
+    },
+    {
+      "id": "s06",
+      "file": "scenes/s06-c06.html",
+      "duration": 5.5,
+      "sfx": [],
+      "in": {
+        "type": "zoom-in",
+        "dur": 0.5
+      }
+    },
+    {
+      "id": "s07",
+      "file": "scenes/s07-link.html",
+      "duration": 4,
+      "sfx": [],
+      "in": {
+        "type": "zoom-out",
+        "dur": 0.5
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<template>
+  <style>
+    [data-composition-id="s03"] .s03-media { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    [data-composition-id="s03"] .s03-pending { background: #cfd0d4; color: #65656d; display: flex; align-items: center; justify-content: center; padding-bottom: 200px; font-size: 64px; }
+    [data-composition-id="s03"] .s03-cap { position: absolute; left: 0; bottom: 70px; width: 1920px; display: flex; justify-content: center; }
+    [data-composition-id="s03"] .s03-pill { background: #fff; border-radius: 80px; padding: 24px 64px 28px; box-shadow: var(--shadow-md); font-size: 64px; line-height: 1.1; letter-spacing: -0.03em; white-space: nowrap; }
+    [data-composition-id="s03"] .s03-credit { position: absolute; left: 60px; top: 60px; background: #fff; border-radius: 60px; padding: 16px 40px 18px; box-shadow: var(--shadow-md); font-size: 30px; line-height: 1.2; white-space: nowrap; }
+  </style>
+  <div id="s03-root" class="rk-scene" data-composition-id="s03" data-width="1920" data-height="1080" data-duration="5.5" data-qa-center="x" data-qa-hold="5.5" data-qa-endhold="5.5">
+    <div id="s03-ground" class="rk-ground clip" data-start="0" data-duration="5.5" data-track-index="0"></div>
+    <div id="s03-v" class="s03-media s03-pending t-title" data-qa-ignore>CAPTURE PENDING</div>
+    <div id="s03-cap" class="s03-cap"><div id="s03-pill" class="s03-pill">Point at Mars. Ask. It plans.</div></div>
+  </div>
+  <script>
+    (() => {
+      const $ = (i) => document.getElementById(i);
+      const tl = gsap.timeline({ paused: true });
+      RK.rise(tl, $("s03-pill"), 0.45, { y: 14, dur: 0.5 });
+      window.__timelines["s03"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

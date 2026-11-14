@@ -1,0 +1,15 @@
+{
+  "link": "[link]",
+  "title": "MarsWalk Copilot",
+  "byline": "Ng Yu Hang, team Ecliptical",
+  "credit": "NASA MRO CTX, Mars Odyssey THEMIS, USGS SIM 3464, Perseverance",
+  "scenes": [
+    { "id": "s01", "kind": "title", "duration": 2.5 },
+    { "id": "s02", "kind": "footage", "clip": "c02", "duration": 3.5, "caption": "Mars maps show regions. Astronauts plan one walk.", "in": "zoom-in" },
+    { "id": "s03", "kind": "footage", "clip": "c03", "duration": 5.5, "caption": "Point at Mars. Ask. It plans.", "words": 0.35, "in": "zoom-out" },
+    { "id": "s04", "kind": "footage", "clip": "c04", "duration": 5.0, "caption": "The agent calls tools. The tools do the math.", "in": "zoom-in" },
+    { "id": "s05", "kind": "footage", "clip": "c05", "duration": 6.0, "caption": "Change a limit. It replans.", "credit": true, "in": "zoom-out" },
+    { "id": "s06", "kind": "footage", "clip": "c06", "duration": 5.5, "caption": "Built for the first walks on Mars.", "in": "zoom-in" },
+    { "id": "s07", "kind": "link", "duration": 4.0, "in": "zoom-out" }
+  ]
+}

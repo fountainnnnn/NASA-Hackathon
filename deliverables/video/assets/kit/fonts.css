@@ -1,0 +1,10 @@
+/* The brand font for this film. Put the woff2 files in assets/kit/fonts/ and declare them here with url()s
+   relative to the project root, then set --font in assets/kit/kit.css. Take the font from the product's own site
+   or design system (and only use fonts you may use). Leave this file empty to fall back to the system stack.
+   font-display: block, so no frame renders in a fallback font.
+
+@font-face { font-family: "Brand Sans"; font-style: normal; font-weight: 400; font-display: block;
+  src: url("assets/kit/fonts/brand-sans-400.woff2") format("woff2"); }
+@font-face { font-family: "Brand Sans"; font-style: normal; font-weight: 500; font-display: block;
+  src: url("assets/kit/fonts/brand-sans-500.woff2") format("woff2"); }
+*/
