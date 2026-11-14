@@ -10,7 +10,7 @@ MarsWalk Copilot is a 3D map of a roughly 30 km patch of Jezero Crater built fro
 - Demo (video, 30 s or less): TODO(link)
 - Demo (slides, 7 or fewer): TODO(link)
 - Live app: TODO(link)
-- Repository: TODO(link)
+- Repository: https://github.com/fountainnnnn/NASA-Hackathon
 
 ## Hero use case
 
@@ -30,6 +30,8 @@ The same tools sit behind the HUD buttons, so the planner works without the agen
 | Thermal | Mars Odyssey THEMIS day and night IR, 100 m |
 | Geology | USGS SIM 3464 Jezero geologic map, 1:75,000 |
 | Surface | Perseverance raw images, waypoints and traverse |
+
+Validation: the terrain agrees with 708 Perseverance waypoints, median offset 1.1 m, mean bias −0.9 m (rover heights are a separate NASA product, so this is a cross-check, not ground truth). Details in `data/validation.json`.
 
 Full list, links, processing and licence notes: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 

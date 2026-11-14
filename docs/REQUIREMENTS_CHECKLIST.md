@@ -23,6 +23,15 @@ Boxes are unchecked until someone has verified them. "Where" says which file or 
 - [ ] Any simulated or stand-in layer carries a visible "Simulated, not NASA data" badge. TODO(verify): confirm none ships.
 - [ ] Unit-test fixtures are labelled synthetic and never shown as NASA data. Where: tests/fixtures. TODO(verify)
 
+## Singapore Local Lead email (13 Nov 2026)
+
+- [x] Every NASA dataset is named, linked and tied to how it supports the solution. Where: NASA Data table in SUBMISSION_DRAFT.md. TODO(verify): same credits in the app's Sources panel, a slide and the video.
+- [x] Summary states solution, problem and impact. Where: SUBMISSION_DRAFT.md.
+- [x] Details state approach, tools, technologies and datasets. Where: SUBMISSION_DRAFT.md.
+- [ ] Slide deck link is the first line of the Detailed Project Description. TODO(link) deck URL
+- [ ] Submit early, target Sun 15 Nov 18:00 SGT. All form fields saved by 12:00. Human only.
+- [ ] Optional: mentor Zoom Sun 15 Nov 17:00 SGT (solo Global eligibility, Mars Trek as Resources tab data, video versus deck).
+
 ## Demo and links (submission guide)
 
 - [ ] Demo is a video of 30 s or less, or 7 slides or fewer. We make both. Over the limit means no Global Judging. Where: docs/DEMO_30_SECONDS.md. TODO(link)
@@ -36,13 +45,13 @@ Boxes are unchecked until someone has verified them. "Where" says which file or 
 
 ## Form fields
 
-- [ ] Project Name. Where: SUBMISSION_DRAFT.md.
-- [ ] High-Level Project Summary, about 120 to 180 words, with numbered inline citations and reference list. Where: SUBMISSION_DRAFT.md.
-- [ ] Link to Project Demo. TODO(link)
-- [ ] Link to Final Project. TODO(link)
-- [ ] Detailed Project Description (what, how, benefits, goals, tools).
+- [x] Project Name. Where: SUBMISSION_DRAFT.md.
+- [x] High-Level Project Summary, 130 to 170 words, with numbered inline citations and reference list. Where: SUBMISSION_DRAFT.md.
+- [ ] Link to Project Demo: the 30 s video is the official Demo link. TODO(link) video URL
+- [ ] Link to Final Project: live Railway app plus repo https://github.com/fountainnnnn/NASA-Hackathon. TODO(link) live app URL
+- [x] Detailed Project Description (what, how, benefits, goals, tools).
 - [ ] Use of Super Intelligence (SI), honest and specific. Where: SUBMISSION_DRAFT.md, AI_USE.md.
-- [ ] NASA Data, each dataset named, linked, with its use.
+- [x] NASA Data, each dataset named, linked, with its use.
 - [ ] Space Agency Partner Data and Other References. Every dataset, tool, code, text, image, font, library.
 - [ ] Images uploaded to the form are JPG, PNG or GIF, 10 MB or less. No video or document uploads (link instead).
 
@@ -68,7 +77,7 @@ Boxes are unchecked until someone has verified them. "Where" says which file or 
 - [ ] No image, video, audio or likeness of anyone under 18 in any media.
 - [ ] Solo participant is registered at the Singapore Local Event (solo teams are eligible there). TODO(verify) with the participant.
 - [ ] Terms and Conditions and Confirm All Work is Original boxes ticked, Submit for Judging clicked, success banner seen. Human only.
-- [ ] Submitted before Sun 15 Nov 2026, 23:59 SGT. Internal cut-off 20:00.
+- [ ] Submitted before Sun 15 Nov 2026, 23:59 SGT. Target 18:00, internal cut-off 20:00.
 
 ## Security and operations
 
@@ -80,8 +89,8 @@ Boxes are unchecked until someone has verified them. "Where" says which file or 
 
 ## Judging criteria self-check (each scored 1 to 5)
 
-- [ ] Impact: why a hyperlocal planner matters. Where: SUBMISSION_DRAFT.md.
+- [x] Impact: why a hyperlocal planner matters. Where: SUBMISSION_DRAFT.md.
 - [ ] Creativity: an agent that acts inside the 3D scene.
 - [ ] Validity: scientifically grounded, feasible, usable. Where: SCIENCE_AND_VALIDATION.md. TODO(verify) results
-- [ ] Relevance: fully addresses the challenge, NASA data integral. Where: CHALLENGE_ALIGNMENT.md.
+- [x] Relevance: fully addresses the challenge, NASA data integral. Where: CHALLENGE_ALIGNMENT.md.
 - [ ] Presentation: demo and slides.

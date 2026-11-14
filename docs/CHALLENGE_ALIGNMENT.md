@@ -23,6 +23,17 @@ The left column paraphrases the official statement and its considerations. The r
 | Resources tab: Curiosity proposed path example | Not used as data. Used as a model of what a proposed traverse view looks like. | |
 | Resources tab: NASA Worldview | Not used (Earth observation viewer). | |
 
+## Singapore Local Lead requirements (email, 13 Nov 2026)
+
+| Requirement | Where it is met | Status |
+| --- | --- | --- |
+| Name every NASA dataset, link it, and say how it supports the solution | NASA Data table in SUBMISSION_DRAFT.md: one row per dataset with exact product URL, mission, instrument and "what it lets the astronaut decide". The summary cites the main ones as [1] to [5]. | Done in text. TODO(verify): same credits in the app's Sources panel, a slide and the video |
+| Project summary covers solution, problem and impact | High-Level Project Summary opens with the problem and impact, then the solution, then the evidence. | Done in text |
+| Project details cover approach, tools, technologies and NASA datasets | Detailed Project Description: how it works, tools and languages, NASA Data. | Done in text |
+| Evidence for validity | DEM checked against 708 Perseverance waypoints (`data/validation.json`): median offset 1.1 m, mean bias −0.9 m. Worded as "agrees with", since rover heights are another NASA product. | Done in text. TODO(verify): numbers match docs/SCIENCE_AND_VALIDATION.md |
+| Submit early | Target Sun 15 Nov 18:00 SGT, with all form fields saved by 12:00. Official deadline 23:59. | Open, human action |
+| Optional mentor Zoom | Sun 15 Nov 17:00 SGT, to check solo eligibility, that Mars Trek counts as Resources tab data, and video versus deck. | Open, human action |
+
 ## Where this goes beyond the brief (AI)
 
 An agent that operates inside the scene: it reads the clicked point, calls deterministic tools, and draws persistent annotations. The agent is an interface to the tools. It does not produce numbers.

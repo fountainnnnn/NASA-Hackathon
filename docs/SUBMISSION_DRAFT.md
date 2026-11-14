@@ -1,6 +1,6 @@
 # Submission draft (paste-ready, DRAFT)
 
-Form fields in the order shown on the Project tab. Anything marked `TODO(verify)` or `TODO(link)` must be resolved before pasting. Do not paste a claim whose TODO is still open. Deadline: Sun 15 Nov 2026, 23:59 SGT.
+Form fields in the order shown on the Project tab. Anything marked `TODO(verify)` or `TODO(link)` must be resolved before pasting. Do not paste a claim whose TODO is still open. Deadline: Sun 15 Nov 2026, 23:59 SGT. Target: submit Sun 18:00 SGT.
 
 ---
 
@@ -12,35 +12,33 @@ MarsWalk Copilot
 
 ## High-Level Project Summary
 
-(About 150 words. Numbers in brackets point to the reference list directly below.)
+Mars maps cover regions; a crew needs to know if it can reach that ridge and get back on one battery. MarsWalk Copilot answers that for one place, the Jezero Crater region. It shows 3D terrain built from NASA elevation data [1], with optical, thermal and geologic layers on top [1][2][3]. You click a point and ask. An AI copilot runs deterministic route, terrain, geology and rover-photo tools [4] and draws the answer on the terrain, replanning when a constraint changes. The terrain agrees with 708 Perseverance waypoints [5], median offset 1.1 m, mean bias −0.9 m. Rover heights are a different NASA product, so this is a cross-check, not ground truth. The impact: a planner can try different slope, battery and time limits by asking, and every number traces to a tool and a named NASA source. It is a planning aid, not a safety certification.
 
-MarsWalk Copilot is a hyperlocal, layered 3D map of a 30 km patch of Jezero Crater for planning a Marswalk. It combines a 20 m Mars Reconnaissance Orbiter CTX elevation model and 6 m orthomosaic [1], Mars Odyssey THEMIS thermal mosaics [2], the USGS geologic map of Jezero [3], and Perseverance waypoints and raw images [4][5]. Click a point and an AI agent reads its coordinates, calls deterministic tools for slope, geology and routing, and draws the results on the terrain. Routes come from an A* search over slope-limited cells, with a Tobler hiking-speed model [6] and an assumed battery model. Change a limit and the route is recomputed, or the app names the reason none exists. Climb work uses NASA's Mars surface gravity [7]. The challenge asks for a view finer than regional tools [8]. Suit constants are assumptions, not a NASA EVA model, and a 20 m DEM cannot show boulders.
+References
 
-**References for the summary**
-
-1. USGS Astrogeology Science Center / Mars 2020 Terrain Relative Navigation team. CTX DEM 20 m and CTX orthomosaic 6 m, Jezero (`JEZ_ctx_B_soc_008`), distributed by NASA JPL Mars Trek. https://trek.nasa.gov/mars/
-2. NASA Mars Odyssey THEMIS Day IR and Night IR 100 m controlled mosaics, via JPL Mars Trek. https://trek.nasa.gov/mars/
-3. Sun, V.Z. and Stack, K.M., 2020, Geologic map of Jezero crater and the Nili Planum region, Mars: USGS Scientific Investigations Map 3464, scale 1:75,000. https://pubs.usgs.gov/publication/sim3464
+1. USGS Astrogeology / Mars 2020 TRN team, MRO CTX DEM 20 m and orthomosaic 6 m, via JPL Mars Trek. https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0
+2. Mars Odyssey THEMIS Day IR and Night IR 100 m controlled mosaics, via JPL Mars Trek. https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml
+3. Sun, V.Z. and Stack, K.M., 2020, Geologic map of Jezero crater and the Nili Planum region, Mars: USGS SIM 3464. https://pubs.usgs.gov/publication/sim3464
 4. NASA Mars 2020 Perseverance raw images. https://mars.nasa.gov/mars2020/multimedia/raw-images/
-5. NASA MMGIS Perseverance waypoints (`M20_waypoints.json`). TODO(link): exact URL used by scripts/prepare-data.mjs
-6. Tobler, W., 1993, Three presentations on geographical analysis and modeling: NCGIA Technical Report 93-1.
-7. NASA Mars Fact Sheet (surface gravity 3.721 m/s^2). https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
-8. NASA Space Apps 2026, Interplanetary Survival Guide: Martian Map. https://www.spaceappschallenge.org/2026/challenges/interplanetary-survival-guide-martian-map/
+5. NASA MMGIS Perseverance waypoints. https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json
 
 ---
 
 ## Link to Project Demo
 
-Video (30 s or less): TODO(link)
-Slides (7 or fewer), supplementary, mention in the description: TODO(link)
+Video (30 s or less, the official Demo link): TODO(link) video URL
 
 ## Link to Final Project
 
-Live app: TODO(link). Source: TODO(link). Must open in a private window with no login.
+Live app (Railway): TODO(link). Repository: https://github.com/fountainnnnn/NASA-Hackathon
+
+The live app must open in a private window with no login.
 
 ---
 
 ## Detailed Project Description
+
+Slides (7): TODO(link) deck URL. Live app: TODO(link). Code: https://github.com/fountainnnnn/NASA-Hackathon
 
 ### What it does
 
@@ -65,6 +63,9 @@ Algorithms.
 - Routing: 8-connected A*. An edge is allowed only if |grade| <= limit and the maximum slope of the cell entered is <= limit. Objective "shortest" minimises 3D length. Objective "fastest" minimises time using the Tobler hiking function, v = 6 exp(-3.5 |tan(theta) + 0.05|) km/h, multiplied by an assumed suit factor (default 0.6). Round trips solve each leg separately.
 - Resources: battery % = P_suit t / C_batt times 100. Climb work = m g ascent, with g = 3.721 m/s^2. Total EVA time = walking time plus dwell.
 - Feasibility: a path exists AND battery use <= 100 - reserve AND EVA time <= limit. Otherwise the reasons are named.
+- Sources for the methods: Horn (1981) for slope, Hart, Nilsson and Raphael (1968) for A*, Tobler (1993) for walking speed, NASA Mars Fact Sheet for surface gravity. Full citations are under "Space Agency Partner Data and Other References".
+
+Validation. `scripts/prepare-data.mjs` samples the DEM at all 708 Perseverance waypoints inside the patch and compares it with each waypoint's recorded elevation (`data/validation.json`). Median offset 1.1 m (DEM lower), mean bias -0.9 m, standard deviation 3.2 m, 95th percentile 6.4 m, largest 11.7 m. This shows the terrain agrees with another NASA product. It does not make the DEM ground truth.
 
 ### Benefits
 
@@ -99,7 +100,7 @@ AI was used, and we want to be specific about where.
 
 - Idea and approach: chosen by the human participant before coding. The participant's own written brief defined the challenge, the hero use case, the data approach and the architecture. AI tools did not come up with the idea for solving the challenge.
 - Coding: Claude Code (Anthropic) was the coding assistant, with Claude Sonnet sub-agents writing modules to a shared interface file. Code was run, tested and reviewed by the human participant. TODO(verify): extent of human review.
-- Art: the mascot and map-marker art was generated with Codex CLI (OpenAI). Each AI-generated image is marked "AI-generated" inside the app. Listed in `public/art/CREDITS.json`. TODO(verify)
+- Art: the mascot (five states), map markers, favicon and wordmark are AI-authored SVG files written by Codex CLI (OpenAI) from text prompts, 13 files in all. They are marked "AI-generated" in the app's Sources panel and listed with tool, prompt and review status in `public/art/CREDITS.json`. TODO(verify): the mark in the Sources panel.
 - Runtime: the app contains an LLM agent (Claude Haiku 5.5 via OpenRouter, fallback GPT-6 Luna). It chooses tools and writes explanations. Distances, slopes, times and coordinates come only from deterministic tools.
 - Docs: drafted with AI assistance and checked by the participant. TODO(verify)
 - NASA imagery and data are never labelled as AI output. No AI media imitates NASA logos or mission marks.
@@ -110,18 +111,21 @@ Full detail: docs/AI_USE.md.
 
 ## NASA Data
 
-| Dataset | Link | Use |
-| --- | --- | --- |
-| MRO CTX DEM, 20 m, `JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0` (USGS Astrogeology for Mars 2020 TRN, via JPL Mars Trek) | https://trek.nasa.gov/mars/ | Terrain mesh, slope, routing, elevation at picked points |
-| MRO CTX orthomosaic, 6 m, `JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0` | https://trek.nasa.gov/mars/ | Optical terrain texture |
-| Mars Odyssey THEMIS Day IR and Night IR, 100 m controlled mosaics (Mars Trek WMTS) | https://trek.nasa.gov/mars/ | Thermal layers (relative brightness) |
-| USGS SIM 3464 geologic map of Jezero, 1:75,000 (USGS-NASA Planetary Geologic Mapping Program) | https://pubs.usgs.gov/publication/sim3464 ; https://astrogeology-usgs.hub.arcgis.com/pages/interactive-maps-mars | Geology layer and "what is here" answers |
-| Perseverance raw images | https://mars.nasa.gov/mars2020/multimedia/raw-images/ | Rover point-of-view photos near a point |
-| Perseverance waypoints (NASA MMGIS `M20_waypoints.json`) | TODO(link) | Traverse overlay, DEM validation, sol-to-place mapping |
-| Perseverance traverse path and IAU nomenclature via Mars Trek | https://trek.nasa.gov/mars/ | Traverse overlay, place names |
-| NASA Mars Fact Sheet | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html | Surface gravity 3.721 m/s^2 for climb work |
+The Resources tab column says whether the challenge page lists the source.
 
-All of the first five items are on the challenge's Resources tab. Challenge resources also listed (not used as data): Curiosity proposed path, NASA Worldview.
+| Dataset | Mission and instrument | Exact product | What it lets the astronaut decide | Resources tab |
+| --- | --- | --- | --- | --- |
+| CTX DEM, 20 m | Mars Reconnaissance Orbiter, Context Camera stereo terrain model | https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0 | Whether a slope can be walked, how much climbing a route needs, the elevation of any picked point | Yes, Mars Trek |
+| CTX orthomosaic, 6 m | Mars Reconnaissance Orbiter, Context Camera | https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0 | What the ground looks like at a candidate stop: ridge, scarp, dunes, crater rim | Yes, Mars Trek |
+| THEMIS Day IR, 100 m | Mars Odyssey, THEMIS | https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml | Daytime thermal context for the area, as relative brightness | Yes, Mars Trek |
+| THEMIS Night IR, 100 m | Mars Odyssey, THEMIS | https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml | Which ground holds heat after dark, a qualitative cue for rocky versus dusty surfaces | Yes, Mars Trek |
+| Geologic map of Jezero, 1:75,000 (SIM 3464) | USGS-NASA Planetary Geologic Mapping Program, map compiled on MRO imagery | https://pubs.usgs.gov/publication/sim3464 and the map's feature services https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/2 and .../FeatureServer/8 | What rock unit is at a point and which stops are worth the walk | Yes, USGS-NASA Planetary Geologic Mapping |
+| Perseverance waypoints | Mars 2020, rover localisation (NASA MMGIS) | https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json | Where the rover has driven, so which ground is known to be passable, and the 708-point check of the terrain | No, found through NASA MMGIS |
+| Perseverance traverse path | Mars 2020, via Mars Trek | https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=Perseverance_Traverse_Path | The rover's continuous drive line drawn on the terrain | Yes, Mars Trek |
+| Perseverance raw images | Mars 2020, rover cameras | API https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&sol=N ; gallery https://mars.nasa.gov/mars2020/multimedia/raw-images/ | What a place looks like from the ground, with sol and camera | Yes, Perseverance raw images |
+| Mars Fact Sheet | NASA NSSDC | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html | Climb work on Mars, using surface gravity 3.721 m/s^2 | No |
+
+The Resources tab also lists the Curiosity proposed path and NASA Worldview. Neither is used as data.
 
 ---
 
@@ -172,6 +176,6 @@ Other dev tooling (TypeScript, ESLint, tsx, type packages): TODO(verify) licence
 ## Pre-paste checks
 
 - [ ] No TODO remains in the text above.
-- [ ] Summary is 120 to 180 words, citations [1] to [8] resolve.
+- [ ] Summary is 130 to 170 words, citations [1] to [5] resolve.
 - [ ] Every number in the description matches the app and docs/SCIENCE_AND_VALIDATION.md.
 - [ ] Participant name and team name filled in the demo.
