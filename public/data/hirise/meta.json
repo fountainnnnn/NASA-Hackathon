@@ -1,0 +1,26 @@
+{
+ "productLabel": "JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd",
+ "title": "MRO HiRISE, Jezero Mosaic, Controlled",
+ "credit": "NASA/JPL-Caltech/University of Arizona/USGS (MRO HiRISE via JPL Mars Trek)",
+ "source": "https://trek.nasa.gov/tiles/Mars/EQ/JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd/1.0.0/default/default028mm/15/{row}/{col}.png (WMTS level 15, EPSG 104905)",
+ "file": "jezero_base.jpg",
+ "mask": "mask.png",
+ "maskDiv": 8,
+ "width": 5120,
+ "height": 4096,
+ "lonMin": 77.36387729644775,
+ "lonMax": 77.47374057769775,
+ "latMin": 18.397057056427002,
+ "latMax": 18.484947681427002,
+ "metresPerPixel": {
+  "northSouth": 1.272,
+  "eastWest": 1.207
+ },
+ "validFraction": 1,
+ "radiometry": {
+  "gain": 0.77022,
+  "offset": 56.169,
+  "note": "linear map matching mean and standard deviation to the CTX 6 m mosaic over this window"
+ },
+ "note": "Native WMTS level-15 posting of the 25 cm controlled mosaic, stitched and cropped on pixel boundaries. uv linear in lon/lat, v = 0 at the north edge."
+}
