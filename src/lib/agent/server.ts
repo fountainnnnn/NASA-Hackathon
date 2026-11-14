@@ -61,10 +61,33 @@ function takeDaily(now: number): boolean {
   return true;
 }
 
+/** Client IP from the hosting proxy, never from client-controlled left-most XFF entries.
+ *  Railway's edge sets X-Real-IP; otherwise use the RIGHT-most XFF hop (appended by our own proxy). */
 function clientIp(req: Request): string {
+  const real = req.headers.get('x-real-ip')?.trim();
+  if (real) return real;
   const xff = req.headers.get('x-forwarded-for');
-  if (xff) return xff.split(',')[0].trim() || 'unknown';
-  return req.headers.get('x-real-ip') ?? 'unknown';
+  if (xff) {
+    const hops = xff.split(',').map((h) => h.trim()).filter(Boolean);
+    if (hops.length) return hops[hops.length - 1];
+  }
+  return 'unknown';
+}
+
+/** Read the body as a stream, aborting as soon as it exceeds `limit` bytes. Returns null when too large. */
+async function readBodyCapped(req: Request, limit: number): Promise<string | null> {
+  if (!req.body) return '';
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) { await reader.cancel().catch(() => {}); return null; }
+    chunks.push(value);
+  }
+  return Buffer.concat(chunks.map((c) => Buffer.from(c))).toString('utf8');
 }
 
 const json = (body: unknown, status = 200) =>
@@ -110,8 +133,8 @@ export async function handleAgentPost(req: Request): Promise<Response> {
 
   const declared = Number(req.headers.get('content-length') ?? 0);
   if (declared > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
-  const raw = await req.text();
-  if (Buffer.byteLength(raw, 'utf8') > MAX_BODY_BYTES) return json({ error: 'payload_too_large' }, 413);
+  const raw = await readBodyCapped(req, MAX_BODY_BYTES);
+  if (raw === null) return json({ error: 'payload_too_large' }, 413);
 
   let parsedJson: unknown;
   try {
