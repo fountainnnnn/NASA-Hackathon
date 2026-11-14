@@ -31,7 +31,7 @@ describe('schemas', () => {
 
 describe('TOOL_SPECS', () => {
   it('is valid OpenAI function format', () => {
-    expect(TOOL_SPECS.length).toBe(13);
+    expect(TOOL_SPECS.length).toBe(20);
     const names = new Set<string>();
     for (const t of TOOL_SPECS) {
       expect(t.type).toBe('function');

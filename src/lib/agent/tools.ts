@@ -7,6 +7,9 @@ import { G_MARS } from '../contracts';
 import type {
   LonLat, MissionConstraints, Provenance, RouteResult, SceneCommand, ToolDeps, WorldPoint, WorldSnapshot,
 } from '../contracts';
+import type { GlobeCommand, LandingScenarioRequest } from '../globeContracts';
+import { JEZERO_BBOX } from '../globalSci';
+import { hasScenarioSource, putScenario, registerScenarioSources, runLandingScenario } from '../scenario';
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -82,6 +85,90 @@ const PlanMultiSchema = z.object({
   roundTrip: z.boolean().default(true),
   label: z.string().max(60).optional(),
 });
+
+
+/* ------------------------------------------------------------------ globe schemas + helpers */
+
+const GlobalLayerSchema = z.enum(['elevation', 'geology', 'hydrogen', 'thermalInertia', 'dust', 'slope']);
+
+/** Mirrors the GlobeCommand union in globeContracts.ts exactly (the allowlist for globe_commands). */
+export const GlobeCommandSchema: z.ZodType<GlobeCommand> = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('globe_fly_to'), lon: lonS, lat: latS, altitudeKm: z.number().positive().max(20000).optional() }),
+  z.object({
+    type: z.literal('globe_marker'), id: z.string().max(64).optional(), lon: lonS, lat: latS,
+    label: z.string().min(1).max(80), kind: z.enum(['click', 'site', 'landing', 'hazard']),
+  }),
+  z.object({
+    type: z.literal('globe_ellipse'), id: z.string().max(64).optional(), lon: lonS, lat: latS,
+    semiMajorKm: z.number().positive().max(2000), semiMinorKm: z.number().positive().max(2000),
+    azimuthDeg: z.number().min(-360).max(360), label: z.string().min(1).max(80), tone: z.enum(['ok', 'warn', 'bad']),
+  }),
+  z.object({ type: z.literal('globe_scatter'), id: z.string().max(64).optional(), scenarioId: z.string().max(32) }),
+  z.object({ type: z.literal('globe_arc'), id: z.string().max(64).optional(), from: LonLatSchema, to: LonLatSchema, label: z.string().min(1).max(80) }),
+  z.object({ type: z.literal('globe_layer'), layer: GlobalLayerSchema, visible: z.boolean() }),
+  z.object({ type: z.literal('globe_clear') }),
+  z.object({ type: z.literal('enter_jezero') }),
+  z.object({ type: z.literal('exit_jezero') }),
+]);
+
+const EllipseOverrideSchema = z.object({
+  semiMajorKm: z.number().positive().max(500), semiMinorKm: z.number().positive().max(500), azimuthDeg: z.number().min(-360).max(360).default(0),
+});
+
+function needGlobal(deps: ToolDeps) {
+  if (!deps.globalSci || !deps.globalSci.loaded) {
+    throw new ToolError('global_data_unavailable', 'The global Mars dataset is not loaded. No verified data available.');
+  }
+  return deps.globalSci;
+}
+function applyGlobe(deps: ToolDeps, cmds: GlobeCommand[]): { applied: number; errors: string[] } | null {
+  return deps.globe ? deps.globe.applyGlobeCommands(cmds) : null;
+}
+const fmtLL = (lon: number, lat: number) => `${Math.abs(lat).toFixed(2)}${lat >= 0 ? 'N' : 'S'} ${Math.abs(lon).toFixed(2)}${lon >= 0 ? 'E' : 'W'}`;
+const rv = (x: number | null, f: (n: number) => number) => (x == null || Number.isNaN(x) ? null : f(x));
+const sig3 = (x: number) => (x === 0 ? 0 : Number(x.toPrecision(3)));
+
+function conditionsBrief(c: import('../globeContracts').SiteConditions, deps: ToolDeps) {
+  const m = deps.globalSci?.manifest();
+  return {
+    point: { lon: rc(c.point.lon), lat: rc(c.point.lat) },
+    placeName: c.placeName,
+    elevationM: rv(c.elevationM, r0),
+    elevationNote: 'metres above the Mars areoid (MOLA)',
+    slopeDeg: rv(c.slopeDeg, r1),
+    slopeNote: 'Regional slope from the coarse global DEM; it says nothing about boulders or rover-scale terrain.',
+    geology: c.geology ? { symbol: c.geology.symbol, name: c.geology.name, description: clip(c.geology.description, 240), source: c.geology.source } : null,
+    layers: c.layers.map((l) => ({ id: l.id, label: l.label, value: rv(l.value, sig3), unit: l.unit, source: l.source })),
+    nearestSites: c.nearestSites.slice(0, 3).map((s) => ({ name: s.name, kind: s.kind, distanceKm: r0(s.distanceKm), bearingDeg: r0(s.bearingDeg) })),
+    insideJezeroHighRes: c.insideJezeroHighRes,
+    notes: c.notes.slice(0, 6),
+    provenance: {
+      elevation: c.elevationM == null ? prov('unavailable', m?.dem.title ?? 'MOLA global DEM') : prov('observed', m?.dem.title ?? 'MOLA global DEM'),
+      slope: c.slopeDeg == null ? prov('unavailable', 'global DEM') : prov('computed', `Horn slope on ${m?.dem.title ?? 'global DEM'} (~${m?.dem.resKm ?? '?'} km posting)`),
+      geology: c.geology ? prov('observed', c.geology.source) : prov('unavailable', 'global geologic map'),
+    },
+  };
+}
+
+function checkBrief(chk: import('../globalSci').LandingCheckResult) {
+  return {
+    site: { lon: rc(chk.site.lon), lat: rc(chk.site.lat) },
+    verdict: chk.verdict,
+    criteria: chk.criteria.map((c) => ({
+      id: c.id, label: c.label, value: rv(c.value, (v) => Math.round(v * 100) / 100), unit: c.unit, limit: c.limit,
+      result: c.pass === null ? 'no data' : c.pass ? 'pass' : 'fail', sourceTitle: c.source.title, sourceUrl: c.source.url,
+    })),
+    ellipse: {
+      semiMajorKm: chk.ellipse.semiMajorKm, semiMinorKm: chk.ellipse.semiMinorKm, azimuthDeg: chk.ellipse.azimuthDeg,
+      sourceTitle: chk.ellipse.source.title, sourceUrl: chk.ellipse.source.url,
+    },
+    notes: chk.notes.slice(0, 5),
+    caveat: chk.criteriaCaveat,
+    provenance: prov('assumption', 'NASA/JPL MSL (Curiosity) landing-site engineering constraints used as a reference, not final Mars 2020 requirements'),
+  };
+}
+
+const toneOf = (v: string): 'ok' | 'warn' | 'bad' => (v === 'meets-all' ? 'ok' : v === 'fails-some' ? 'bad' : 'warn');
 
 /* ------------------------------------------------------------------ point resolution */
 
@@ -505,6 +592,191 @@ export const TOOLS: ToolDef[] = [
       res && res.geojson
         ? { ok: true, download: true, filename: res.filename, featureCount: res.geojson.features.length, note: 'Plan file is ready for download in the UI.' }
         : res,
+  }),
+
+  /* ---------------------------------------------------------------- globe tools (whole-planet) */
+
+  defineTool({
+    name: 'get_site_conditions',
+    description: 'Conditions at ANY point on Mars from the global dataset: elevation, regional slope, geologic unit, orbital layers (hydrogen, thermal inertia, dust), nearest landing sites and named places. Marks the point on the globe. No live weather or radiation exists in this dataset.',
+    schema: z.object({ lon: lonS, lat: latS }),
+    run: ({ lon, lat }, deps) => {
+      const g = needGlobal(deps);
+      const c = g.conditionsAt(lon, lat);
+      const globe = applyGlobe(deps, [{ type: 'globe_marker', id: 'probe', lon: c.point.lon, lat: c.point.lat, label: c.placeName ?? fmtLL(c.point.lon, c.point.lat), kind: 'click' }]);
+      return { ...conditionsBrief(c, deps), globe };
+    },
+  }),
+
+  defineTool({
+    name: 'check_landing_site',
+    description: 'Check a point against cited landing-site engineering criteria (latitude, elevation, 2-5 km slope, thermal inertia) using the global data. Returns pass/fail/no-data per criterion with source links and a verdict. Marks the site and draws the Mars 2020 sized ellipse. Follow with run_landing_scenario to offer the touchdown simulation.',
+    schema: z.object({ lon: lonS, lat: latS }),
+    run: ({ lon, lat }, deps) => {
+      const g = needGlobal(deps);
+      const chk = g.checkLandingSite(lon, lat);
+      const cmds: GlobeCommand[] = [
+        { type: 'globe_marker', id: 'landing-marker', lon: chk.site.lon, lat: chk.site.lat, label: `Landing check: ${chk.verdict}`, kind: 'landing' },
+      ];
+      if (Number.isFinite(chk.ellipse.semiMajorKm)) {
+        cmds.push({
+          type: 'globe_ellipse', id: 'landing-ellipse', lon: chk.site.lon, lat: chk.site.lat, semiMajorKm: chk.ellipse.semiMajorKm,
+          semiMinorKm: chk.ellipse.semiMinorKm, azimuthDeg: chk.ellipse.azimuthDeg, label: `Ellipse ${chk.ellipse.semiMajorKm * 2} x ${chk.ellipse.semiMinorKm * 2} km`, tone: toneOf(chk.verdict),
+        });
+      }
+      cmds.push({ type: 'globe_fly_to', lon: chk.site.lon, lat: chk.site.lat });
+      return { ...checkBrief(chk), globe: applyGlobe(deps, cmds) };
+    },
+  }),
+
+  defineTool({
+    name: 'run_landing_scenario',
+    description: 'Monte-Carlo touchdown simulation: draws random landing points inside the ellipse (default Mars 2020 size 7.7 x 6.6 km), measures the slope at each from the terrain model (20 m inside Jezero, coarse global DEM elsewhere) and reports the fraction at or below maxSlopeDeg, slope percentiles and the no-data fraction. Draws the scatter and ellipse on the globe. maxSlopeDeg is an assumption the user sets (5-30), not a NASA requirement.',
+    schema: z.object({
+      lon: lonS, lat: latS,
+      samples: z.number().int().min(100).max(20000).default(10000),
+      maxSlopeDeg: z.number().min(5).max(30).default(15),
+      ellipse: EllipseOverrideSchema.optional().describe('override the default ellipse (semi-axes in km, major-axis azimuth in degrees clockwise from north)'),
+      seed: z.number().int().min(0).max(2 ** 31).optional(),
+    }),
+    run: async (a, deps) => {
+      const g = needGlobal(deps);
+      const def = g.defaultEllipse();
+      const ell = a.ellipse ?? (def ? { semiMajorKm: def.semiMajorKm, semiMinorKm: def.semiMinorKm, azimuthDeg: def.azimuthDeg } : null);
+      if (!ell) throw new ToolError('no_ellipse', 'No default ellipse is loaded; pass an ellipse override.');
+      registerScenarioSources({ global: g.slopeSource() });
+      const insideJez = a.lon >= JEZERO_BBOX[0] && a.lon <= JEZERO_BBOX[2] && a.lat >= JEZERO_BBOX[1] && a.lat <= JEZERO_BBOX[3];
+      const dem: LandingScenarioRequest['dem'] = insideJez && hasScenarioSource('jezero20m') ? 'jezero20m' : 'global';
+      const req: LandingScenarioRequest = {
+        center: { lon: a.lon, lat: a.lat }, semiMajorKm: ell.semiMajorKm, semiMinorKm: ell.semiMinorKm, azimuthDeg: ell.azimuthDeg,
+        samples: a.samples, maxSlopeDeg: a.maxSlopeDeg, seed: a.seed ?? 2026, dem,
+      };
+      const res = await runLandingScenario(req);
+      const rec = putScenario(req, res);
+      const tone = res.okFraction >= 0.95 ? 'ok' : res.okFraction >= 0.8 ? 'warn' : 'bad';
+      const pct = (x: number) => Math.round(x * 1000) / 10;
+      const globe = applyGlobe(deps, [
+        { type: 'globe_ellipse', id: 'landing-ellipse', lon: a.lon, lat: a.lat, semiMajorKm: ell.semiMajorKm, semiMinorKm: ell.semiMinorKm, azimuthDeg: ell.azimuthDeg, label: `${pct(res.okFraction)}% within ${a.maxSlopeDeg} deg`, tone },
+        { type: 'globe_scatter', id: 'landing-scatter', scenarioId: rec.id },
+        { type: 'globe_fly_to', lon: a.lon, lat: a.lat, altitudeKm: Math.min(2000, Math.max(50, ell.semiMajorKm * 8)) },
+      ]);
+      const m = deps.globalSci?.manifest();
+      return {
+        scenarioId: rec.id,
+        center: { lon: rc(a.lon), lat: rc(a.lat) },
+        samples: res.samples,
+        maxSlopeDeg: a.maxSlopeDeg,
+        okPercent: pct(res.okFraction),
+        slopeP50Deg: rv(res.slopeP50, r1), slopeP95Deg: rv(res.slopeP95, r1),
+        nodataPercent: pct(res.nodataFraction),
+        ellipse: { ...ell, usedDefault: !a.ellipse },
+        terrainModel: dem === 'jezero20m' ? `Jezero CTX DEM, ${res.demResM} m posting` : `global DEM, ~${m?.dem.resKm ?? '?'} km posting`,
+        engine: res.engine, computeMs: r0(res.computeMs), seed: req.seed,
+        note: dem === 'global'
+          ? 'Coarse global DEM: slopes are averaged over kilometres and miss boulders and small craters, so this is an optimistic regional view. Pick a site inside Jezero for 20 m terrain.'
+          : '20 m DEM: boulders and sub-20 m slopes are not resolved.',
+        method: 'Truncated 2-D Gaussian touchdown dispersion, 3 sigma = ellipse semi-axes; slope limit is the user assumption.',
+        globe,
+        provenance: { stats: prov('computed', `Monte-Carlo (${res.engine}) on ${dem === 'jezero20m' ? 'MRO CTX DEM via JPL Mars Trek' : m?.dem.title ?? 'global DEM'}`), slopeLimit: prov('assumption', 'set by the user, not a NASA requirement') },
+      };
+    },
+  }),
+
+  defineTool({
+    name: 'show_edl_timeline',
+    description: 'Mars 2020 entry-descent-landing timeline from NASA press-kit numbers (phases, times after entry, altitudes), plus a schematic approach track and a marker at the chosen site. Times are for the Perseverance EDL, not a prediction for another site.',
+    schema: z.object({ lon: lonS, lat: latS }),
+    run: ({ lon, lat }, deps) => {
+      const g = needGlobal(deps);
+      const phases = g.edlPhases();
+      if (!phases.length) throw new ToolError('no_edl', 'No verified data available (EDL timeline not loaded).');
+      // Schematic approach track: 40 km long, from the west. NASA's pages give no ground track, so it is illustrative.
+      const dLon = 40 / ((Math.PI / 180) * 3396.19 * Math.max(Math.cos((lat * Math.PI) / 180), 0.05));
+      const from = { lon: Math.max(-180, lon - dLon), lat };
+      const globe = applyGlobe(deps, [
+        { type: 'globe_arc', id: 'edl-track', from, to: { lon, lat }, label: 'EDL approach (schematic)' },
+        { type: 'globe_marker', id: 'edl-touchdown', lon, lat, label: 'Touchdown', kind: 'landing' },
+        { type: 'globe_fly_to', lon, lat, altitudeKm: 400 },
+      ]);
+      return {
+        site: { lon: rc(lon), lat: rc(lat) },
+        timeOrigin: 'entry interface = 0 s',
+        phases: phases.map((p) => ({
+          id: p.id, label: p.label, tStartS: p.tStartS, tEndS: p.tEndS, altitudeKmStart: p.altitudeKmStart ?? null,
+          altitudeKmEnd: p.altitudeKmEnd ?? null, note: p.note ? clip(p.note, 260) : undefined, sourceTitle: p.source.title, sourceUrl: p.source.url,
+        })),
+        trackNote: 'The approach line is schematic (direction and length are illustrative; NASA text gives no ground track).',
+        globe,
+        provenance: prov('observed', 'NASA/JPL Mars 2020 Perseverance press kits (planned values; landing time varies by about a minute)'),
+      };
+    },
+  }),
+
+  defineTool({
+    name: 'compare_sites',
+    description: 'Compare two points on Mars: elevation, regional slope, geologic unit, orbital layers, landing-criteria verdict and which criteria fail. Marks both and draws a link.',
+    schema: z.object({ a: LonLatSchema, b: LonLatSchema }),
+    run: ({ a, b }, deps) => {
+      const g = needGlobal(deps);
+      const side = (p: LonLat) => {
+        const c = g.conditionsAt(p.lon, p.lat);
+        const chk = g.checkLandingSite(p.lon, p.lat);
+        return {
+          point: { lon: rc(c.point.lon), lat: rc(c.point.lat) }, placeName: c.placeName, elevationM: rv(c.elevationM, r0), slopeDeg: rv(c.slopeDeg, r1),
+          geology: c.geology ? `${c.geology.name} (${c.geology.symbol})` : null,
+          layers: c.layers.map((l) => ({ id: l.id, value: rv(l.value, sig3), unit: l.unit })),
+          verdict: chk.verdict, failing: chk.criteria.filter((x) => x.pass === false).map((x) => x.id), noData: chk.criteria.filter((x) => x.pass === null).map((x) => x.id),
+        };
+      };
+      const A = side(a), B = side(b);
+      const gcKm = (() => {
+        const D = Math.PI / 180;
+        const x = Math.sin(((b.lat - a.lat) * D) / 2) ** 2 + Math.cos(a.lat * D) * Math.cos(b.lat * D) * Math.sin(((b.lon - a.lon) * D) / 2) ** 2;
+        return 2 * 3396.19 * Math.asin(Math.min(1, Math.sqrt(x)));
+      })();
+      const globe = applyGlobe(deps, [
+        { type: 'globe_marker', id: 'cmp-a', lon: a.lon, lat: a.lat, label: `A ${A.placeName ?? fmtLL(a.lon, a.lat)}`, kind: 'site' },
+        { type: 'globe_marker', id: 'cmp-b', lon: b.lon, lat: b.lat, label: `B ${B.placeName ?? fmtLL(b.lon, b.lat)}`, kind: 'site' },
+        { type: 'globe_arc', id: 'cmp-arc', from: a, to: b, label: `${r0(gcKm)} km` },
+      ]);
+      return {
+        a: A, b: B,
+        distanceKm: r0(gcKm),
+        deltas: {
+          elevationM: A.elevationM != null && B.elevationM != null ? B.elevationM - A.elevationM : null,
+          slopeDeg: A.slopeDeg != null && B.slopeDeg != null ? r1(B.slopeDeg - A.slopeDeg) : null,
+        },
+        note: 'Deltas are B minus A. Slopes come from the coarse global DEM.',
+        globe,
+        provenance: prov('computed', 'global dataset (MOLA elevation, geologic map, orbital layers) and cited landing criteria'),
+      };
+    },
+  }),
+
+  defineTool({
+    name: 'globe_commands',
+    description: 'Draw on the 3D globe. Allowed: globe_fly_to, globe_marker, globe_ellipse, globe_scatter, globe_arc, globe_layer, globe_clear, enter_jezero, exit_jezero.',
+    schema: z.object({ commands: z.array(GlobeCommandSchema).min(1).max(12) }),
+    run: ({ commands }, deps) => {
+      if (!deps.globe) throw new ToolError('no_globe', 'The globe is not available in this view.');
+      const r = deps.globe.applyGlobeCommands(commands);
+      return { applied: r.applied, errors: r.errors, provenance: prov('computed', 'globe command allowlist') };
+    },
+  }),
+
+  defineTool({
+    name: 'go_to_jezero',
+    description: 'Switch from the globe to the 20 m Jezero terrain, where the walking-route tools work.',
+    schema: NO_ARGS,
+    run: (_a, deps) => {
+      if (!deps.globe) throw new ToolError('no_globe', 'The globe is not available in this view.');
+      const r = deps.globe.applyGlobeCommands([{ type: 'enter_jezero' }]);
+      return {
+        applied: r.applied, errors: r.errors, mode: deps.globe.snapshot().mode,
+        note: 'In Jezero mode use get_location_context, plan_route and the other walk tools.',
+        provenance: prov('computed', 'app state'),
+      };
+    },
   }),
 ];
 

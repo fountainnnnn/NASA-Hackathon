@@ -269,7 +269,12 @@ export interface WorldSnapshot {
 }
 
 /** lib/agent — owned by agent-loop agent. UI calls ONLY these two functions. */
-export interface ToolDeps { world: WorldFacade; terrain: TerrainApi; science: ScienceApi }
+export interface ToolDeps {
+  world: WorldFacade; terrain: TerrainApi; science: ScienceApi;
+  /** Globe revamp (optional so Jezero-only callers and old tests keep working). */
+  globe?: import('./globalSci/types').GlobeFacade;
+  globalSci?: import('./globalSci/types').GlobalScienceApi;
+}
 export interface TraceStep { id: string; tool: string; label: string; status: 'running' | 'done' | 'error'; ms?: number; summary?: string }
 export interface ChatMessage { role: 'user' | 'assistant' | 'tool'; content: string; tool_calls?: { id: string; type: 'function'; function: { name: string; arguments: string } }[]; tool_call_id?: string; name?: string }
 export interface AgentApi {
@@ -278,4 +283,20 @@ export interface AgentApi {
     Promise<{ text: string; history: ChatMessage[]; trace: TraceStep[]; unverifiedNumbers: string[]; offline: boolean; error?: string }>;
   /** Deterministic path used by HUD buttons (same executors the LLM uses). Returns the tool's JSON result. */
   executeTool(name: string, args: unknown, deps: ToolDeps): Promise<unknown>;
+}
+
+/* ---------------------------------------------------------------- regional context terrain (apron) */
+
+/** public/data/context_meta.json — written by scripts/prepare-context.mjs. Same grid conventions as DemMeta
+ *  (Int16 LE in `file`, outer edges, row 0 = north); ~463 m MOLA posting around the 20 m CTX DEM patch. */
+export interface ContextMeta extends DemMeta {
+  imageFile: string;             // "context.jpg": CTX global mosaic cropped exactly to this grid's outer edges
+  imageWidth: number; imageHeight: number;
+  imageSourceUrl: string;
+  /** Linear-light gain that matches the context image brightness to the 6 m CTX mosaic over the overlap. */
+  imageGainToPatch: number;
+  /** CTX DEM minus MOLA over the overlap (metres), computed by the prep script. */
+  datumCheck: Record<string, unknown>;
+  imageRegistration: Record<string, unknown>;
+  credit: string;
 }

@@ -1,0 +1,149 @@
+{
+  "version": 1,
+  "retrieved": "2026-11-14",
+  "caveat": "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
+  "guide": {
+    "title": "MSL Landing Site Selection Users Guide to Engineering Constraints (JPL, Apr 2006)",
+    "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+  },
+  "ellipse": {
+    "semiMajorKm": 3.85,
+    "semiMinorKm": 3.3,
+    "azimuthDeg": 0,
+    "azimuthNote": "ASSUMPTION: the cited NASA pages give the ellipse size (7.7 km by 6.6 km, i.e. full axes) but not its orientation; 0 deg (major axis north-south) is an arbitrary default and can be overridden.",
+    "source": {
+      "title": "NASA Science: Perseverance Rover Landing Ellipse in Jezero Crater (4.8 by 4.1 miles, 7.7 by 6.6 km)",
+      "url": "https://science.nasa.gov/resource/perseverance-rover-landing-ellipse-in-jezero-crater/"
+    },
+    "quote": "The landing ellipse, measuring 4.8 miles by 4.1 miles (7.7 kilometers by 6.6 kilometers)"
+  },
+  "verdictRule": "meets-all = every criterion with required=true is evaluated and passes; fails-some = any evaluated criterion fails; otherwise insufficient-data. Criteria with required=false need rover-scale data the global dataset does not have and are listed with no verdict.",
+  "criteria": [
+    {
+      "id": "latitude",
+      "label": "Latitude band",
+      "kind": "latitude",
+      "op": "abs<=",
+      "limit": 60,
+      "unit": "deg",
+      "required": true,
+      "limitText": "|latitude| <= 60 deg",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.2 Latitude",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "MSL EDL is designed to land at any latitude between 60N and 60S."
+      }
+    },
+    {
+      "id": "elevation",
+      "label": "Landing-site elevation (MOLA areoid)",
+      "kind": "elevation",
+      "op": "<=",
+      "limit": 2000,
+      "unit": "m",
+      "required": true,
+      "limitText": "elevation <= +2000 m above the MOLA areoid",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.3 Altitude",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "allowing the landing site altitude to be as high as +2 km with respect to the MOLA-defined areoid."
+      }
+    },
+    {
+      "id": "slope-2-5km",
+      "label": "Regional slope (2-5 km length scale)",
+      "kind": "slope-global",
+      "op": "<=",
+      "limit": 3,
+      "unit": "deg",
+      "baselineKmRange": [2, 5],
+      "required": true,
+      "limitText": "slope <= 3 deg over a 2-5 km length scale",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "three degrees or less over a 2 to 5 km length scale to avoid altimetry errors in the start of powered descent"
+      }
+    },
+    {
+      "id": "thermal-inertia",
+      "label": "Thermal inertia (not dust-dominated)",
+      "kind": "layer",
+      "layerId": "thermalInertia",
+      "op": ">",
+      "limit": 100,
+      "unit": "J m-2 s-0.5 K-1",
+      "required": true,
+      "limitText": "thermal inertia > 100 J m-2 s-0.5 K-1",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 3.3 Table 2 (Load bearing surface)",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "Load bearing surface | Not dominated by dust | Thermal inertia >100 J m-2 s-0.5 K-1 and albedo <0.25"
+      }
+    },
+    {
+      "id": "slope-200-500m",
+      "label": "Slope at 200-500 m length scale",
+      "kind": "unassessable",
+      "op": "<=",
+      "limit": 5,
+      "unit": "deg",
+      "required": false,
+      "limitText": "slope <= 5 deg over a 200-500 m length scale",
+      "unassessableReason": "needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "five degrees or less over a 200 to 500 m length scale to avoid altimetry errors in preparation for the sky-crane landing maneuver"
+      }
+    },
+    {
+      "id": "slope-20-40m",
+      "label": "Slope at 20-40 m length scale",
+      "kind": "unassessable",
+      "op": "<=",
+      "limit": 15,
+      "unit": "deg",
+      "required": false,
+      "limitText": "slope <= 15 deg over a 20-40 m length scale",
+      "unassessableReason": "needs metre-scale topography; only available inside Jezero (20 m CTX DEM)",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "fifteen degrees or less over a 20 to 40 m length scale to avoid altimetry errors in preparation for rover release"
+      }
+    },
+    {
+      "id": "slope-5m",
+      "label": "Slope at 5 m length scale",
+      "kind": "unassessable",
+      "op": "<=",
+      "limit": 15,
+      "unit": "deg",
+      "required": false,
+      "limitText": "slope <= 15 deg over a 5 m length scale",
+      "unassessableReason": "needs HiRISE-class stereo or photoclinometry",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "fifteen degrees or less over a 5 m length scale to ensure landing stability and trafficability of the rover"
+      }
+    },
+    {
+      "id": "rock-abundance",
+      "label": "Rock abundance (damaging rocks under the rover)",
+      "kind": "unassessable",
+      "op": "~<=",
+      "limit": 10,
+      "unit": "% area",
+      "required": false,
+      "limitText": "rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)",
+      "unassessableReason": "needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset",
+      "source": {
+        "title": "MSL Landing Site Selection Users Guide, section 1.6 Rocks",
+        "url": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "quote": "this translates to a rock abundance (cumulative area covered by rocks) of around 10%."
+      }
+    }
+  ]
+}

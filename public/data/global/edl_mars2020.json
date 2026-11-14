@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "retrieved": "2026-11-14",
+  "timeOrigin": "entry interface (top of the Martian atmosphere) = 0 s",
+  "caveat": "Only numbers stated on the cited NASA pages are used. Times that NASA states relative to another event are added up and marked 'derived'. NASA publishes altitude triggers (not clock times) for terrain-relative navigation and the sky crane, so those phases carry the nearest sourced time bound and say so in the note. Planned values from the 2020 press kits (EDL varies by about a minute).",
+  "phases": [
+    {
+      "id": "cruise_stage_separation",
+      "label": "Cruise stage separation",
+      "tStartS": -600,
+      "tEndS": -600,
+      "note": "About 10 minutes before entry the cruise stage is shed. Time derived from 'about 10 minutes before entry'.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "entry_interface",
+      "label": "Entry interface and guided entry",
+      "tStartS": 0,
+      "tEndS": 75,
+      "note": "Reaches the top of the Martian atmosphere at about 19,500 kph (12,100 mph). Small thrusters on the aeroshell adjust lift for guided entry. Ends at peak heating.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "peak_heating",
+      "label": "Peak heating",
+      "tStartS": 75,
+      "tEndS": 240,
+      "note": "Peak heating about 75 s after entry; heat shield surface reaches about 1,300 C (2,370 F). The vehicle then decelerates until the parachute deploys.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "parachute_deploy",
+      "label": "Parachute deploy (Range Trigger)",
+      "tStartS": 240,
+      "tEndS": 260,
+      "altitudeKmStart": 11,
+      "note": "About 240 s after entry at about 11 km altitude and about 1,512 kph (940 mph). 21.5 m (70.5 ft) parachute. End time derived: heat shield separates 20 s after deployment.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "heat_shield_separation",
+      "label": "Heat shield separation",
+      "tStartS": 260,
+      "tEndS": 260,
+      "note": "20 s after parachute deployment (derived: 240 + 20). Reveals the radar and the cameras. Radar is active from here to touchdown, about 7 to 8 km (4 to 5 miles) above the surface.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "trn_radar",
+      "label": "Terrain-Relative Navigation and radar",
+      "tStartS": 260,
+      "tEndS": 350,
+      "altitudeKmEnd": 2.1,
+      "note": "Lander Vision System compares camera images with an onboard map at about 4.2 to 2.2 km above the ground, locating the vehicle to about 40 m in under 10 s and able to shift touchdown by up to 600 m (2,000 ft). NASA gives altitudes, not clock times, for this step: the bounds are heat shield separation (260 s) and back shell separation (350 s, derived).",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "backshell_separation",
+      "label": "Back shell and parachute separation",
+      "tStartS": 350,
+      "tEndS": 350,
+      "altitudeKmStart": 2.1,
+      "note": "About 90 s after heat shield separation (derived: 260 + 90), powered descent vehicle about 2.1 km (1.3 miles) above the surface.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Launch Press Kit, Entry Descent and Landing (90 s) and Landing Press Kit (2.1 km)",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/launch/mission/"
+      }
+    },
+    {
+      "id": "powered_descent",
+      "label": "Powered descent",
+      "tStartS": 350,
+      "tEndS": 420,
+      "altitudeKmStart": 2.1,
+      "altitudeKmEnd": 0.02,
+      "note": "Begins at about 306 kph (190 mph) and 2.1 km (6,900 ft); slows to about 2.7 kph (1.7 mph) at about 20 m (66 ft). End bound is touchdown at about 420 s ('EDL ends about seven minutes later'); NASA gives the end as an altitude.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "sky_crane",
+      "label": "Sky crane",
+      "tStartS": 420,
+      "tEndS": 420,
+      "altitudeKmStart": 0.02,
+      "altitudeKmEnd": 0,
+      "note": "Starts when the descent stage is 20 m (65 ft) over the target; cords lower the rover 7.6 m (25 ft) below the descent stage. NASA gives an altitude trigger, not a clock time: shown at the touchdown bound (about 420 s).",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "touchdown",
+      "label": "Touchdown",
+      "tStartS": 420,
+      "tEndS": 420,
+      "altitudeKmEnd": 0,
+      "note": "EDL ends about seven minutes after entry with the rover stationary on the surface; connecting cords are then cut and the descent stage flies away.",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    }
+  ]
+}
