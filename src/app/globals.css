@@ -1,42 +1,51 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #120d0e;
+  --panel: rgba(20, 15, 17, 0.82);
+  --panel-solid: #181214;
+  --hairline: rgba(255, 255, 255, 0.11);
+  --hairline-strong: rgba(255, 255, 255, 0.2);
+  --text: #f1ece7;       /* 15:1 on --panel-solid */
+  --muted: #b3aba4;      /* 7.6:1 on --panel-solid */
+  --accent: #e0884a;     /* Mars ochre, 6.9:1 */
+  --accent-ink: #1a0f08;
+  --data: #5cc8ff;       /* cool data accent, 9:1 */
+  --ok: #7ddba3;
+  --warn: #ffb347;
+  --bad: #ff7a6e;
+  --prov-observed: #5cc8ff;
+  --prov-computed: #7ddba3;
+  --prov-assumption: #e0884a;
+  --prov-unavailable: #a0a3a8;
+  --radius: 12px;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+* { box-sizing: border-box; padding: 0; margin: 0; }
 
-html,
+html, body { height: 100%; max-width: 100vw; overflow: hidden; background: var(--bg); }
+
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--data); }
+
+:focus-visible { outline: 2px solid var(--data); outline-offset: 2px; border-radius: 4px; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
+details > summary { cursor: pointer; font-size: 12.5px; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 6px; }
+details > summary::-webkit-details-marker { display: none; }

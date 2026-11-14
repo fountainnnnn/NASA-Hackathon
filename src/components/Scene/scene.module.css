@@ -1,0 +1,18 @@
+.pin { position: relative; width: 0; height: 0; font-family: var(--font-sans), system-ui, sans-serif; }
+.pinDot {
+  position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%;
+  display: grid; place-items: center; color: #14100e; background: var(--accent);
+  border: 2px solid #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.pinLabel {
+  position: absolute; left: 18px; top: -11px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;
+  font-size: 12px; line-height: 22px; padding: 0 8px; border-radius: 6px; color: #f4efea;
+  background: rgba(14, 11, 12, 0.88); border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.base .pinDot { background: #f4efea; color: #14100e; }
+.selected .pinDot { background: var(--data); }
+.science .pinDot { background: #7ddba3; }
+.hazard .pinDot { background: #ff6b5e; }
+.info .pinDot { background: #cbb8ff; }
+.callout { position: relative; width: 0; height: 0; font-family: var(--font-sans), system-ui, sans-serif; }
+.callout .pinDot { background: #ff4d4d; color: #fff; font: 600 12px/1 var(--font-mono), monospace; }
