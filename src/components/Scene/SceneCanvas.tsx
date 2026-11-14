@@ -7,8 +7,10 @@ import { Apron } from './Apron';
 import { buildContextScene } from './contextGrid';
 import { CoverageOutline } from './CoverageOutline';
 import { HAZE, Sky } from './Sky';
+import { SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG } from './atmosphere';
 import { useRuntime } from '@/state/services';
 import { CameraRig, initialPose } from './CameraRig';
+import { LassoOutline } from './LassoOutline';
 import { LineLayers } from './LineLayers';
 import { Pins } from './Pins';
 import { Routes } from './Routes';
@@ -16,7 +18,7 @@ import { SceneCtx } from './sceneCtx';
 import { Terrain } from './Terrain';
 
 // sun from the west-south-west (azimuth 247.5° from north), 35° above the horizon; +x east, -z north
-const AZ = (247.5 * Math.PI) / 180, EL = (35 * Math.PI) / 180;
+const AZ = (SUN_AZIMUTH_DEG * Math.PI) / 180, EL = (SUN_ELEVATION_DEG * Math.PI) / 180;
 const SUN: [number, number, number] = [
   Math.cos(EL) * Math.sin(AZ) * 60000, Math.sin(EL) * 60000, -Math.cos(EL) * Math.cos(AZ) * 60000,
 ];
@@ -76,6 +78,7 @@ export default function SceneCanvas({ children }: { children?: ReactNode }) {
         <CoverageOutline />
         <LineLayers />
         <Routes />
+        <LassoOutline />
         <Pins />
         <CameraRig />
         {children}

@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<template>
+  <style>
+    /* 0:26.6 the future, then the end card. Line 72px centred on y 540; then the wordmark (Michroma 120px, top 380),
+       the link (Martian Mono 48px, top 560) and the byline (36px, top 650): the block spans 380..694, centre 537. */
+    [data-composition-id="s10"] .s10-line { position: absolute; left: 0; top: 496px; width: 1920px; text-align: center; font-size: 72px; line-height: 1.15; font-weight: 500; letter-spacing: -0.02em; color: var(--text-1); white-space: nowrap; }
+    [data-composition-id="s10"] .s10-word { top: 380px; font-size: 120px; }
+    [data-composition-id="s10"] .s10-link { position: absolute; left: 0; top: 566px; width: 1920px; text-align: center; font-size: 48px; line-height: 1.2; color: var(--text-1); white-space: nowrap; }
+    [data-composition-id="s10"] .s10-by { position: absolute; left: 0; top: 650px; width: 1920px; text-align: center; font-size: 36px; line-height: 1.2; color: var(--text-2); white-space: nowrap; }
+  </style>
+  <div id="s10-root" class="rk-scene on-stage" data-composition-id="s10" data-width="1920" data-height="1080" data-duration="2.4" data-qa-center="x" data-qa-endhold="1.4">
+    <div id="s10-ground" class="rk-ground is-stage clip" data-start="0" data-duration="2.4" data-track-index="0"></div>
+    <div id="s10-world" class="rk-world" data-qa-camera>
+      <div id="s10-line" class="s10-line">Built for the first walks on Mars.</div>
+      <div id="s10-word" class="hm-wordmark s10-word">HEYMARS</div>
+      <div id="s10-link" class="s10-link hm-mono">[link]</div>
+      <div id="s10-by" class="s10-by">Ng Yu Hang, team Ecliptical</div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const $ = (i) => document.getElementById(i);
+      const tl = gsap.timeline({ paused: true });
+      tl.set([$("s10-word"), $("s10-link"), $("s10-by")], { opacity: 0 }, 0);
+      // 0.10 the line that closes the story
+      RK.words(tl, $("s10-line"), 0.1, { stagger: 0.06, dur: 0.45 });
+      // 1.05 it lifts away; the wordmark, the link and the byline settle in its place
+      RK.out(tl, $("s10-line"), 1.05, { dur: 0.2 });
+      RK.rise(tl, $("s10-word"), 1.2, { y: 14, dur: 0.6, fade: 0.2 });
+      RK.rise(tl, [$("s10-link"), $("s10-by")], 1.35, { y: 10, dur: 0.5, stagger: 0.08 });
+      tl.fromTo($("s10-world"), { scale: 1 }, { scale: 1.03, duration: 2.4, ease: "none", transformOrigin: "960px 540px" }, 0);
+      window.__timelines["s10"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

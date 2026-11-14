@@ -1,54 +1,48 @@
-# AI use (DRAFT)
+# AI use
 
-This project used AI tools for coding, art and a runtime agent. The idea and approach were set by a human.
+HeyMars was built with AI coding assistants and contains a runtime language-model agent, MarsAgent. The idea and approach were set by the human participant, Ng Yu Hang.
 
 ## Who decided what
 
-The human participant wrote the project brief: the challenge choice, the hero use case, the Jezero region, the data approach, the route and resource model, and the architecture. AI tools did not come up with the idea for solving the challenge. They helped build it.
+The participant chose the challenge and wrote the brief: a map you point at and ask, Jezero Crater as the walking region, real NASA data only, every number from a tool, and the safety checks a crew needs. The participant approved the UI design (mockup v4, `docs/UI_SPEC.md`), reviewed the live build and screenshots, and directed each revision, including dropping an early robot mascot and moving to a real-terrain planet view. AI tools did not come up with the idea for solving the challenge. They helped build it.
 
 ## Tools
 
-| Tool | Purpose | How it was used | Human validation | Limitations |
+| Tool | Purpose | How it was used | Human check | Limits |
 | --- | --- | --- | --- | --- |
-| Claude Code (Anthropic) | Coding assistant and orchestrator | Planned modules, wrote and edited code, ran tests | The participant supervised, ran and reviewed results. TODO(verify): extent of line-by-line review | Can write plausible but wrong code; every claim in docs is tied to a test or marked TODO |
-| Claude Sonnet sub-agents | Module implementation | Each owned separate files against a shared interface (`src/lib/contracts.ts`) | Outputs reviewed and wired by the orchestrating session and tested | Same as above |
-| Codex CLI (OpenAI) | Mascot and map-marker art | Generated original images or SVGs from prompts | Every asset viewed before use; rejected assets regenerated once or replaced with a plain icon. TODO(verify) | Can introduce text errors or look like real insignia; checked for NASA-like marks |
-| Claude Haiku 5.5 via OpenRouter (fallback GPT-6 Luna) | Runtime agent in the app | Chooses tools and writes explanations from tool results | Tool allowlist, Zod validation, scene-command allowlist, step limit, number guard. TODO(verify): live tool-selection test | Prose can be wrong. Numbers come only from tools. The guard flags unmatched numbers, not wrong claims |
-| AI-assisted documentation | Drafting docs | Drafts written with AI, then checked against code and test output | TODO(verify) | Claims without a verified source are marked TODO |
+| Claude Code with Claude Opus 5.5 (Anthropic) | Coding orchestrator and builder | Planned modules, wrote and integrated code, ran tests, browser QA and deploys | The participant reviewed the running app and screenshots and approved each direction. TODO(verify): whether you also reviewed code line by line | Can write plausible but wrong code. Claims in the docs are tied to a test, a data file or a screenshot, or marked TODO |
+| Claude Sonnet subagents | Module implementation | Each owned separate files against shared interfaces (`src/lib/contracts.ts`, `src/lib/globeContracts.ts`) | Integrated and tested by the orchestrator | Same as above |
+| Claude Fable 5.2 | QA reviewer | Reviewed screenshots, the live app and docs against the requirements | Findings fixed and re-tested | Review can miss problems |
+| Codex CLI (OpenAI) | Early SVG art | Wrote 13 art files (12 SVG and a PNG favicon: a mascot, markers, wordmark) from text prompts, listed in `public/art/CREDITS.json` | Reviewed, then dropped from the UI | Not shown in the app now (see below) |
+| Claude Haiku 5.5 via OpenRouter | Runtime agent for free-text questions | Chooses tools and writes the explanation from tool results | Tool allowlist, Zod validation, scene-command allowlist, round and call limits, number guard | Prose can be wrong. Numbers come only from tools |
+| AI-assisted documentation | Docs | Drafted with AI, then checked against code, data files and test output | Participant to read before submitting | Unverified claims are marked TODO |
+
+The server has a fallback model setting (`AGENT_FALLBACK_MODEL`) used only if the primary model fails.
 
 ## What the runtime agent can and cannot do
 
-- It can call a fixed list of tools and issue allowlisted scene commands (pins, route drawing, highlights, camera, layer visibility).
-- It cannot run code, browse, or change the world state any other way.
-- It does not produce distances, slopes, times or coordinates. The tools do.
-- The API key stays on the server. The server fixes the model, prompt and tools, and caps usage.
-- With no key or on error, the app says the agent is offline. It does not pretend. TODO(verify)
+- Map actions, rail tools, card buttons and maths follow-ups run fixed code. No model is called for them, and the panel shows "no model" on those turns.
+- For free-text questions the model can call 20 fixed tools and issue allowlisted scene commands (pins, routes, highlights, camera, layers, globe markers).
+- It cannot run code, browse or change the app's state any other way.
+- It does not produce distances, slopes, times, battery figures or coordinates. The tools do. A number guard flags any number in its answer that no tool returned.
+- The API key stays on the server. The server fixes the model, system prompt and tools, and limits use per IP (100 rounds per 10 min by default) and per day (2,000 by default).
+- With no key the server returns "agent offline" and the app says the language model is not configured. Everything else keeps working.
 
-## AI-generated art
+## Images, video and audio
 
-Listed in `public/art/CREDITS.json` (tool, prompt, date, review result). TODO(verify): file exists and matches this list.
-
-| Asset | Tool | Watermark / label in app | Reviewed |
-| --- | --- | --- | --- |
-| Agent mascot, 5 states | Codex CLI | "AI-generated" tag, TODO(verify) | TODO(verify) |
-| Astronaut marker | Codex CLI | TODO(verify) | TODO(verify) |
-| Base marker | Codex CLI | TODO(verify) | TODO(verify) |
-| Science-stop flag | Codex CLI | TODO(verify) | TODO(verify) |
-| Hazard marker | Codex CLI | TODO(verify) | TODO(verify) |
-| Rover marker | Codex CLI | TODO(verify) | TODO(verify) |
-| Wordmark and favicon | Codex CLI | TODO(verify) | TODO(verify) |
-
-UI control icons are Lucide (not AI-generated).
+- **App.** No AI-generated images are shown. The MarsAgent reticle and map symbols are drawn in code. Icons are Lucide. The lander, parachute, heat shield, back shell, rover and astronauts are simple 3D models built in code. The favicon is the Next.js default. Rover photos are NASA/JPL-Caltech raw images, shown unaltered with credit.
+- **Leftover art.** `public/art/` still holds the 13 Codex art files and their prompts. The app does not reference them.
+- **Video.** No AI-generated images or video. Footage is a real screen capture of the app. Illustrations are HTML, CSS and SVG with Lucide icons.
+- **Audio.** The video's music bed is synthesised by a Python script (`deliverables/video/tools/music.py`, NumPy) written with AI assistance. No generative audio model was used, there is no voice, and nothing is sampled. TODO(verify): add an AI-assistance note to the video file's metadata (for example the comment tag) at final render.
+- **Narrate aloud.** Off by default. It uses the browser's built-in speech synthesis and is labelled "synthetic voice".
 
 ## Rules we follow
 
-- AI images carry a visible "AI-generated" mark. TODO(verify)
-- AI code and any AI-assisted data are acknowledged here, in the README and in the submission form. TODO(verify): repository metadata
-- NASA data layers and NASA rover photos are never labelled AI-generated, because they are not.
-- No AI media uses or imitates NASA logos, flags, mission patches or identifiers.
-- No AI audio is planned. If a music bed is added to the video, it will be acknowledged in the description and file metadata. TODO(verify)
+- AI-generated code is acknowledged here, in the README and in the submission form. TODO(verify): repository metadata, for example the GitHub repo description.
+- NASA data and NASA rover photos are never labelled AI-generated, because they are not.
+- No AI content uses or imitates NASA logos, flags, mission patches or identifiers. The 3D models carry no insignia.
 - No image or likeness of anyone under 18.
 
 ## Not AI
 
-The data, the algorithms in `docs/SCIENCE_AND_VALIDATION.md` (from cited literature), the choice of challenge and the product design.
+The NASA and USGS data, the published methods in `docs/SCIENCE_AND_VALIDATION.md` (Tobler, Horn, A*, Mars24, MSL landing constraints), the choice of challenge and the product direction.

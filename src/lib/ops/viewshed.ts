@@ -145,6 +145,39 @@ export function pairVisibility(
   return { ...r, a: { lon: pa.lon, lat: pa.lat }, b: { lon: pb.lon, lat: pb.lat } };
 }
 
+export interface PairSight {
+  /** Instants checked, every `stepMin` of the walk timeline. */
+  checks: number;
+  hidden: number;
+  /** Longest run of consecutive hidden checks, in walk minutes; null when the pair is in sight at every check. */
+  worst: { startMin: number; endMin: number } | null;
+  separationM: number;
+  stepMin: number;
+}
+
+/**
+ * Crew in sight of each other along a walk: the second suit follows the first on the same path, `separationM` behind
+ * (as the playback draws them), so its timeline is the first one delayed by separationM ÷ mean walking speed.
+ * pairVisibility is evaluated every `stepMin` minutes from start to end; the worst stretch is the longest hidden run.
+ */
+export function pairSightAlongRoute(dem: Dem, route: RouteResult | Timeline, separationM: number, stepMin = 0.5): PairSight {
+  const a = 'samples' in route ? route : buildTimeline(route);
+  const dwell = a.samples.reduce((m, s) => m + s.dwellAfterMin, 0);
+  const moving = Math.max(1e-6, a.totalMin - dwell);
+  const lagMin = a.totalDistM > 0 ? separationM / (a.totalDistM / moving) : 0;
+  const b: Timeline = { ...a, samples: a.samples.map((s) => ({ ...s, tMin: s.tMin + lagMin })) };
+  let checks = 0, hidden = 0, runStart = -1, worst: PairSight['worst'] = null;
+  for (let t = 0; t <= a.totalMin + 1e-9; t += stepMin) {
+    checks++;
+    const r = pairVisibility(dem, a, b, t);
+    if (r.visible || r.distM < 1) { runStart = -1; continue; }
+    hidden++;
+    if (runStart < 0) runStart = t;
+    if (!worst || t - runStart > worst.endMin - worst.startMin) worst = { startMin: runStart, endMin: t };
+  }
+  return { checks, hidden, worst, separationM, stepMin };
+}
+
 /* ------------------------------------------------------------------ viewshed raster */
 
 /**

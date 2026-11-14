@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<template>
+  <style>
+    /* 0:02 the challenge and why (guide beat 2). Earth (left) and Mars (right) on one rail, a light pulse travels
+       across; the line under it says why a crew must plan on Mars. Geometry: Earth centre x 560, Mars centre x 1360,
+       rail y 360 from 650 to 1270. Light time 10.95 min one way on 15 Nov 2026 (public/data/earth_link.json, JPL Horizons). */
+    [data-composition-id="s02"] .s02-earth { position: absolute; left: 500px; top: 300px; width: 120px; height: 120px; color: var(--data); }
+    [data-composition-id="s02"] .s02-earth svg { width: 120px; height: 120px; display: block; }
+    [data-composition-id="s02"] .s02-mars { position: absolute; left: 1300px; top: 300px; width: 120px; height: 120px; border-radius: 50%; background: #2a170c; border: 3px solid var(--hm-accent); }
+    [data-composition-id="s02"] .s02-lab { position: absolute; top: 444px; width: 300px; text-align: center; font-size: 36px; color: var(--text-2); white-space: nowrap; }
+    [data-composition-id="s02"] .s02-rail { position: absolute; left: 650px; top: 359px; width: 620px; height: 0; border-top: 2px dashed var(--line-strong); }
+    [data-composition-id="s02"] .s02-dot { position: absolute; left: 650px; top: 352px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--text-1); }
+    [data-composition-id="s02"] .s02-min { position: absolute; left: 0; top: 236px; width: 1920px; text-align: center; font-size: 46px; line-height: 1.2; color: var(--text-1); white-space: nowrap; }
+    [data-composition-id="s02"] .s02-src { position: absolute; left: 0; top: 444px; width: 1920px; text-align: center; font-size: 30px; color: var(--text-3); white-space: nowrap; }
+    [data-composition-id="s02"] .s02-cap { position: absolute; left: 0; top: 650px; width: 1920px; text-align: center; font-size: 68px; line-height: 1.15; font-weight: 500; letter-spacing: -0.02em; color: var(--text-1); white-space: nowrap; }
+  </style>
+  <div id="s02-root" class="rk-scene on-stage" data-composition-id="s02" data-width="1920" data-height="1080" data-duration="3.2" data-qa-center="x">
+    <div id="s02-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3.2" data-track-index="0"></div>
+    <div id="s02-world" class="rk-world" style="top: 56px;" data-qa-camera>
+      <div id="s02-diag" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform: translateY(-40px) scale(1.4); transform-origin: 960px 380px;">
+      <div id="s02-earth" class="s02-earth" data-qa="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54"/><path d="M7 3.34V5a3 3 0 0 0 3 3a2 2 0 0 1 2 2c0 1.1.9 2 2 2a2 2 0 0 0 2-2c0-1.1.9-2 2-2h3.17"/><path d="M11 21.95V18a2 2 0 0 0-2-2a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2H2.05"/><circle cx="12" cy="12" r="10"/></svg></div>
+      <div id="s02-mars" class="s02-mars"></div>
+      <div id="s02-le" class="s02-lab" style="left: 410px;">Earth</div>
+      <div id="s02-lm" class="s02-lab" style="left: 1210px;">Mars</div>
+      <div id="s02-rail" class="s02-rail" data-qa-ignore></div>
+      <div id="s02-dot" class="s02-dot" data-qa-ignore></div>
+      <div id="s02-min1" class="s02-min"><span class="hm-mono">11</span> min one way</div>
+      <div id="s02-min2" class="s02-min"><span class="hm-mono">22</span> min to ask and hear back</div>
+      <div id="s02-src" class="s02-src">Light time today, JPL Horizons</div>
+      </div>
+      <div id="s02-capa" class="s02-cap">Earth is <span class="hm-mono">11</span> light-minutes away.</div>
+      <div id="s02-capb" class="s02-cap">On Mars, nobody can plan your walk for you.</div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const $ = (i) => document.getElementById(i);
+      const tl = gsap.timeline({ paused: true });
+      tl.set([$("s02-min2"), $("s02-capb")], { opacity: 0 }, 0);
+      // 0.00 the two planets and the rail are there on the first frame (fast rise)
+      RK.rise(tl, [$("s02-earth"), $("s02-mars")], 0.0, { y: 10, dur: 0.45, stagger: 0.06, fade: 0.12 });
+      RK.rise(tl, [$("s02-le"), $("s02-lm")], 0.1, { y: 8, dur: 0.45, stagger: 0.06 });
+      tl.fromTo($("s02-rail"), { opacity: 0 }, { opacity: 1, duration: 0.3 }, 0.1);
+      // 0.20 the hook line
+      RK.words(tl, $("s02-capa"), 0.15, { stagger: 0.06, dur: 0.45 });
+      // 0.30 a pulse leaves Earth and reaches Mars at 1.35; the light time lands as it arrives
+      tl.fromTo($("s02-dot"), { x: 0, opacity: 0 }, { x: 620, opacity: 1, duration: 1.05, ease: RK.E.io }, 0.3);
+      RK.rise(tl, $("s02-min1"), 0.5, { y: 10, dur: 0.5 });
+      RK.rise(tl, $("s02-src"), 0.7, { y: 8, dur: 0.5 });
+      // 1.65 the answer would come back: the pulse returns, the delay doubles, and the line turns to why
+      tl.fromTo($("s02-dot"), { x: 620 }, { x: 0, duration: 1.1, ease: RK.E.io, immediateRender: false }, 1.6);
+      RK.swap(tl, $("s02-min1"), $("s02-min2"), 1.6, { y: 10, dur: 0.45 });
+      RK.swap(tl, $("s02-capa"), $("s02-capb"), 1.65, { words: true, stagger: 0.05, dur: 0.45 });
+      tl.fromTo($("s02-world"), { scale: 1 }, { scale: 1.03, duration: 3.2, ease: "none", transformOrigin: "960px 540px" }, 0);
+      window.__timelines["s02"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

@@ -51,29 +51,31 @@ function fmtTarget(t: unknown, deps: ToolDeps): string {
   return 'the selected point';
 }
 
-export function describeToolCall(name: string, rawArgs: string, deps: ToolDeps): string {
+/** One line per tool call for the narration: present tense while it runs, past tense once it has finished. */
+export function describeToolCall(name: string, rawArgs: string, deps: ToolDeps, past = false): string {
   let a: any = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
   try { a = rawArgs ? JSON.parse(rawArgs) : {}; } catch { /* label only */ }
   const slope = deps.world.snapshot().constraints.maxSlopeDeg;
+  const v = (now: string, done: string) => (past ? done : now);
   switch (name) {
-    case 'get_scene_context': return 'Reading the scene';
-    case 'get_location_context': return `Reading geology at ${fmtTarget(a.target, deps)}`;
-    case 'find_science_context': return `Finding science sites near ${fmtTarget(a.target, deps)}`;
-    case 'get_rover_images_near': return `Looking for rover images near ${fmtTarget(a.target, deps)}`;
-    case 'analyze_terrain': return `Analysing terrain around ${fmtTarget(a.target, deps)}`;
-    case 'set_mission_constraints': return `Updating mission limits (${Object.entries(a).map(([k, v]) => `${k} ${v}`).join(', ') || 'no change'})`;
-    case 'suggest_science_stops': return `Searching ${a.objective ?? ''} science stops`.replace('  ', ' ');
-    case 'plan_route': return `Solving ${a.roundTrip === false ? 'one-way route' : 'round trip'} (max slope ${slope}°)`;
-    case 'plan_multi_stop': return `Solving multi-stop ${a.roundTrip === false ? 'route' : 'round trip'} (max slope ${slope}°)`;
-    case 'compare_routes': return `Comparing routes ${Array.isArray(a.routeIds) ? a.routeIds.join(' and ') : ''}`.trim();
-    case 'find_hazard_segments': return `Finding hazard segments on ${a.routeId ?? 'route'}`;
+    case 'get_scene_context': return v('Reading the scene', 'Read the scene');
+    case 'get_location_context': return `${v('Reading', 'Read')} geology at ${fmtTarget(a.target, deps)}`;
+    case 'find_science_context': return `${v('Finding', 'Found')} science sites near ${fmtTarget(a.target, deps)}`;
+    case 'get_rover_images_near': return `${v('Looking for', 'Looked for')} rover images near ${fmtTarget(a.target, deps)}`;
+    case 'analyze_terrain': return `${v('Analysing', 'Analysed')} terrain around ${fmtTarget(a.target, deps)}`;
+    case 'set_mission_constraints': return `${v('Updating', 'Updated')} mission limits (${Object.entries(a).map(([k, x]) => `${k} ${x}`).join(', ') || 'no change'})`;
+    case 'suggest_science_stops': return `${v('Searching', 'Searched')} ${a.objective ?? ''} science stops`.replace('  ', ' ');
+    case 'plan_route': return `${v('Solving', 'Solved')} ${a.roundTrip === false ? 'one-way route' : 'round trip'} (max slope ${slope}°)`;
+    case 'plan_multi_stop': return `${v('Solving', 'Solved')} multi-stop ${a.roundTrip === false ? 'route' : 'round trip'} (max slope ${slope}°)`;
+    case 'compare_routes': return `${v('Comparing', 'Compared')} routes ${Array.isArray(a.routeIds) ? a.routeIds.join(' and ') : ''}`.trim();
+    case 'find_hazard_segments': return `${v('Finding', 'Found')} hazard segments on ${a.routeId ?? 'route'}`;
     case 'issue_scene_commands': {
       const cmds: { type?: string; routeId?: string }[] = Array.isArray(a.commands) ? a.commands : [];
       const draw = cmds.find((c) => c.type === 'draw_route');
-      return draw ? `Drawing route ${draw.routeId}` : `Updating the 3D scene (${cmds.length} command${cmds.length === 1 ? '' : 's'})`;
+      return draw ? `${v('Drawing', 'Drew')} route ${draw.routeId}` : `${v('Updating', 'Updated')} the 3D scene (${cmds.length} command${cmds.length === 1 ? '' : 's'})`;
     }
-    case 'export_mission_plan': return `Exporting mission plan for ${a.routeId ?? 'route'}`;
-    default: return `Running ${name}`;
+    case 'export_mission_plan': return `${v('Exporting', 'Exported')} mission plan for ${a.routeId ?? 'route'}`;
+    default: return `${v('Running', 'Ran')} ${name}`;
   }
 }
 
@@ -108,22 +110,25 @@ export async function runAgentTurn(args: Parameters<AgentApi['runAgentTurn']>[0]
   for (let round = 0; round < MAX_ROUNDS; round++) {
     if (signal?.aborted) return fail({ error: 'aborted' });
     let res: Response;
+    const tModel = Date.now();
+    observer?.({ type: 'model-start', round });
     try {
       res = await fetch('/api/agent', {
         method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ messages }), signal,
       });
     } catch (e) {
       if (signal?.aborted || (e instanceof Error && e.name === 'AbortError')) return fail({ error: 'aborted' });
-      return fail({ error: 'Could not reach the copilot service. Check your connection and try again.' });
+      return fail({ error: 'Could not reach the MarsAgent model service. Check your connection and try again.' });
     }
     if (res.status === 503) return fail({ offline: true });
-    if (res.status === 429) return fail({ error: 'The copilot is busy (rate limit reached). Please wait a few minutes and try again.' });
-    if (!res.ok) return fail({ error: `The copilot service returned an error (${res.status}). Please try again.` });
+    if (res.status === 429) return fail({ error: 'The MarsAgent model is busy (rate limit reached). Please wait a few minutes and try again.' });
+    if (!res.ok) return fail({ error: `The MarsAgent model service returned an error (${res.status}). Please try again.` });
 
     let data: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     try { data = await res.json(); } catch { data = null; }
     const m = data?.message;
-    if (!m || m.role !== 'assistant') return fail({ error: 'The copilot returned an unreadable response.' });
+    observer?.({ type: 'model', round, model: typeof data?.model === 'string' ? data.model : null, usage: data?.usage ?? null, ms: Date.now() - tModel });
+    if (!m || m.role !== 'assistant') return fail({ error: 'The MarsAgent model returned an unreadable response.' });
     const assistant: ChatMessage = {
       role: 'assistant', content: typeof m.content === 'string' ? m.content : '',
       ...(Array.isArray(m.tool_calls) && m.tool_calls.length ? { tool_calls: m.tool_calls } : {}),
@@ -152,8 +157,10 @@ export async function runAgentTurn(args: Parameters<AgentApi['runAgentTurn']>[0]
         trace.push(step);
         emit();
         const t0 = Date.now();
+        observer?.({ type: 'tool-start', name: tc.function.name, args: tc.function.arguments });
         const result = await executeTool(tc.function.name, tc.function.arguments, deps);
         step.ms = Date.now() - t0;
+        observer?.({ type: 'tool', name: tc.function.name, args: tc.function.arguments, result, ms: step.ms });
         step.status = (result as { error?: unknown })?.error ? 'error' : 'done';
         step.summary = summarize(tc.function.name, result);
         emit();
@@ -165,8 +172,17 @@ export async function runAgentTurn(args: Parameters<AgentApi['runAgentTurn']>[0]
   }
   return fail({
     text: lastText, history: messages,
-    error: 'The copilot used its step limit before finishing. Try a more specific request.',
+    error: 'MarsAgent used its step limit before finishing. Try a more specific request.',
   });
 }
+
+/** Observer for the narration: a start and an end event per model round-trip and per tool call, in execution order. */
+export type AgentEvent =
+  | { type: 'model-start'; round: number }
+  | { type: 'model'; round: number; model: string | null; usage: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } | null; ms: number }
+  | { type: 'tool-start'; name: string; args: string }
+  | { type: 'tool'; name: string; args: string; result: unknown; ms: number };
+let observer: ((e: AgentEvent) => void) | null = null;
+export function setAgentObserver(fn: ((e: AgentEvent) => void) | null) { observer = fn; }
 
 export const agentApi: AgentApi = { runAgentTurn, executeTool };

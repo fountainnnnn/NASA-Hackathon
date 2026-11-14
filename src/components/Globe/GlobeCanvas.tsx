@@ -77,7 +77,7 @@ export default function GlobeCanvas({ controls = true, children }: { controls?: 
           </CamCtx.Provider>
         </Canvas>
       )}
-      <div ref={reticleRef} className={styles.reticle} aria-hidden>
+      <div ref={reticleRef} className={styles.reticle} aria-hidden style={{ visibility: mode === 'globe' ? 'visible' : 'hidden' }}>
         <svg width="40" height="40" viewBox="-20 -20 40 40" fill="none" stroke="currentColor" strokeWidth="1">
           <path d="M-20 0H-2M2 0H20M0 -20V-2M0 2V20" />
         </svg>

@@ -116,7 +116,7 @@ async function callUpstream(model: string, key: string, messages: unknown[]): Pr
       headers: {
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
-        'X-Title': 'MarsWalk Copilot',
+        'X-Title': 'HeyMars',
       },
       body: JSON.stringify({
         model,

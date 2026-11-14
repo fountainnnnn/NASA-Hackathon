@@ -5,13 +5,15 @@
  * Pointer tools use DOM listeners on the canvas element and the same heightfield ray march as the terrain picker.
  */
 import { Line } from '@react-three/drei';
-import { useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { LonLat } from '@/lib/contracts';
 import { densify } from '@/lib/scene/drape';
 import { marchRay, meshHeightAt } from '@/lib/scene/terrainGrid';
+import { ellipsePoints } from '@/components/Globe/geo';
 import { BaseCamp } from '@/components/Scenario/BaseCamp';
+import { edlEndS, revealCount, unpackTouchdowns } from '@/components/Scenario/landing';
 import { Crew } from '@/components/Scenario/Crew';
 import { HelmetCamera } from '@/components/Scenario/HelmetHud';
 import { RoverAssist } from '@/components/Scenario/RoverAssist';
@@ -19,11 +21,15 @@ import { RulerLine } from '@/components/Scenario/RulerLine';
 import { useSceneGround } from '@/components/Scenario/sceneAdapter';
 import { useWalkUi } from '@/components/Scenario/walkStore';
 import { clickGuard, insideBounds } from '@/components/Scene/pick';
-import { lineY, trueHeight, useScene } from '@/components/Scene/sceneCtx';
+import { clearLassoOutline, setLassoOutline } from '@/components/Scene/lassoStore';
+import { useShell } from '@/state/shell';
+import { groundAt, lineY, trueHeight, useScene } from '@/components/Scene/sceneCtx';
 import type { SceneCtxValue } from '@/components/Scene/sceneCtx';
 import { useHud } from '@/state/hud';
 import type { Tone } from '@/state/hud';
-import { useRuntime } from '@/state/services';
+import { usePlayback } from '@/state/playback';
+import { getScenario } from '@/lib/scenario';
+import { useGlobal, useRuntime } from '@/state/services';
 import { useWorld } from '@/state/world';
 import { polygonAreaKm2 } from './demTools';
 import { SceneProjector } from './projector';
@@ -83,17 +89,24 @@ function PointerTools({ onPlan, onLasso, preview, clearPreview }: JezeroLayerPro
       return Math.hypot(dN, dE) < 400 ? { lon: b.lon, lat: b.lat } : p;
     };
 
+    // touch: one finger plans (or lassos with the Lasso tool); a second finger hands the gesture to orbit and zoom
+    const touches = new Set<number>();
+    let owner = -1;
     const onDown = (e: PointerEvent) => {
-      if (e.button !== 0 || e.pointerType !== 'mouse') return;
+      if (e.pointerType === 'touch') {
+        touches.add(e.pointerId);
+        if (touches.size > 1) { if (mode !== 'none') onCancel(); return; }
+      } else if (e.button !== 0 || e.pointerType !== 'mouse') return;
+      owner = e.pointerId;
       down = { x: e.clientX, y: e.clientY }; moved = false;
-      if (e.shiftKey) { mode = 'lasso'; poly = [{ x: e.clientX, y: e.clientY }]; return; }
+      if (e.shiftKey || useShell.getState().tool === 'lasso') { mode = 'lasso'; poly = [{ x: e.clientX, y: e.clientY }]; return; }
       const g = pick(e.clientX, e.clientY);
       if (g && insideBounds(bounds(), g.lon, g.lat)) { mode = 'plan'; start = snapToBase(g); } else mode = 'none';
     };
     const onMove = (e: PointerEvent) => {
-      if (mode === 'none') return;
+      if (mode === 'none' || e.pointerId !== owner) return;
       if (!moved && Math.hypot(e.clientX - down.x, e.clientY - down.y) < DRAG_PX) return;
-      if (!moved) { moved = true; useHud.getState().patch({ dragging: true }); }
+      if (!moved) { moved = true; clearLassoOutline(); useHud.getState().patch({ dragging: true }); }
       if (mode === 'plan' && start) {
         const g = pick(e.clientX, e.clientY);
         if (!g || !insideBounds(bounds(), g.lon, g.lat)) return;
@@ -113,6 +126,8 @@ function PointerTools({ onPlan, onLasso, preview, clearPreview }: JezeroLayerPro
       }
     };
     const onUp = (e: PointerEvent) => {
+      touches.delete(e.pointerId);
+      if (e.pointerId !== owner) return;
       window.clearTimeout(timer);
       const m = mode; mode = 'none';
       if (!moved) return;
@@ -126,22 +141,23 @@ function PointerTools({ onPlan, onLasso, preview, clearPreview }: JezeroLayerPro
         const step = Math.max(1, Math.floor(poly.length / 32));
         const ll = poly.filter((_, i) => i % step === 0).map((q) => pick(q.x, q.y)).filter((q): q is LonLat => !!q);
         useHud.getState().patch({ lasso: null, lassoLabel: null });
-        if (ll.length >= 3) cb.current.onLasso(ll, polygonAreaKm2(ll));
+        if (ll.length >= 3) { setLassoOutline(ll); cb.current.onLasso(ll, polygonAreaKm2(ll)); }
       }
       start = null;
     };
-    const onCancel = () => { window.clearTimeout(timer); mode = 'none'; useHud.getState().patch({ dragging: false, lasso: null, lassoLabel: null }); cb.current.clearPreview(); };
+    function onCancel() { window.clearTimeout(timer); mode = 'none'; moved = false; useHud.getState().patch({ dragging: false, lasso: null, lassoLabel: null }); cb.current.clearPreview(); }
+    const onTouchGone = (e: PointerEvent) => { touches.delete(e.pointerId); if (e.pointerId === owner) onCancel(); };
 
     el.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
-    el.addEventListener('pointercancel', onCancel);
+    el.addEventListener('pointercancel', onTouchGone);
     return () => {
       window.clearTimeout(timer);
       el.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
-      el.removeEventListener('pointercancel', onCancel);
+      el.removeEventListener('pointercancel', onTouchGone);
     };
   }, [gl, pick]);
   return null;
@@ -194,13 +210,81 @@ function Actors() {
   const reach = useHud((s) => s.reach);
   const rover = useWalkUi((s) => s.roverFraction);
   const base = useWorld((s) => s.base);
+  const mast = useHud((s) => s.mastHeightM);
   return (
     <>
       {walkOn && tl && <Crew timeline={tl} ground={ground} />}
       {walkOn && tl && rover > 0 && <RoverAssist timeline={tl} ground={ground} />}
       {walkOn && tl && <HelmetCamera timeline={tl} ground={ground} />}
-      {reachOn && base && <BaseCamp centre={{ lon: base.lon, lat: base.lat }} ground={ground} reach={reach} />}
+      {reachOn && base && <BaseCamp centre={{ lon: base.lon, lat: base.lat }} ground={ground} reach={reach} mastHeightM={mast} />}
     </>
+  );
+}
+
+/* ------------------------------------------------------------------ landing scenario on the 20 m terrain */
+
+const OK = '#58c98a', FAIL = '#d9423b'; // same as the legend: go green, no-go red
+
+/** The landing scenario inside Jezero: the dispersion ellipse and every touchdown as a disc draped on the 20 m terrain, revealed by the playback clock. */
+function LandingScatter() {
+  const v = useScene();
+  const landing = useHud((h) => h.landing);
+  const gs = useGlobal((g) => g.gs);
+  const exag = useWorld((s) => s.exaggeration);
+  const { camera } = useThree();
+  const rec = landing ? getScenario(landing.scenarioId) : undefined;
+  const endS = useMemo(() => edlEndS(gs?.edlPhases() ?? []), [gs]);
+  const pts = useMemo(() => (landing && rec ? unpackTouchdowns(rec.result.points, landing.maxSlopeDeg) : []), [landing, rec]);
+  const ground = useMemo(() => pts.map((p) => {
+    const { x, z } = v.rt.geo.toLocal(v.rt.meta, p.lon, p.lat);
+    return { x, z, y: groundAt(v, x, z, exag) + 0.8 * exag };
+  }), [pts, v, exag]);
+  const ring = useMemo(() => {
+    if (!landing) return null;
+    const e = landing.ellipse;
+    return ellipsePoints(landing.site, e.semiMajorKm, e.semiMinorKm, e.azimuthDeg, 128).map((q) => {
+      const { x, z } = v.rt.geo.toLocal(v.rt.meta, q.lon, q.lat);
+      return [x, groundAt(v, x, z, exag) + 2 * exag, z] as [number, number, number];
+    });
+  }, [landing, v, exag]);
+  const inst = useRef<THREE.InstancedMesh>(null);
+  const tmp = useMemo(() => new THREE.Object3D(), []);
+  const last = useRef({ n: -1, r: -1 });
+  useEffect(() => {
+    const im = inst.current; if (!im) return;
+    const c = new THREE.Color();
+    pts.forEach((p, i) => im.setColorAt(i, c.set(p.ok ? OK : FAIL)));
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
+    last.current = { n: -1, r: -1 };
+  }, [pts, ground]);
+  useFrame(() => {
+    const im = inst.current; if (!im || !landing) return;
+    const n = revealCount(usePlayback.getState().t, endS, pts.length);
+    const { x, z } = v.rt.geo.toLocal(v.rt.meta, landing.site.lon, landing.site.lat);
+    const dist = camera.position.distanceTo(tmp.position.set(x, 0, z));
+    const r = Math.max(1, dist * 0.0017); // about 3 px across
+    if (last.current.n === n && Math.abs(last.current.r - r) / r < 0.05) return;
+    last.current = { n, r };
+    for (let i = 0; i < pts.length; i++) {
+      const g = ground[i];
+      tmp.position.set(g.x, g.y, g.z);
+      tmp.rotation.set(-Math.PI / 2, 0, 0);
+      tmp.scale.setScalar(i < n ? r : 1e-6);
+      tmp.updateMatrix();
+      im.setMatrixAt(i, tmp.matrix);
+    }
+    im.instanceMatrix.needsUpdate = true;
+  });
+  if (!landing || !rec) return null;
+  return (
+    <group>
+      {ring && <Line points={ring} color="#060505" lineWidth={4} transparent opacity={0.7} depthWrite={false} renderOrder={14} raycast={noRaycast} />}
+      {ring && <Line points={ring} color="#ece7e1" lineWidth={1.5} transparent depthWrite={false} renderOrder={15} raycast={noRaycast} />}
+      <instancedMesh ref={inst} args={[undefined, undefined, Math.max(1, pts.length)]} frustumCulled={false} renderOrder={16}>
+        <circleGeometry args={[1, 10]} />
+        <meshBasicMaterial transparent opacity={0.9} side={THREE.DoubleSide} depthWrite={false} />
+      </instancedMesh>
+    </group>
   );
 }
 
@@ -213,6 +297,7 @@ export default function JezeroLayer(props: JezeroLayerProps) {
       <PointerTools {...props} />
       <PreviewLine />
       <RouteRuler />
+      <LandingScatter />
       <Actors />
     </>
   );

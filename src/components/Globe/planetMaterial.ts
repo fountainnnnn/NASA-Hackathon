@@ -34,12 +34,12 @@ void main() {
   vec3 n = normalize(vN);
   vec3 albedo = uHasTex > 0.5 ? texture2D(uTex, vUv).rgb : vec3(0.045, 0.022, 0.012); // linear dark ochre (loading / unavailable)
   vec4 l;
-  if (uLA[0] > 0.0) { l = texture2D(uL0, vUv); albedo = mix(albedo, l.rgb, l.a * uLA[0]); }
-  if (uLA[1] > 0.0) { l = texture2D(uL1, vUv); albedo = mix(albedo, l.rgb, l.a * uLA[1]); }
-  if (uLA[2] > 0.0) { l = texture2D(uL2, vUv); albedo = mix(albedo, l.rgb, l.a * uLA[2]); }
-  if (uLA[3] > 0.0) { l = texture2D(uL3, vUv); albedo = mix(albedo, l.rgb, l.a * uLA[3]); }
-  if (uLA[4] > 0.0) { l = texture2D(uL4, vUv); albedo = mix(albedo, l.rgb, l.a * uLA[4]); }
-  if (uLA[5] > 0.0) { l = texture2D(uL5, vUv); albedo = mix(albedo, l.rgb, l.a * uLA[5]); }
+  if (uLA[0] > 0.0) { l = texture2D(uL0, vUv); albedo = mix(albedo, l.rgb, smoothstep(0.92, 1.0, l.a) * uLA[0]); }
+  if (uLA[1] > 0.0) { l = texture2D(uL1, vUv); albedo = mix(albedo, l.rgb, smoothstep(0.92, 1.0, l.a) * uLA[1]); }
+  if (uLA[2] > 0.0) { l = texture2D(uL2, vUv); albedo = mix(albedo, l.rgb, smoothstep(0.92, 1.0, l.a) * uLA[2]); }
+  if (uLA[3] > 0.0) { l = texture2D(uL3, vUv); albedo = mix(albedo, l.rgb, smoothstep(0.92, 1.0, l.a) * uLA[3]); }
+  if (uLA[4] > 0.0) { l = texture2D(uL4, vUv); albedo = mix(albedo, l.rgb, smoothstep(0.92, 1.0, l.a) * uLA[4]); }
+  if (uLA[5] > 0.0) { l = texture2D(uL5, vUv); albedo = mix(albedo, l.rgb, smoothstep(0.92, 1.0, l.a) * uLA[5]); }
 
   vec3 nn = n;
   if (uHasDem > 0.5) {

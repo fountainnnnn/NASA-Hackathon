@@ -5,6 +5,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { setAnchor } from '@/state/ui';
+import { useWalkUi } from '@/components/Scenario/walkStore';
+import { useHud } from '@/state/hud';
 import { useWorld } from '@/state/world';
 import { groundAt, useScene } from './sceneCtx';
 import { HAZE_NEAR_M, HAZE_SPAN_M } from './atmosphere';
@@ -34,6 +36,7 @@ export function CameraRig() {
   const { rt, grid } = v;
   const ctrl = useRef<OrbitControlsImpl>(null);
   const { camera, scene, size } = useThree();
+  const walkOn = useHud((h) => h.walkOn);
   const pose = useMemo(() => initialPose(grid), [grid]);
   const tween = useRef<Tween | null>(null);
   const last = useRef({ near: 0 });
@@ -71,13 +74,18 @@ export function CameraRig() {
       if (k >= 1) tween.current = null;
     }
     const exag = useWorld.getState().exaggeration;
-    // keep the camera above the ground
-    const floor = groundAt(v, camera.position.x, camera.position.z, exag) + 25;
+    // keep the camera above the ground: 25 m in planning views (where nothing finer than the 6 m imagery is on show);
+    // during a walk the chase and helmet cameras run lower, and orbiting the crew may come down to 3 m
+    const g0 = groundAt(v, camera.position.x, camera.position.z, exag);
+    const walk = useHud.getState().walkOn;
+    const floor = g0 + (walk ? 3 * exag : 25);
     if (camera.position.y < floor) camera.position.y = floor;
+    // close to the ground the CTX ortho (about 6 m per pixel) is visibly soft: the shell says so beside the legend
+    useWalkUi.getState().setCloseRange(camera.position.y - g0 < 600);
 
     // adaptive clip planes + fog so depth precision holds from 150 m out to the whole region
     const dist = camera.position.distanceTo(c.target);
-    const near = Math.max(4, dist * 0.015);
+    const near = Math.max(walk ? 1.5 : 4, dist * 0.015);
     const persp = camera as THREE.PerspectiveCamera;
     if (Math.abs(near - last.current.near) / near > 0.05) {
       persp.near = near; persp.far = dist * 2 + 300_000;
@@ -103,7 +111,9 @@ export function CameraRig() {
       ref={ctrl} makeDefault enableDamping dampingFactor={0.09} screenSpacePanning={false}
       // left-drag is the planner (Ops layer): orbit moves to the right button, pan to the middle one
       mouseButtons={{ LEFT: -1 as unknown as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE }}
-      minDistance={120} maxDistance={MAX_DISTANCE_M} maxPolarAngle={(84 * Math.PI) / 180}
+      // touch: one finger is the planner (drag to plan, like the left mouse button); two fingers orbit and zoom
+      touches={{ ONE: -1 as unknown as THREE.TOUCH, TWO: THREE.TOUCH.DOLLY_ROTATE }}
+      minDistance={walkOn ? 12 : 120} maxDistance={MAX_DISTANCE_M} maxPolarAngle={(84 * Math.PI) / 180}
       zoomToCursor target={[0, 0, 0]}
     />
   );

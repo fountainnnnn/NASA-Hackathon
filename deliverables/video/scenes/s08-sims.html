@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<template>
+  <style>
+    [data-composition-id="s08"] .hm-cam { position: absolute; left: 0; top: 0; width: 1440px; height: 810px; transform-origin: 0 0; }
+    [data-composition-id="s08"] .hm-media { position: absolute; left: 0; top: 0; width: 1440px; height: 810px; object-fit: cover; }
+    [data-composition-id="s08"] .hm-slate { background: #1e1a19; border: 1px solid var(--line-strong); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 0 140px; text-align: center; }
+    [data-composition-id="s08"] .hm-slate b { font-size: 56px; font-weight: 600; color: var(--text-2); letter-spacing: 0.02em; }
+    [data-composition-id="s08"] .hm-slate span { font-size: 30px; line-height: 1.35; color: var(--text-3); white-space: normal; }
+  </style>
+  <div id="s08-root" class="rk-scene on-stage" data-composition-id="s08" data-width="1920" data-height="1080" data-duration="4.4" data-qa-hold="4.4" data-qa-endhold="4.4">
+    <div id="s08-ground" class="rk-ground is-stage clip" data-start="0" data-duration="4.4" data-track-index="0"></div>
+    <div id="s08-cam" class="hm-cam" style="transform: translate(0px, 0px) scale(1.3333);">
+      <div id="s08-m0" class="hm-media hm-slate clip" data-start="0" data-duration="2.2" data-track-index="1" data-qa-ignore><b>CAPTURE PENDING</b><span>Sky crane lowers the lander onto the real terrain, seen from the ground-level tracking camera (Cesium)</span></div>
+      <div id="s08-m1" class="hm-media hm-slate clip" data-start="2.2" data-duration="2.2" data-track-index="2" data-qa-ignore><b>CAPTURE PENDING</b><span>Chase camera behind the two astronauts walking the planned route at 600x</span></div>
+    </div>
+    <div id="s08-co0-tag" class="hm-tag" data-qa="box" style="left: 1281.56px; top: 723.05px; opacity: 0;"><span class="hm-mono">600</span>× playback</div>
+    <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
+      <circle id="s08-co0-ring" cx="1281.56" cy="843.05" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s08-co0-line" opacity="0" x1="1281.56" y1="723.05" x2="1281.56" y2="827.05" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
+    </svg>
+    <div id="s08-edl" class="hm-edl" style="top: 96px; opacity: 0;" data-qa="box">
+      <div class="hm-edl-rail"></div>
+      <div id="s08-edl-fill" class="hm-edl-fill"></div>
+      <div id="s08-e0" class="hm-edl-mark" style="left: 120px; top: 0px; transform: translate(0,0); text-align: left;"><b>Entry</b> <span class="hm-mono">0</span> s</div>
+      <div id="s08-et0" class="hm-edl-tick" style="left: 119px;"></div>
+      <div id="s08-e1" class="hm-edl-mark" style="left: 970.29px; top: 92px; transform: translate(-50%,0); text-align: center;"><b>Parachute</b> <span class="hm-mono">240</span> s</div>
+      <div id="s08-et1" class="hm-edl-tick" style="left: 969.29px;"></div>
+      <div id="s08-e2" class="hm-edl-mark" style="left: 1041.14px; top: 0px; transform: translate(-50%,0); text-align: center;"><b>Heat shield off</b> <span class="hm-mono">260</span> s</div>
+      <div id="s08-et2" class="hm-edl-tick" style="left: 1040.14px;"></div>
+      <div id="s08-e3" class="hm-edl-mark" style="left: 1360px; top: 92px; transform: translate(-50%,0); text-align: center;"><b>Powered descent</b> <span class="hm-mono">350</span> s</div>
+      <div id="s08-et3" class="hm-edl-tick" style="left: 1359px;"></div>
+      <div id="s08-e4" class="hm-edl-mark" style="left: 1608px; top: 0px; transform: translate(-100%,0); text-align: right;"><b>Sky crane</b> <span class="hm-mono">420</span> s</div>
+      <div id="s08-et4" class="hm-edl-tick" style="left: 1607px;"></div>
+    </div>
+    <div id="s08-pending" class="hm-pending" data-qa-ignore>CAPTURE PENDING</div>
+    <div id="s08-band" class="hm-band"></div>
+    <div id="s08-cap0" class="hm-cap">Perseverance's landing steps, down to the sky crane.</div>
+    <div id="s08-cap1" class="hm-cap">Two crew walk the route at <span class="hm-mono">600</span>× speed.</div>
+    <div id="s08-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
+  </div>
+  <script>
+    (() => {
+      const $ = (i) => document.getElementById(i);
+      const tl = gsap.timeline({ paused: true });
+      // camera (app CSS px -> frame px): translate then scale, origin 0 0
+      tl.set($("s08-cam"), { x: 0, y: 0, scale: 1.3333, transformOrigin: "0 0" }, 0);
+      tl.fromTo($("s08-cam"), { x: 0, y: 0, scale: 1.3333 }, { x: 177.78, y: 0, scale: 1.0864, duration: 0.01, ease: RK.E.io, immediateRender: false }, 2.2);
+      gsap.set($("s08-co0-tag"), { xPercent: -50, yPercent: -100 });
+      // callout 0: "600× playback" at (1281.56, 843.05)
+      tl.set([$("s08-co0-ring"), $("s08-co0-line"), $("s08-co0-tag")], { opacity: 0 }, 0);
+      tl.fromTo($("s08-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1281.56px 843.05px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.7);
+      tl.fromTo($("s08-co0-line"), { opacity: 1, strokeDashoffset: 104 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.78);
+      RK.rise(tl, $("s08-co0-tag"), 2.92, { y: 10, dur: 0.45, fade: 0.12 });
+      tl.set($("s08-edl"), { opacity: 0 }, 0);
+      RK.rise(tl, $("s08-edl"), 0.15, { y: -8, dur: 0.45, fade: 0.15 });
+      tl.fromTo($("s08-edl-fill"), { scaleX: 0.82 }, { scaleX: 1, duration: 1.8, ease: "none", transformOrigin: "0 50%" }, 0.15);
+      tl.fromTo($("s08-e3"), { opacity: 0.4 }, { opacity: 1, duration: 0.15 }, 0.27);
+      tl.fromTo($("s08-e4"), { opacity: 0.4 }, { opacity: 1, duration: 0.15 }, 1.9);
+      tl.to($("s08-edl"), { opacity: 0, duration: 0.2, ease: RK.E.in }, 2.05);
+      RK.words(tl, $("s08-cap0"), 0.3, { stagger: 0.05, dur: 0.45 });
+      tl.set($("s08-cap1"), { opacity: 0 }, 0);
+      RK.swap(tl, $("s08-cap0"), $("s08-cap1"), 2.3, { words: true, stagger: 0.05, dur: 0.45 });
+      window.__timelines["s08"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

@@ -1,6 +1,7 @@
 /**
  * Ruler ticks along a route: a short tick every 100 m of path and a longer tick every 10 minutes of moving time,
- * so distance and time can be read off the ground (design system, signature 1). Pure, testable.
+ * so distance and time can be read off the ground (design system, signature 1). Long ticks are labelled with the mission
+ * elapsed time at that point ("T+01:00"). Pure, testable.
  */
 import { sampleAtOdometer } from './model';
 import type { Timeline } from './model';
@@ -13,6 +14,9 @@ export interface RulerTick {
   nx: number; nz: number;
   label: string | null;
 }
+
+/** Mission elapsed time at a long tick, "T+01:00" (hours and minutes since the EVA start, dwell included). */
+export const tickLabel = (elapsedS: number) => { const m = Math.max(0, Math.round(elapsedS / 60)); return `T+${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
 
 export function rulerTicks(tl: Timeline, opts: { everyM?: number; everyMin?: number } = {}): RulerTick[] {
   const everyM = opts.everyM ?? 100, everyMin = opts.everyMin ?? 10;
@@ -32,7 +36,7 @@ export function rulerTicks(tl: Timeline, opts: { everyM?: number; everyMin?: num
     const dur = (s.t1 - s.t0) / 60;
     while (moving + dur >= nextMin && dur > 0) {
       const f = (nextMin - moving) / dur;
-      mk('time', s.d0 + (s.d1 - s.d0) * f, `${nextMin} min`);
+      mk('time', s.d0 + (s.d1 - s.d0) * f, tickLabel(s.t0 + (s.t1 - s.t0) * f));
       nextMin += everyMin;
     }
     moving += dur;

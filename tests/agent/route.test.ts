@@ -57,7 +57,7 @@ describe('POST /api/agent', () => {
     expect(body.reasoning).toEqual({ effort: 'low' });
     expect(body.max_tokens).toBe(900);
     expect(init.headers.Authorization).toBe('Bearer sk-test-key');
-    expect(init.headers['X-Title']).toBe('MarsWalk Copilot');
+    expect(init.headers['X-Title']).toBe('HeyMars');
     const out = await r.json();
     expect(out.message).toEqual({ role: 'assistant', content: 'ok' });
     expect(out.model).toBe('mm');

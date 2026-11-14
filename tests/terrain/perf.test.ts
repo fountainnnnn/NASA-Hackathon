@@ -27,7 +27,9 @@ describe('performance', () => {
     const dem = makeSmoothDem(1600, 5);
     const grid = buildPlanningGrid(dem, computeSlopeField(dem));
     const goal = 797 * 800 + 797;
-    grid.slopeMaxDeg[goal] = 89; // goal cell violates the limit -> every reachable cell is expanded
+    // wall the goal in: its eight neighbours violate the limit, so every reachable cell is expanded before giving up
+    // (a goal cell that itself violates the limit is now rejected up front by the endpoint rule)
+    for (const d of [-801, -800, -799, -1, 1, 799, 800, 801]) grid.slopeMaxDeg[goal + d] = 89;
     for (const objective of ['fastest', 'shortest'] as const) {
       const t0 = performance.now();
       const res = solvePath(grid, 2 * 800 + 2, goal, { maxSlopeDeg: 15, objective, suitSpeedFactor: 0.6 });

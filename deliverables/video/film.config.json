@@ -1,15 +1,452 @@
 {
-  "link": "[link]",
-  "title": "MarsWalk Copilot",
-  "byline": "Ng Yu Hang, team Ecliptical",
-  "credit": "NASA MRO CTX, Mars Odyssey THEMIS, USGS SIM 3464, Perseverance",
-  "scenes": [
-    { "id": "s01", "kind": "title", "duration": 2.5 },
-    { "id": "s02", "kind": "footage", "clip": "c02", "duration": 3.5, "caption": "Mars maps show regions. Astronauts plan one walk.", "in": "zoom-in" },
-    { "id": "s03", "kind": "footage", "clip": "c03", "duration": 5.5, "caption": "Point at Mars. Ask. It plans.", "words": 0.35, "in": "zoom-out" },
-    { "id": "s04", "kind": "footage", "clip": "c04", "duration": 5.0, "caption": "The agent calls tools. The tools do the math.", "in": "zoom-in" },
-    { "id": "s05", "kind": "footage", "clip": "c05", "duration": 6.0, "caption": "Change a limit. It replans.", "credit": true, "in": "zoom-out" },
-    { "id": "s06", "kind": "footage", "clip": "c06", "duration": 5.5, "caption": "Built for the first walks on Mars.", "in": "zoom-in" },
-    { "id": "s07", "kind": "link", "duration": 4.0, "in": "zoom-out" }
-  ]
+ "title": "HeyMars",
+ "byline": "Ng Yu Hang, team Ecliptical",
+ "link": "[link]",
+ "transition": 0.4,
+ "credit": "NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons",
+ "capture": {
+  "viewport": [
+   1440,
+   810
+  ],
+  "scale": 2,
+  "fps": 60
+ },
+ "scenes": [
+  {
+   "id": "s01",
+   "kind": "file",
+   "file": "scenes/s01-title.html",
+   "duration": 2.2
+  },
+  {
+   "id": "s02",
+   "kind": "file",
+   "file": "scenes/s02-hook.html",
+   "duration": 3.2,
+   "in": "zoom-in"
+  },
+  {
+   "id": "s03",
+   "kind": "footage",
+   "name": "orbit",
+   "duration": 3.0,
+   "in": "zoom-out",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c03",
+     "pending": {
+      "slate": "Real Mars globe from orbit, then the camera falls to Jezero Crater (Cesium, JPL Mars Trek terrain)"
+     }
+    }
+   ],
+   "overlay": "wordmark",
+   "credit": "NASA imagery and terrain via JPL Mars Trek",
+   "cam": [
+    {
+     "at": 0,
+     "fill": true
+    },
+    {
+     "at": 0.2,
+     "dur": 2.8,
+     "fill": true,
+     "zoom": 1.08,
+     "ease": "none"
+    }
+   ],
+   "captions": [
+    {
+     "at": 1.65,
+     "text": "The whole real Mars, from orbit to the ground."
+    }
+   ]
+  },
+  {
+   "id": "s04",
+   "kind": "footage",
+   "name": "click",
+   "duration": 4.4,
+   "in": "zoom-in",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c04",
+     "pending": {
+      "still": "map"
+     }
+    }
+   ],
+   "cam": [
+    {
+     "at": 0,
+     "box": [
+      0,
+      0,
+      1440,
+      810
+     ]
+    },
+    {
+     "at": 1.2,
+     "dur": 1.0,
+     "box": "card@click",
+     "pad": 0.2,
+     "grow": [
+      40,
+      20,
+      40,
+      -170
+     ]
+    }
+   ],
+   "captions": [
+    {
+     "at": 0.35,
+     "text": "Click any spot on Mars and ask."
+    }
+   ],
+   "callouts": [
+    {
+     "at": 2.4,
+     "box": "card@click",
+     "anchor": "l",
+     "side": "left",
+     "len": 140,
+     "text": "Answer at your cursor"
+    }
+   ]
+  },
+  {
+   "id": "s05",
+   "kind": "file",
+   "file": "scenes/s05-agent.html",
+   "duration": 2.6,
+   "in": "zoom-out"
+  },
+  {
+   "id": "s06",
+   "kind": "footage",
+   "name": "steps",
+   "duration": 3.2,
+   "in": "zoom-in",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c06",
+     "pending": {
+      "still": "steps"
+     }
+    }
+   ],
+   "cam": [
+    {
+     "at": 0,
+     "box": "narration@steps",
+     "pad": 0.06
+    },
+    {
+     "at": 1.5,
+     "dur": 0.8,
+     "box": "formula@steps",
+     "pad": 0.1
+    }
+   ],
+   "captions": [
+    {
+     "at": 0.3,
+     "text": "Every answer is computed, and every step is shown."
+    }
+   ],
+   "callouts": [
+    {
+     "at": 2.35,
+     "box": "formula@steps",
+     "anchor": "l",
+     "side": "left",
+     "len": 120,
+     "text": "Formula with real numbers"
+    }
+   ]
+  },
+  {
+   "id": "s07",
+   "kind": "footage",
+   "name": "replan",
+   "duration": 3.8,
+   "in": "zoom-out",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c07",
+     "pending": {
+      "still": "map"
+     }
+    }
+   ],
+   "cam": [
+    {
+     "at": 0,
+     "box": [
+      150,
+      60,
+      860,
+      600
+     ]
+    }
+   ],
+   "captions": [
+    {
+     "at": 0.3,
+     "text": "NO GO: 2.2 km of the walk is out of radio contact."
+    },
+    {
+     "at": 2.0,
+     "text": "Raise the mast to 20 m. It replans: GO."
+    }
+   ],
+   "callouts": [
+    {
+     "at": 0.7,
+     "until": 1.9,
+     "box": "shadow@route",
+     "anchor": "c",
+     "side": "below",
+     "len": 150,
+     "text": "Radio shadow 2.2 km"
+    },
+    {
+     "at": 2.4,
+     "box": "verdict@replan",
+     "anchor": "l",
+     "side": "left",
+     "len": 130,
+     "text": "Verdict with its reason"
+    }
+   ]
+  },
+  {
+   "id": "s08",
+   "kind": "footage",
+   "name": "sims",
+   "duration": 4.4,
+   "in": "zoom-in",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c08a",
+     "pending": {
+      "slate": "Sky crane lowers the lander onto the real terrain, seen from the ground-level tracking camera (Cesium)"
+     }
+    },
+    {
+     "at": 2.2,
+     "clip": "c08b",
+     "pending": {
+      "slate": "Chase camera behind the two astronauts walking the planned route at 600x"
+     }
+    }
+   ],
+   "overlay": "edl",
+   "overlayUntil": 2.2,
+   "cam": [
+    {
+     "at": 0,
+     "fill": true
+    },
+    {
+     "at": 2.2,
+     "dur": 0.01,
+     "box": [
+      0,
+      0,
+      1440,
+      810
+     ]
+    }
+   ],
+   "captions": [
+    {
+     "at": 0.3,
+     "text": "Perseverance's landing steps, down to the sky crane."
+    },
+    {
+     "at": 2.3,
+     "text": "Two crew walk the route at 600\u00d7 speed."
+    }
+   ],
+   "callouts": [
+    {
+     "at": 2.7,
+     "box": "speed@walk",
+     "anchor": "t",
+     "side": "above",
+     "len": 120,
+     "text": "600\u00d7 playback"
+    }
+   ],
+   "edl": {
+    "from": 345,
+    "to": 420
+   }
+  },
+  {
+   "id": "s09",
+   "kind": "footage",
+   "name": "report",
+   "duration": 3.4,
+   "in": "zoom-out",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c09",
+     "pending": {
+      "still": "report"
+     }
+    },
+    {
+     "at": 1.5,
+     "clip": null,
+     "pending": {
+      "still": "report2"
+     }
+    }
+   ],
+   "cam": [
+    {
+     "at": 0,
+     "box": "paper@report",
+     "pad": 0.02
+    },
+    {
+     "at": 1.5,
+     "box": "validationNote@report2",
+     "pad": 0.06,
+     "grow": [
+      0,
+      240,
+      0,
+      40
+     ],
+     "dur": 0.7
+    }
+   ],
+   "captions": [
+    {
+     "at": 0.3,
+     "text": "A full report mission planners can check and export."
+    },
+    {
+     "at": 1.75,
+     "text": "Terrain agrees with 708 Perseverance waypoints, median 1.1 m."
+    }
+   ],
+   "callouts": [
+    {
+     "at": 2.3,
+     "kind": "underline",
+     "box": "validationNote@report2"
+    }
+   ]
+  },
+  {
+   "id": "s10",
+   "kind": "file",
+   "file": "scenes/s10-close.html",
+   "duration": 2.4,
+   "in": "zoom-out"
+  }
+ ],
+ "pendingAlias": {
+  "click": "map",
+  "clicked": "map",
+  "route": "map",
+  "replan": "map",
+  "walk": "map"
+ },
+ "pendingBoxes": {
+  "map": {
+   "shadow": [
+    790,
+    350,
+    100,
+    30
+   ]
+  },
+  "steps": {
+   "narration": [
+    1108,
+    96,
+    330,
+    440
+   ],
+   "formula": [
+    1108,
+    300,
+    330,
+    330
+   ]
+  }
+ },
+ "boxes": {},
+ "cuts": {
+  "c03": {
+   "shot": "orbit",
+   "from": "fly-0.3",
+   "to": "landed+0.8",
+   "maxSpeed": 2.5
+  },
+  "c04": {
+   "shot": "click",
+   "from": "start",
+   "to": "answered+0.6",
+   "skip": [
+    [
+     "asked+0.6",
+     "answered-1.2"
+    ]
+   ],
+   "maxSpeed": 1.6
+  },
+  "c06": {
+   "shot": "steps",
+   "from": "start+0.2",
+   "to": "end"
+  },
+  "c07": {
+   "shot": "replan",
+   "from": "start",
+   "to": "replanned+1.2",
+   "skip": [
+    [
+     "change+0.6",
+     "replanned-0.8"
+    ]
+   ]
+  },
+  "c08a": {
+   "shot": "landing",
+   "from": "slow+0.3",
+   "to": "touchdown+1.5",
+   "maxSpeed": 3.5
+  },
+  "c08b": {
+   "shot": "walk",
+   "from": "speed+0.4",
+   "to": "speed+3",
+   "maxSpeed": 1.2
+  },
+  "c09": {
+   "shot": "report",
+   "from": "open-0.2",
+   "to": "validation+1.6",
+   "skip": [
+    [
+     "open+1.3",
+     "validation-0.3"
+    ]
+   ]
+  }
+ }
 }

@@ -1,7 +1,7 @@
 'use client';
 import { Html, Line } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import * as THREE from 'three';
 import { useGlobeStore, type GlobeArc, type GlobeEllipse, type GlobeMarker, type ScatterSet } from '../../state/globe';
 import { globalDemVersion, reliefRadius, subscribeDem } from './dem';
@@ -24,21 +24,53 @@ const v3 = (a: [number, number, number]) => new THREE.Vector3(a[0], a[1], a[2]);
 const facing = (p: THREE.Vector3, cam: THREE.Vector3) => cam.dot(p) > p.lengthSq();
 
 const labelStyle = (color: string): React.CSSProperties => ({
-  transform: 'translateY(-18px)', whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',
+  transform: 'translate(14px, -9px)', whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',
   font: '400 11px/1.2 var(--font-mono, "Martian Mono", ui-monospace, monospace)', fontVariantNumeric: 'tabular-nums', color: '#ece7e1',
   background: '#0d0b0b', border: '1px solid rgba(236,231,225,0.10)', borderLeft: `2px solid ${color}`, borderRadius: 2, padding: '2px 6px',
   transition: 'opacity 90ms linear',
 });
 
-/** Label that hides itself behind the planet limb. `world` is the anchor in scene units. */
-function Label({ world, text, color, dy = 0 }: { world: THREE.Vector3; text: string; color: string; dy?: number }) {
+/** Every globe label registers here so one pass can keep them from landing on each other or on the HUD. */
+const registry = new Set<{ el: HTMLDivElement; prio: number }>();
+
+/** Greedy screen-space declutter: higher priority first, a label that would overlap one already placed (or a HUD block) is hidden. */
+function declutter() {
+  const hud: DOMRect[] = [];
+  document.querySelectorAll('[data-avoid], [data-companion]').forEach((n) => hud.push(n.getBoundingClientRect()));
+  const hit = (a: DOMRect, b: DOMRect) => a.left < b.right + 3 && a.right > b.left - 3 && a.top < b.bottom + 3 && a.bottom > b.top - 3;
+  const placed: DOMRect[] = [];
+  for (const l of [...registry].sort((a, b) => b.prio - a.prio)) {
+    const faded = l.el.style.opacity === '0';
+    if (faded) continue;
+    l.el.style.visibility = 'visible';
+    const r = l.el.getBoundingClientRect();
+    if (r.width === 0) continue;
+    if (placed.some((p) => hit(p, r)) || hud.some((h) => hit(h, r))) l.el.style.visibility = 'hidden';
+    else placed.push(r);
+  }
+}
+
+/** Label that hides itself behind the planet limb. `world` is the anchor in scene units; it sits to the right of the anchor so the click ring and Scout (up and left) stay clear. */
+function Label({ world, text, color, dy = 0, prio = 1 }: { world: THREE.Vector3; text: string; color: string; dy?: number; prio?: number }) {
   const div = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = div.current; if (!el) return;
+    const rec = { el, prio }; registry.add(rec);
+    return () => { registry.delete(rec); };
+  }, [prio]);
   useFrame(({ camera }) => { if (div.current) div.current.style.opacity = facing(world, camera.position) ? '1' : '0'; });
   return (
-    <Html position={world} center zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>
-      <div ref={div} style={{ ...labelStyle(color), transform: `translateY(${-18 + dy}px)` }}>{text}</div>
+    <Html position={world} zIndexRange={[30, 0]} style={{ pointerEvents: 'none' }}>
+      <div ref={div} data-gl-label style={{ ...labelStyle(color), transform: `translate(14px, ${-9 + dy}px)` }}>{text}</div>
     </Html>
   );
+}
+
+/** Runs the declutter a few times a second. */
+function Declutter() {
+  const n = useRef(0);
+  useFrame(() => { if (n.current++ % 2 === 0) declutter(); });
+  return null;
 }
 
 /** 1 px reticle: ring with a clear centre and four ticks, lying in the tangent plane, constant screen size. */
@@ -69,7 +101,7 @@ function Marker({ m, exag, demV }: { m: GlobeMarker; exag: number; demV: number 
         <lineSegments geometry={RETICLE} renderOrder={20}><lineBasicMaterial color={color} depthTest={false} /></lineSegments>
       </group>
       {/* the pointer readout already says where this is, so the click ring carries no label */}
-      {m.kind !== 'click' && <Label world={pos} text={m.label} color={color} />}
+      {m.kind !== 'click' && <Label world={pos} text={m.label} color={color} prio={m.kind === 'landing' ? 5 : 3} />}
     </>
   );
 }
@@ -92,7 +124,7 @@ function EllipseLine({ e, exag, demV }: { e: GlobeEllipse; exag: number; demV: n
     <>
       <Line points={pts} color={color} lineWidth={1.5} dashed={e.tone === 'warn'} dashSize={pathLen(pts) / 48} gapSize={pathLen(pts) / 96} />
       {e.tone === 'bad' && <lineSegments geometry={hatch}><lineBasicMaterial color={color} /></lineSegments>}
-      <Label world={center} text={e.label} color={color} dy={-4} />
+      <Label world={center} text={e.label} color={color} dy={22} prio={4} />
     </>
   );
 }
@@ -109,7 +141,7 @@ function ArcLine({ a, exag, demV }: { a: GlobeArc; exag: number; demV: number })
   return (
     <>
       <Line points={pts} color={ARC_COLOR} lineWidth={1.5} dashed dashSize={pathLen(pts) / 60} gapSize={pathLen(pts) / 120} />
-      <Label world={apex} text={a.label} color={ARC_COLOR} />
+      <Label world={apex} text={a.label} color={ARC_COLOR} prio={2} />
     </>
   );
 }
@@ -139,6 +171,11 @@ function JezeroOutline({ exag, demV }: { exag: number; demV: number }) {
   const cam = useCam();
   const lineRef = useRef<{ material: THREE.Material & { opacity: number } } | null>(null);
   const label = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = label.current; if (!el) return;
+    const rec = { el, prio: 0 }; registry.add(rec);
+    return () => { registry.delete(rec); };
+  }, []);
   const { pts, top } = useMemo(() => {
     const { lonMin, lonMax, latMin, latMax } = JEZERO_BOUNDS, seg = 24, ring: [number, number][] = [];
     for (let i = 0; i < seg; i++) ring.push([lonMin + ((lonMax - lonMin) * i) / seg, latMin]);
@@ -175,6 +212,7 @@ export function Overlays() {
   const demV = useDemVersion();
   return (
     <group>
+      <Declutter />
       <JezeroOutline exag={exag} demV={demV} />
       {ellipses.map((e) => <EllipseLine key={e.id} e={e} exag={exag} demV={demV} />)}
       {arcs.map((a) => <ArcLine key={a.id} a={a} exag={exag} demV={demV} />)}

@@ -31,7 +31,7 @@ import { makePlaceholderDem, PLACEHOLDER_LABEL } from '@/lib/scene/placeholder';
 import { configureWorld, useWorld, world } from './world';
 import type { ContextData } from '@/components/Scene/contextGrid';
 
-export const UNAVAILABLE = 'Copilot unavailable right now. Clicks and actions still work.';
+export const UNAVAILABLE = 'The MarsAgent language model is unavailable right now. Clicks, checks and maths follow-ups still work.';
 
 export type TexId = 'ctx' | 'themisDay' | 'themisNight' | 'geology';
 export interface GeologyUnit { symbol: string; name: string; color: string }
@@ -326,6 +326,7 @@ export function startGlobalLoading(): Promise<void> {
 const noTerrain: TerrainApi = {
   init: () => Promise.reject(new Error('Terrain engine is not ready.')),
   planRoute: () => Promise.reject(new Error('Terrain engine is not ready.')),
+  nearestReachable: () => Promise.reject(new Error('Terrain engine is not ready.')),
   analyze: () => Promise.reject(new Error('Terrain engine is not ready.')),
   hazards: () => Promise.reject(new Error('Terrain engine is not ready.')),
   slopeField: () => Promise.reject(new Error('Terrain engine is not ready.')),
@@ -350,9 +351,9 @@ export function toolDeps(): ToolDeps {
   };
 }
 
-/** Deterministic path (no LLM): the same executor the copilot uses. Throws with the tool's message on a tool error. */
+/** Deterministic path (no LLM): the same executor MarsAgent's model uses. Throws with the tool's message on a tool error. */
 export async function callTool<T = Record<string, unknown>>(name: string, args: unknown): Promise<T> {
-  const out = (await runnerExecuteTool(name, args, toolDeps())) as T & { error?: string; message?: string };
+  const out = (await runnerExecuteTool(name, args, toolDeps())) as T & { error?: string; message?: string; engine?: string };
   if (out && typeof out === 'object' && 'error' in out && out.error) throw new Error(out.message || String(out.error));
   return out;
 }

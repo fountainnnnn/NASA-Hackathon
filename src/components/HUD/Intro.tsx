@@ -33,6 +33,7 @@ function useLoadFraction() {
 export function Intro() {
   const open = useIntro((st) => st.open);
   const startRef = useRef<HTMLButtonElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const { pct, done, error } = useLoadFraction();
 
   useEffect(() => {
@@ -40,6 +41,15 @@ export function Intro() {
     try { seen = localStorage.getItem(KEY) === '1'; } catch { /* storage unavailable */ }
     useIntro.setState({ open: !seen });
   }, []);
+
+  // modal: while the card is up, nothing behind it can take focus
+  useEffect(() => {
+    if (!open) return;
+    const root = rootRef.current;
+    const others = root ? [...(root.parentElement?.children ?? [])].filter((c) => c !== root && c.tagName !== 'STYLE') : [];
+    others.forEach((o) => o.setAttribute('inert', ''));
+    return () => others.forEach((o) => o.removeAttribute('inert'));
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -54,10 +64,10 @@ export function Intro() {
   if (open === null) return <div className={s.intro} aria-hidden />;
   const sources = () => { useIntro.getState().hide(); useHud.getState().setSheet('sources'); };
   return (
-    <div className={s.intro} data-out={!open} role="dialog" aria-modal="true" aria-labelledby="intro-title" aria-hidden={!open} inert={!open}>
+    <div ref={rootRef} className={s.intro} data-out={!open} data-modal role="dialog" aria-modal="true" aria-labelledby="intro-title" aria-hidden={!open} inert={!open}>
       <div className={s.introBox}>
-        <h1 id="intro-title" className={s.introTitle}>MarsWalk Copilot</h1>
-        <p className={s.introLede}>Click anywhere on Mars and Scout reads the data. In Jezero Crater, drag on the ground to plan a walk.</p>
+        <h1 id="intro-title" className={s.introTitle}>HEYMARS</h1>
+        <p className={s.introLede}>Click anywhere on Mars and MarsAgent reads the data there. In Jezero Crater, drag from the base to plan a walk and see every calculation behind the verdict.</p>
         <div className={s.introActions}>
           <button ref={startRef} className={s.primary} onClick={() => useIntro.getState().hide()}>Start</button>
           <button className={s.link} onClick={sources}>Sources</button>

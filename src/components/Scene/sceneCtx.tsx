@@ -48,3 +48,19 @@ export function lineY(v: SceneCtxValue, x: number, z: number, h: number | null, 
 export function groundAt(v: SceneCtxValue, x: number, z: number, exag: number): number {
   return groundHeight(v.grid, v.context, x, z, exag);
 }
+
+/**
+ * Height of the rendered terrain triangles (not the bilinear patch): the mesh splits each cell along the (i+1, j) to
+ * (i, j+1) diagonal, so objects that stand on the ground (crew, rover, habitat, draped lines) sit exactly on what is drawn.
+ */
+export function renderedGroundAt(v: SceneCtxValue, x: number, z: number, exag: number): number {
+  const g = v.grid;
+  let fx = (x - g.x0) / g.dx, fz = (z - g.z0) / g.dz;
+  if (v.context && (fx < 0 || fz < 0 || fx > g.nx - 1 || fz > g.nz - 1)) return groundAt(v, x, z, exag);
+  fx = Math.min(Math.max(fx, 0), g.nx - 1.000001);
+  fz = Math.min(Math.max(fz, 0), g.nz - 1.000001);
+  const i = Math.floor(fx), j = Math.floor(fz), tx = fx - i, tz = fz - j, h = g.heights;
+  const a = h[j * g.nx + i], b = h[(j + 1) * g.nx + i], c = h[j * g.nx + i + 1], d = h[(j + 1) * g.nx + i + 1];
+  const y = tx + tz <= 1 ? a + tx * (c - a) + tz * (b - a) : d + (1 - tx) * (b - d) + (1 - tz) * (c - d);
+  return y * exag;
+}

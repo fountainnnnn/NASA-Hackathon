@@ -99,7 +99,7 @@ function HeadingTape({ headingDeg }: { headingDeg: number }) {
     if (major) ticks.push(<text key={`t${d}`} x={x} y={12} textAnchor="middle" fontSize={norm % 45 === 0 ? 12 : 10} fill="currentColor" fillOpacity={norm % 45 === 0 ? 1 : 0.6}>{CARD[norm] ?? String(norm).padStart(3, '0')}</text>);
   }
   return (
-    <svg className={css.tape} width={TAPE_W} height={TAPE_H} viewBox={`0 0 ${TAPE_W} ${TAPE_H}`} role="img" aria-label={`Heading ${Math.round(headingDeg)} degrees`}>
+    <svg className={css.tape} data-avoid viewBox={`0 0 ${TAPE_W} ${TAPE_H}`} role="img" aria-label={`Heading ${Math.round(headingDeg)} degrees`}>
       <line x1={0} x2={TAPE_W} y1={30} y2={30} stroke="currentColor" strokeOpacity={0.25} />
       {ticks}
       <path d={`M${TAPE_W / 2 - 5} 38 L${TAPE_W / 2} 31 L${TAPE_W / 2 + 5} 38`} fill="none" stroke="var(--accent, #e0884a)" strokeWidth={1.5} />
@@ -125,7 +125,7 @@ function MiniMap({ timeline, t }: { timeline: Timeline; t: number }) {
   const me = geom.P(lead.x, lead.z);
   const tb = timeline.turnBack ? geom.P(timeline.turnBack.v.x, timeline.turnBack.v.z) : null;
   return (
-    <svg className={css.map} viewBox="0 0 150 150" role="img" aria-label="Route overview with current position">
+    <svg className={css.map} viewBox="0 0 150 150" role="img" data-avoid aria-label="Route overview with current position">
       <path d={geom.d} fill="none" stroke="var(--accent, #e0884a)" strokeWidth={1.5} />
       {tb && <g stroke="var(--nogo, #d9423b)" strokeWidth={1.5}><line x1={tb[0] - 4} x2={tb[0] + 4} y1={tb[1] - 4} y2={tb[1] + 4} /><line x1={tb[0] - 4} x2={tb[0] + 4} y1={tb[1] + 4} y2={tb[1] - 4} /></g>}
       <circle cx={me[0]} cy={me[1]} r={3.5} fill="var(--text-1, #ece7e1)" />
@@ -162,23 +162,21 @@ export function HelmetHud({ timeline, sunElevationDeg = null, commsVisible = nul
   const remaining = Math.max(0, timeline.durationS - t);
   return (
     <div className={css.hud} aria-label="Helmet display">
-      <span className={`${css.corner} ${css.tl}`} /><span className={`${css.corner} ${css.tr}`} />
-      <span className={`${css.corner} ${css.bl}`} /><span className={`${css.corner} ${css.br}`} />
       <HeadingTape headingDeg={headingDeg} />
-      <div className={css.times}>
+      <div className={css.times} data-avoid>
         <div><span className={css.k}>Elapsed</span>{formatMissionTime(t)}</div>
         <div><span className={css.k}>Remaining</span>{formatMissionTime(remaining).replace('T+', '')}</div>
-        {sunDeg != null && <div><span className={css.k}>Sun</span>{sunDeg.toFixed(0)}<span className={css.u}>deg</span></div>}
+        {sunDeg != null && <div><span className={css.k}>Sun</span>{sunDeg.toFixed(0)}°</div>}
         {commsVisible != null && <div className={commsVisible ? undefined : css.low}><span className={css.k}>Comms</span>{commsVisible ? 'line of sight' : 'in shadow'}</div>}
       </div>
-      <div className={css.numbers}>
+      <div className={css.numbers} data-avoid>
         <div className={css.n}>
           <span className={css.k}>{stop ? `To ${stop.marker.label.toLowerCase()}` : 'To next stop'}</span>
           <span className={css.v}>{stop ? Math.round(stop.distM) : 0}<span className={css.u}>m</span></span>
         </div>
         <div className={css.n}>
           <span className={css.k}>Slope, next 100 m</span>
-          <span className={`${css.v} ${slope.meanDeg > c.maxSlopeDeg ? css.low : ''}`}>{slope.meanDeg.toFixed(1)}<span className={css.u}>deg</span></span>
+          <span className={`${css.v} ${slope.meanDeg > c.maxSlopeDeg ? css.low : ''}`}>{slope.meanDeg.toFixed(1)}<span className={css.deg}>°</span></span>
         </div>
         <div className={css.n}>
           <span className={css.k}>{low ? 'Reserve, below limit' : 'Reserve'}</span>

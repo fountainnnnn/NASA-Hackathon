@@ -4,23 +4,28 @@
 <body>
 <template>
   <style>
-    [data-composition-id="s01"] .s01-a { position: absolute; left: 0; top: 432px; width: 1920px; white-space: nowrap; }
-    [data-composition-id="s01"] .s01-b { position: absolute; left: 0; top: 595px; width: 1920px; white-space: nowrap; text-align: center; color: var(--muted); }
+    /* 0:00 name and team (guide beat 1). Two centred lines on the near-black stage, built from frame 0.
+       Name 76px at top 438 (cap band 452..520), challenge 44px at top 556: the pair centres on y 540. */
+    [data-composition-id="s01"] .s01-a { position: absolute; left: 0; top: 432px; width: 1920px; font-size: 76px; line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; text-align: center; color: var(--text-1); white-space: nowrap; }
+    [data-composition-id="s01"] .s01-b { position: absolute; left: 0; top: 556px; width: 1920px; font-size: 44px; line-height: 1.2; text-align: center; color: var(--text-2); white-space: nowrap; }
   </style>
-  <div id="s01-root" class="rk-scene" data-composition-id="s01" data-width="1920" data-height="1080" data-duration="2.5" data-qa-center="x">
-    <div id="s01-ground" class="rk-ground clip" data-start="0" data-duration="2.5" data-track-index="0"></div>
+  <div id="s01-root" class="rk-scene on-stage" data-composition-id="s01" data-width="1920" data-height="1080" data-duration="2.2" data-qa-center="x">
+    <div id="s01-ground" class="rk-ground is-stage clip" data-start="0" data-duration="2.2" data-track-index="0"></div>
     <div id="s01-world" class="rk-world" data-qa-camera>
-      <div id="s01-a" class="s01-a t-hero">MarsWalk Copilot</div>
-      <div id="s01-b" class="s01-b t-sub">Ng Yu Hang, team Ecliptical</div>
+      <div id="s01-a" class="s01-a">Ng Yu Hang, team Ecliptical</div>
+      <div id="s01-b" class="s01-b">NASA Space Apps Challenge 2026, Martian Map</div>
     </div>
   </div>
   <script>
     (() => {
       const $ = (i) => document.getElementById(i);
       const tl = gsap.timeline({ paused: true });
-      RK.words(tl, $("s01-a"), 0.0, { stagger: 0.12, dur: 0.6 });
-      RK.rise(tl, $("s01-b"), 0.5, { y: 12, dur: 0.6 });
-      tl.fromTo($("s01-world"), { scale: 1 }, { scale: 1.04, duration: 2.5, ease: "none", transformOrigin: "960px 540px" }, 0);
+      // 0.00 name builds word by word (first word already landing on frame 0)
+      RK.words(tl, $("s01-a"), 0.0, { stagger: 0.06, dur: 0.45 });
+      // 0.35 the challenge line rises under it
+      RK.rise(tl, $("s01-b"), 0.35, { y: 12, dur: 0.55 });
+      // slow push so the card never sits still
+      tl.fromTo($("s01-world"), { scale: 1 }, { scale: 1.035, duration: 2.2, ease: "none", transformOrigin: "960px 540px" }, 0);
       window.__timelines["s01"] = tl;
     })();
   </script>

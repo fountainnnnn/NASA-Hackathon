@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Html, Line } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -7,6 +7,11 @@ import { rulerTicks } from './ruler';
 import type { RulerTick } from './ruler';
 import type { GroundApi, Timeline } from './model';
 import css from './scenario.module.css';
+import { useWalkUi } from './walkStore';
+import { useHud } from '@/state/hud';
+import { fadeBasicMaterial } from './sceneAdapter';
+
+const LABEL_GAP_PX = 80;
 
 export interface RulerLineProps {
   timeline: Timeline;
@@ -14,19 +19,25 @@ export interface RulerLineProps {
   color?: string;
   /** Also draw the 1.5 px route line itself (the Jezero Scene already draws its own, so default false). */
   showLine?: boolean;
-  /** Time tick labels such as "10 min". */
+  /** Time tick labels such as "T+01:00" (mission elapsed). */
   labels?: boolean;
   everyM?: number;
   everyMin?: number;
 }
 
-/** Route ruler: short tick every 100 m, long tick every 10 min of moving time. Tick length follows camera distance. */
+/** Route ruler: short tick every 100 m, long tick every 10 min of moving time. Ticks keep a constant screen length. */
 export function RulerLine({ timeline, ground, color = '#e0884a', showLine = false, labels = true, everyM = 100, everyMin = 10 }: RulerLineProps) {
   const ticks = useMemo(() => rulerTicks(timeline, { everyM, everyMin }), [timeline, everyM, everyMin]);
-  const lift = 1.2 * ground.exag;
+  // helmet view: ticks lie on the ground under the boots (and fade near the eye), never at eye height
+  const helmet = useWalkUi((w) => w.helmet);
+  const walkOn = useHud((h) => h.walkOn);
+  const lift = (helmet || walkOn ? 0.3 : 1.2) * ground.exag;
   const lineGeo = useRef<THREE.BufferGeometry>(null);
+  const tickMat = useMemo(() => { const m = new THREE.LineBasicMaterial({ color, transparent: true, depthWrite: false }); fadeBasicMaterial(m); return m; }, [color]);
+  useEffect(() => () => tickMat.dispose(), [tickMat]);
   const { camera } = useThree();
-  const lastDist = useRef(0);
+  const lastCam = useRef(new THREE.Vector3(Infinity, 0, 0));
+  const filledHelmet = useRef(helmet);
   const ys = useMemo(() => ticks.map((k) => ground.y(k.x, k.z, k.h) + lift), [ticks, ground, lift]);
   const pathPts = useMemo(() => {
     if (!showLine) return null;
@@ -40,35 +51,62 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
   }, [timeline, ground, lift, showLine]);
 
   const buf = useMemo(() => new Float32Array(ticks.length * 6), [ticks.length]);
-  const fill = (dist: number) => {
+  const attr = useMemo(() => new THREE.BufferAttribute(buf, 3), [buf]);
+  const tv = useMemo(() => new THREE.Vector3(), []);
+  /** Tick half-lengths are screen-constant (about 4 px, 9 px for the 10 min ticks) from each tick's own distance. */
+  const fill = (heightPx: number) => {
     const g = lineGeo.current;
     if (!g) return;
-    const base = Math.max(3, dist * 0.004);
+    if (g.getAttribute('position') !== attr) g.setAttribute('position', attr);
+    const cam = camera as THREE.PerspectiveCamera;
+    const k2 = (2 * Math.tan((cam.fov * Math.PI) / 360)) / Math.max(1, heightPx);
     ticks.forEach((k: RulerTick, i) => {
-      const half = (k.kind === 'time' ? 2.4 : 1) * base;
+      const d = camera.position.distanceTo(tv.set(k.x, ys[i], k.z));
+      const half = Math.max(helmet ? 0.35 : 1.5, (k.kind === 'time' ? 9 : 4) * k2 * d);
       buf[i * 6] = k.x - k.nx * half; buf[i * 6 + 1] = ys[i]; buf[i * 6 + 2] = k.z - k.nz * half;
       buf[i * 6 + 3] = k.x + k.nx * half; buf[i * 6 + 4] = ys[i]; buf[i * 6 + 5] = k.z + k.nz * half;
     });
-    g.setAttribute('position', new THREE.BufferAttribute(buf, 3));
+    attr.needsUpdate = true;
     g.computeBoundingSphere();
   };
-  useFrame(() => {
-    const first = ticks[0];
-    if (!first) return;
-    const d = camera.position.distanceTo(new THREE.Vector3(first.x, ys[0], first.z));
-    if (Math.abs(d - lastDist.current) / Math.max(1, d) > 0.1 || lastDist.current === 0) { lastDist.current = d; fill(d); }
+  const labelEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const proj = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ size, gl }) => {
+    // tick positions are canvas pixels; the obstacles are viewport rects, so shift by the canvas's place on the page
+    const cv = gl.domElement.getBoundingClientRect();
+    // screen-space declutter: at most one minute label per LABEL_GAP_PX on screen, nearest the start wins
+    let kept: { x: number; y: number }[] = [];
+    const blocks = Array.from(document.querySelectorAll('[data-avoid], [data-companion]')).filter((n) => !(n as HTMLElement).className.toString().includes('tick') && getComputedStyle(n).visibility !== 'hidden').map((n) => n.getBoundingClientRect());
+    ticks.forEach((k, i) => {
+      const el = labelEls.current[i];
+      if (!el) return;
+      proj.set(k.x + k.nx, ys[i], k.z + k.nz).project(camera);
+      const sx = (proj.x * 0.5 + 0.5) * size.width, sy = (-proj.y * 0.5 + 0.5) * size.height;
+      const inside = proj.z < 1 && proj.z > -1 && sx > 24 && sx < size.width - 90 && sy > 56 && sy < size.height - 24;
+      // where the label really sits: drei centres it on the point, then the span moves 18 px right and 8 px up
+      const w = el.offsetWidth || 70, h = el.offsetHeight || 14;
+      const box = { l: cv.left + sx - w / 2 + 18, r: cv.left + sx + w / 2 + 18, t: cv.top + sy - h / 2 - 8, b: cv.top + sy + h / 2 - 8 };
+      const free = !blocks.some((b) => box.l < b.right + 3 && box.r > b.left - 3 && box.t < b.bottom + 3 && box.b > b.top - 3);
+      const clear = inside && free && kept.every((q) => Math.hypot(q.x - sx, q.y - sy) >= LABEL_GAP_PX);
+      if (clear) kept = [...kept, { x: sx, y: sy }];
+      el.style.visibility = clear ? 'visible' : 'hidden';
+    });
+    // refill when the camera has moved a little (cheap: one pass over the ticks, buffer updated in place)
+    if (camera.position.distanceToSquared(lastCam.current) > 0.25 || filledHelmet.current !== helmet) { lastCam.current.copy(camera.position); filledHelmet.current = helmet; fill(size.height); }
   });
 
+  // helmet view: the ground ribbon carries the path (chevrons every 10 m); screen-space ticks would read as a glitch at eye height
+  if (helmet) return null;
   return (
     <>
       {pathPts && pathPts.length > 1 && <Line points={pathPts} color={color} lineWidth={1.5} transparent depthWrite={false} renderOrder={11} raycast={() => null} />}
       <lineSegments frustumCulled={false} renderOrder={12} raycast={() => null}>
         <bufferGeometry ref={lineGeo} />
-        <lineBasicMaterial color={color} transparent depthWrite={false} />
+        <primitive object={tickMat} attach="material" />
       </lineSegments>
-      {labels && ticks.map((k, i) => k.label && (
+      {labels && !helmet && ticks.map((k, i) => k.label && (
         <Html key={i} position={[k.x + k.nx * 1, ys[i], k.z + k.nz * 1]} center zIndexRange={[10, 0]} style={{ pointerEvents: 'none' }}>
-          <span className={css.tick} style={{ display: 'inline-block', transform: 'translate(18px, -8px)' }}>{k.label}</span>
+          <span ref={(el) => { labelEls.current[i] = el; }} className={css.tick} data-avoid style={{ display: 'inline-block', transform: 'translate(18px, -8px)', visibility: 'hidden' }}>{k.label}</span>
         </Html>
       ))}
     </>

@@ -28,6 +28,27 @@ export function tokenizeAnswer(text: string, unverified: string[] = []): Token[]
   return out;
 }
 
+/**
+ * Numbers in answer prose: a number, optionally with a unit that is a whole word ("10,000 s" in "10,000 simulated" is not
+ * seconds). Ordinals ("95th") and bare four-digit years ("2006", "2020") stay plain text.
+ */
+const NUM = /(?<![\p{L}\d.,])(-?\d(?:[\d,]*\d)?(?:\.\d+)?)(\s?(?:km\/h|m\/s²|m\/s|km²|km|kJ|Wh|W|min|ms|h|m|s|%|°|kg)(?![\p{L}\d]))?(?![\p{L}\d])/gu;
+const YEAR = /^(1[89]|20)\d\d$/;
+export function richTokens(text: string): { text: string; num: boolean }[] {
+  const out: { text: string; num: boolean }[] = [];
+  let last = 0;
+  for (const m of text.matchAll(NUM)) {
+    const i = m.index ?? 0;
+    const tok = m[0];
+    if (!m[2] && YEAR.test(m[1])) continue; // a year, not a measurement
+    if (i > last) out.push({ text: text.slice(last, i), num: false });
+    out.push({ text: tok, num: true });
+    last = i + tok.length;
+  }
+  if (last < text.length) out.push({ text: text.slice(last), num: false });
+  return out;
+}
+
 export function firstLine(text: string, max = 70): string {
   const line = text.split('\n').find((l) => l.trim())?.trim() ?? '';
   return line.length > max ? `${line.slice(0, max - 1).trimEnd()}…` : line;
@@ -54,7 +75,7 @@ export interface ReadoutSample { lat: number; lon: number; elevM: number | null;
 export function formatReadout(r: ReadoutSample, dwell = false): string[] {
   const lat = `${Math.abs(r.lat).toFixed(2)}${r.lat >= 0 ? 'N' : 'S'}`;
   const lon = `${Math.abs(r.lon).toFixed(2)}${r.lon >= 0 ? 'E' : 'W'}`;
-  const first = `${lat} ${lon}  ${r.elevM === null ? 'no elevation' : `${Math.round(r.elevM)} m`}`;
+  const first = r.elevM === null ? `${lat} ${lon}` : `${lat} ${lon}  ${Math.round(r.elevM)} m`;
   if (!dwell) return [first];
   const bits = [r.slopeDeg != null ? `slope ${r.slopeDeg.toFixed(1)}°` : '', r.unit ?? ''].filter(Boolean);
   return bits.length ? [first, bits.join('  ')] : [first];

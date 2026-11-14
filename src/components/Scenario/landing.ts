@@ -18,10 +18,13 @@ export function landingDurationS(phases: EdlPhase[], revealS = LANDING_REVEAL_S)
   return edlEndS(phases) + revealS;
 }
 
-/** Current phase at time t (the last started phase after the end), or null before the first. */
+/**
+ * Current clock-timed phase at time t (the last started phase after the end), or null before the first. Phases NASA defines
+ * by altitude ("trigger": "altitude", e.g. Terrain-Relative Navigation) are skipped: they do not own a time span.
+ */
 export function phaseAt(phases: EdlPhase[], t: number): EdlPhase | null {
   let cur: EdlPhase | null = null;
-  for (const p of [...phases].sort((a, b) => a.tStartS - b.tStartS)) if (p.tStartS <= t) cur = p;
+  for (const p of [...phases].sort((a, b) => a.tStartS - b.tStartS)) if (p.tStartS <= t && (p as EdlPhase & { trigger?: string }).trigger !== 'altitude') cur = p;
   return cur;
 }
 
@@ -36,11 +39,15 @@ export function altitudeKmAt(phases: EdlPhase[], t: number): number | null {
   return a + (b - a) * f;
 }
 
-/** Fraction 0..1 along the approach arc. Schematic ease-out: fast early, slow near touchdown. */
+/**
+ * Fraction 0..1 along the approach arc. Schematic ease-out (quartic): fast during entry, slow under the parachute and in
+ * powered descent, so the discarded heat shield and back shell come down within the touchdown view, up-range of the rover instead of tens of
+ * kilometres off, where it sat at the edge of the touchdown view. Visual only, not a trajectory.
+ */
 export function approachFraction(t: number, endS: number): number {
   if (endS <= 0) return 1;
   const u = Math.min(1, Math.max(0, t / endS));
-  return 1 - Math.pow(1 - u, 1.8);
+  return 1 - Math.pow(1 - u, 4);
 }
 
 /** Reveal progress 0..1 of the touchdown scatter. */

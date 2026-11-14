@@ -168,6 +168,16 @@ function checkBrief(chk: import('../globalSci').LandingCheckResult) {
   };
 }
 
+/** Plain words for a landing verdict (never the raw "fails-some" code). */
+export function plainVerdict(chk: { verdict: string; criteria: { label: string; pass: boolean | null }[] }): string {
+  if (chk.verdict === 'meets-all') return 'Meets every listed criterion';
+  if (chk.verdict === 'fails-some') {
+    const fails = chk.criteria.filter((c) => c.pass === false);
+    return `Fails ${fails.length} of ${chk.criteria.length} criteria: ${fails.map((c) => c.label).join(', ')}`;
+  }
+  return 'Not enough data';
+}
+
 const toneOf = (v: string): 'ok' | 'warn' | 'bad' => (v === 'meets-all' ? 'ok' : v === 'fails-some' ? 'bad' : 'warn');
 
 /* ------------------------------------------------------------------ point resolution */
@@ -584,7 +594,7 @@ export const TOOLS: ToolDef[] = [
         },
       };
       return {
-        geojson, download: true, filename: `marswalk-plan-${r.id}.geojson`,
+        geojson, download: true, filename: `heymars-plan-${r.id}.geojson`,
         provenance: prov('computed', `route solver on ${SRC_DEM}`),
       };
     },
@@ -616,7 +626,7 @@ export const TOOLS: ToolDef[] = [
       const g = needGlobal(deps);
       const chk = g.checkLandingSite(lon, lat);
       const cmds: GlobeCommand[] = [
-        { type: 'globe_marker', id: 'landing-marker', lon: chk.site.lon, lat: chk.site.lat, label: `Landing check: ${chk.verdict}`, kind: 'landing' },
+        { type: 'globe_marker', id: 'landing-marker', lon: chk.site.lon, lat: chk.site.lat, label: plainVerdict(chk), kind: 'landing' },
       ];
       if (Number.isFinite(chk.ellipse.semiMajorKm)) {
         cmds.push({
@@ -656,9 +666,9 @@ export const TOOLS: ToolDef[] = [
       const tone = res.okFraction >= 0.95 ? 'ok' : res.okFraction >= 0.8 ? 'warn' : 'bad';
       const pct = (x: number) => Math.round(x * 1000) / 10;
       const globe = applyGlobe(deps, [
-        { type: 'globe_ellipse', id: 'landing-ellipse', lon: a.lon, lat: a.lat, semiMajorKm: ell.semiMajorKm, semiMinorKm: ell.semiMinorKm, azimuthDeg: ell.azimuthDeg, label: `${pct(res.okFraction)}% within ${a.maxSlopeDeg} deg`, tone },
+        { type: 'globe_ellipse', id: 'landing-ellipse', lon: a.lon, lat: a.lat, semiMajorKm: ell.semiMajorKm, semiMinorKm: ell.semiMinorKm, azimuthDeg: ell.azimuthDeg, label: `${pct(res.okFraction)}% within ${a.maxSlopeDeg}°`, tone },
         { type: 'globe_scatter', id: 'landing-scatter', scenarioId: rec.id },
-        { type: 'globe_fly_to', lon: a.lon, lat: a.lat, altitudeKm: Math.min(2000, Math.max(50, ell.semiMajorKm * 8)) },
+        { type: 'globe_fly_to', lon: a.lon, lat: a.lat, altitudeKm: Math.min(4000, Math.max(450, ell.semiMajorKm * 7)) }, // ellipse diameter fills ~40% of the view where the 8k texture allows (450 km floor keeps it from smearing)
       ]);
       const m = deps.globalSci?.manifest();
       return {

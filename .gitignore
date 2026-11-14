@@ -44,3 +44,18 @@ next-env.d.ts
 data/raw/
 test-results/
 playwright-report/
+deliverables/screens/flow-*
+test-results/
+
+# Cesium static build: loaded from CDN in production (see Planet/engine.ts)
+public/cesium/
+
+# generated artefacts (kept local)
+deliverables/qa/
+deliverables/video/.qa/
+deliverables/video/renders/
+deliverables/video/footage/
+deliverables/video/assets/bgm/*.wav
+deliverables/screens/
+test-results/
+deliverables/video/.film/

@@ -15,7 +15,8 @@ Paste over `:root` in `src/app/globals.css` and alias the old names until call s
   --bg-2: #161313;
   --text-1: #ece7e1;
   --text-2: #a39c95;
-  --text-3: #6a645f;
+  --text-3: #8a837d; /* 5.2:1 on bg-1; the first value (#6a645f) failed 4.5:1 */
+  --chip: rgba(6, 5, 5, 0.88); /* flat scrim behind any text that sits on the planet */
   --accent: #e0884a; /* route, primary action */
   --accent-ink: #160c06;
   --data: #5cc8ff;   /* measured values, focus */

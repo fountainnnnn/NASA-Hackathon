@@ -72,7 +72,7 @@ describe('cuff card contents match the route numbers', () => {
     const r = planSynthetic({ maxSlopeDeg: 12, batteryReservePct: 25, evaMaxMin: 300 });
     const c = buildCuffCard({ route: r });
     const t = c.abortRules.join('\n');
-    expect(t).toContain('12 deg');
+    expect(t).toContain('12°');
     expect(t).toContain('25%');
     expect(t).toContain('T+05:00');
     expect(c.abortRules.some((x) => x.includes(fmtT(c.turnBack!.tMin, true)))).toBe(true);
@@ -85,7 +85,7 @@ describe('formats', () => {
     for (const l of card.text.split('\n')) expect(l.length).toBeLessThanOrEqual(62);
     expect(card.markdown.split('\n').filter((l) => /^\| \d+ \|/.test(l))).toHaveLength(card.rows.length);
     expect(card.svg).toMatch(/^<svg [^>]*width="600" height="900"/);
-    expect(card.svg).toContain('#0b0f14');
+    expect(card.svg).toContain('fill="#ffffff"'); // black on white for print
     expect(card.svg).toContain('monospace');
     expect(card.svg).toContain('START');
     expect((card.svg.match(/<text /g) ?? []).length).toBe((card.svg.match(/<\/text>/g) ?? []).length);
@@ -162,7 +162,7 @@ describe('comms and daylight on the card', () => {
     const day = buildCuffCard({ route, startUtc: start, constraints: k });
     expect(day.startUtc).toBe(new Date(start).toISOString());
     expect(day.rows.every((x) => x.sunElevationDeg !== null && x.sunElevationDeg > 0)).toBe(true);
-    expect(day.abortRules.some((x) => x.startsWith('Sun below 0 deg'))).toBe(true);
+    expect(day.abortRules.some((x) => x.startsWith('Sun below 0°'))).toBe(true);
     expect(day.turnBack!.limitedBy).toBe('eva-time');
     // start so late that sunset arrives before the EVA limit: daylight becomes the binding limit
     const lateStart = sun.sunsetMs! - 150 * MIN;
@@ -173,5 +173,20 @@ describe('comms and daylight on the card', () => {
     const endMs = lateStart + (late.turnBack!.tMin + route.legs[1].timeMin) * MIN;
     expect(endMs).toBeLessThanOrEqual(sun.sunsetMs! + 2 * MIN);
     expect(endMs).toBeGreaterThan(sun.sunsetMs! - 8 * MIN);
+  });
+});
+
+describe('cuff card naming and verdict (QA round 1)', () => {
+  it('is a HeyMars card in degrees; a NO GO route says so on its first line', () => {
+    const route = planSynthetic();
+    const go = buildCuffCard({ route });
+    expect(go.text.split('\n')[0]).toMatch(/^HEYMARS CUFF CARD /);
+    expect(go.text).not.toMatch(/MARSWALK|\bdeg\b/);
+    expect(go.text).toMatch(/MAXSLP \d+\.\d°/);
+    expect(go.markdown).not.toMatch(/[—·⚠]/);
+    const nogo = buildCuffCard({ route, verdict: 'NO GO' });
+    expect(nogo.text.split('\n')[0]).toBe('NO GO, PLANNING ONLY. DO NOT WALK THIS ROUTE');
+    expect(nogo.svg).toContain('NO GO, PLANNING ONLY');
+    expect(nogo.markdown).toContain('NO GO, planning only');
   });
 });

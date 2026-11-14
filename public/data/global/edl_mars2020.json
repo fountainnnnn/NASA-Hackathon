@@ -2,7 +2,7 @@
   "version": 1,
   "retrieved": "2026-11-14",
   "timeOrigin": "entry interface (top of the Martian atmosphere) = 0 s",
-  "caveat": "Only numbers stated on the cited NASA pages are used. Times that NASA states relative to another event are added up and marked 'derived'. NASA publishes altitude triggers (not clock times) for terrain-relative navigation and the sky crane, so those phases carry the nearest sourced time bound and say so in the note. Planned values from the 2020 press kits (EDL varies by about a minute).",
+  "caveat": "Only numbers stated on the cited NASA pages are used. Times that NASA states relative to another event are added up and marked 'derived'. NASA publishes altitude triggers (not clock times) for terrain-relative navigation and the sky crane, so those phases carry the nearest sourced time bound and say so in the note. Planned values from the 2020 press kits (EDL varies by about a minute). Phases with \"trigger\": \"altitude\" are shown by altitude (altitudeKmStart to altitudeKmEnd), not by clock time.",
   "phases": [
     {
       "id": "cruise_stage_separation",
@@ -61,12 +61,26 @@
       }
     },
     {
-      "id": "trn_radar",
-      "label": "Terrain-Relative Navigation and radar",
+      "id": "radar_acquisition",
+      "label": "Radar acquires the ground",
       "tStartS": 260,
       "tEndS": 350,
       "altitudeKmEnd": 2.1,
-      "note": "Lander Vision System compares camera images with an onboard map at about 4.2 to 2.2 km above the ground, locating the vehicle to about 40 m in under 10 s and able to shift touchdown by up to 600 m (2,000 ft). NASA gives altitudes, not clock times, for this step: the bounds are heat shield separation (260 s) and back shell separation (350 s, derived).",
+      "note": "After heat shield separation the landing radar is exposed and starts measuring altitude and velocity, about 7 to 8 km (4 to 5 miles) above the surface, and runs until touchdown. Time bounds: heat shield separation (260 s, derived) to back shell separation (350 s, derived).",
+      "source": {
+        "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
+        "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
+      }
+    },
+    {
+      "id": "trn_radar",
+      "label": "Terrain-Relative Navigation",
+      "tStartS": 260,
+      "tEndS": 350,
+      "altitudeKmStart": 4.2,
+      "altitudeKmEnd": 2.2,
+      "trigger": "altitude",
+      "note": "Lander Vision System compares camera images with an onboard map at about 4.2 to 2.2 km above the ground, locating the vehicle to about 40 m in under 10 s and able to shift touchdown by up to 600 m (2,000 ft). NASA gives altitudes, not clock times, for this step: it is shown only while the altitude is between 4.2 and 2.2 km; the time bounds are heat shield separation (260 s) and back shell separation (350 s, derived).",
       "source": {
         "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
         "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"
@@ -104,7 +118,8 @@
       "tEndS": 420,
       "altitudeKmStart": 0.02,
       "altitudeKmEnd": 0,
-      "note": "Starts when the descent stage is 20 m (65 ft) over the target; cords lower the rover 7.6 m (25 ft) below the descent stage. NASA gives an altitude trigger, not a clock time: shown at the touchdown bound (about 420 s).",
+      "trigger": "altitude",
+      "note": "Starts when the descent stage is 20 m (65 ft) over the target; cords lower the rover 7.6 m (25 ft) below the descent stage. NASA gives an altitude trigger, not a clock time: the phase is shown whenever the descent stage is 20 m or less above the ground before touchdown (about 420 s), and its timeline mark sits at the touchdown bound.",
       "source": {
         "title": "NASA/JPL Mars 2020 Perseverance Landing Press Kit, Entry Descent and Landing",
         "url": "https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/"

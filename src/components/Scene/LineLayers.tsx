@@ -3,6 +3,8 @@ import { useMemo } from 'react';
 import { Line } from '@react-three/drei';
 import { densify } from '@/lib/scene/drape';
 import { meshHeightAt } from '@/lib/scene/terrainGrid';
+import { useWalkUi } from '@/components/Scenario/walkStore';
+import { useHud } from '@/state/hud';
 import { useWorld } from '@/state/world';
 import { lineY, trueHeight, useScene } from './sceneCtx';
 
@@ -10,12 +12,17 @@ const noRaycast = () => null;
 type Pt = [number, number, number];
 interface Geo { x: number[]; z: number[]; h: (number | null)[] }
 
-/** Traverse polyline (thin white dashed) and landing-ellipse outline (ochre), both toggleable layers. */
+/**
+ * Perseverance traverse (1 px solid bone at 45 % opacity, screen-space width) and the landing-ellipse outline, both
+ * toggleable layers. The traverse is context for planning views only: hidden while a walk, the helmet or reach is shown.
+ */
 export function LineLayers() {
   const v = useScene();
   const exag = useWorld((s) => s.exaggeration);
   const layers = useWorld((s) => s.layers);
   const opacity = useWorld((s) => s.layerOpacity);
+  const scenario = useHud((h) => h.walkOn || h.reachOn);
+  const helmet = useWalkUi((w) => w.helmet);
 
   const build = (pts: { lon: number; lat: number }[]): Geo => {
     const g: Geo = { x: [], z: [], h: [] };
@@ -45,8 +52,8 @@ export function LineLayers() {
 
   return (
     <>
-      {layers.traverse && tPts && (
-        <Line points={tPts} color="#ffffff" lineWidth={1.6} dashed dashSize={35} gapSize={30} transparent opacity={opacity.traverse} raycast={noRaycast} />
+      {layers.traverse && tPts && !scenario && !helmet && (
+        <Line points={tPts} color="#ece7e1" lineWidth={1} transparent opacity={0.45 * opacity.traverse} depthWrite={false} renderOrder={6} raycast={noRaycast} />
       )}
       {layers.ellipse && ePts.map((p, i) => p.length > 1 && (
         <Line key={i} points={p} color="#E0884A" lineWidth={2} transparent opacity={opacity.ellipse} raycast={noRaycast} />

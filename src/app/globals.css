@@ -3,9 +3,12 @@
   --bg-0: #060505;
   --bg-1: #0d0b0b;
   --bg-2: #161313;
+  --bg-3: #1e1a19;
   --text-1: #ece7e1;
   --text-2: #a39c95;
-  --text-3: #6a645f;
+  --text-3: #8a837d; /* 5.4:1 on bg-0, 5.2:1 on bg-1 (was #6a645f, 3.4:1) */
+  --chip: rgba(6, 5, 5, 0.88); /* flat scrim behind any text that sits on the planet */
+  --bar-h: 118px; /* height of the playback bar when it is on screen */
   --accent: #e0884a; /* route, primary action */
   --accent-ink: #160c06;
   --data: #5cc8ff;   /* measured values, focus */
@@ -14,6 +17,10 @@
   --nogo: #d9423b;    /* darkest, hatched */
   --line: rgba(236, 231, 225, 0.10);
   --line-strong: rgba(236, 231, 225, 0.22);
+  --line-2: rgba(236, 231, 225, 0.20);
+  --nogo-text: #ee6a63; /* --nogo tinted for text on near-black (5.4:1) */
+  /* shell geometry (docs/UI_SPEC.md): the map is everything else */
+  --top-h: 40px; --rail-w: 56px; --panel-w: 336px; --time-h: 46px; --status-h: 24px;
   --stroke: 1.5px;
   --r-1: 2px; --r-2: 6px; --r-3: 10px;
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 40px;
@@ -84,3 +91,38 @@ a:hover { text-decoration-color: var(--text-1); }
 
 details > summary { cursor: pointer; font-size: var(--t-small); font-weight: 600; list-style: none; display: flex; align-items: center; gap: 6px; }
 details > summary::-webkit-details-marker { display: none; }
+
+/* ------------------------------------------------------------------ shell grid
+   top bar 40 px across; rail 56 px down the left; stage; MarsAgent panel 336 px (0 when collapsed); timeline 46 px under
+   the stage while a simulation is loaded, otherwise a 24 px status line. */
+.app {
+  position: fixed; inset: 0; overflow: hidden; background: var(--bg-0);
+  --pw: var(--panel-w);
+  display: grid; grid-template-columns: var(--rail-w) minmax(0, 1fr) var(--pw);
+  grid-template-rows: var(--top-h) minmax(0, 1fr) var(--bottom-h, var(--status-h));
+  transition: grid-template-columns var(--dur-2) var(--ease);
+}
+.app[data-panel='false'] { --pw: 0px; }
+.app[data-sim='true'] { --bottom-h: var(--time-h); }
+.stage { grid-column: 2; grid-row: 2; position: relative; overflow: hidden; min-width: 0; min-height: 0; background: var(--bg-0); }
+.stage > .layer { position: absolute; inset: 0; }
+@media (max-width: 640px) {
+  :root { --rail-w: 44px; }
+  /* phones: the map card is a bottom sheet; the legend and the terrain credit step aside while it is up */
+  .app[data-card='true'] .stage [aria-label='Legend'], .app[data-card='true'] .stage [class*='credit'] { visibility: hidden; }
+  /* phones: the panel is a bottom sheet over the stage, so it takes no width */
+  .app, .app[data-panel] { --pw: 0px; }
+}
+
+/* ------------------------------------------------------------------ print: the report only */
+@media print {
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  html, body { overflow: visible !important; height: auto !important; background: #fff !important; }
+  body > *:not([data-report-root]) { display: none !important; }
+  [data-report-root] { position: static !important; inset: auto !important; display: block !important; background: #fff !important; }
+  [data-report-root] [data-report-chrome] { display: none !important; }
+  [data-report-root] [data-report-body], [data-report-root] [data-report-scroll] { display: block !important; overflow: visible !important; height: auto !important; padding: 0 !important; background: #fff !important; }
+  [data-report-root] [data-report-paper] { box-shadow: none !important; width: auto !important; max-width: none !important; padding: 0 !important; margin: 0 !important; background: #fff !important; }
+  [data-report-root] [data-report-paper] h2 { break-after: avoid; }
+  [data-report-root] [data-report-paper] table, [data-report-root] [data-report-paper] pre { break-inside: avoid; }
+}

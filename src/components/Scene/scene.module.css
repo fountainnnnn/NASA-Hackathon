@@ -1,19 +1,15 @@
 /* Survey Reticle: a thin ring and a mono label, no icons, no fills */
 .pin { position: relative; width: 0; height: 0; font-family: var(--font-sans), system-ui, sans-serif; }
-.pinDot {
-  position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%;
-  display: grid; place-items: center; background: transparent; border: 1.5px solid var(--text-1, #ece7e1);
-  box-shadow: 0 0 0 1px rgba(6, 5, 5, 0.7);
-}
-.pinDot svg { display: none; }
+.pinDot { position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; display: block; }
+.pinDot svg { display: block; }
 .pinLabel {
   position: absolute; left: 14px; top: -9px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;
   font: 400 11px/18px var(--font-mono), monospace; padding: 0 6px; border-radius: 2px; color: var(--text-1, #ece7e1);
   background: rgba(13, 11, 11, 0.92); border: 1px solid var(--line, rgba(236, 231, 225, 0.1));
 }
-.base .pinDot { border-radius: 2px; }
-.science .pinDot { border-color: var(--go, #58c98a); }
-.hazard .pinDot { border-color: var(--nogo, #d9423b); }
-.info .pinDot { border-color: var(--text-2, #a39c95); }
+.pin[data-flip='left'] .pinLabel { left: auto; right: 14px; }
+.pin[data-flip='up'] .pinLabel { top: -30px; left: 6px; }
+.pin[data-flip='down'] .pinLabel { top: 12px; left: 6px; }
+.pin[data-flip='upleft'] .pinLabel { top: -30px; left: auto; right: 6px; }
+.pin[data-flip='downleft'] .pinLabel { top: 12px; left: auto; right: 6px; }
 .callout { position: relative; width: 0; height: 0; font-family: var(--font-sans), system-ui, sans-serif; }
-.callout .pinDot { background: #ff4d4d; color: #fff; font: 600 12px/1 var(--font-mono), monospace; }

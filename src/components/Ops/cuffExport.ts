@@ -3,10 +3,10 @@ import { buildCuffCard, fmtT } from '@/lib/ops/cuffCard';
 import type { CommsResult } from '@/lib/opsContracts';
 import type { CuffView } from '@/state/hud';
 
-export function makeCuff(route: RouteResult, comms: CommsResult | null, startUtcMs: number): CuffView {
-  const card = buildCuffCard({ route, comms, startUtc: startUtcMs });
+export function makeCuff(route: RouteResult, comms: CommsResult | null, startUtcMs: number, verdict: 'GO' | 'HOLD' | 'NO GO' | null = null): CuffView {
+  const card = buildCuffCard({ route, comms, startUtc: startUtcMs, verdict });
   const tb = card.turnBack ? `Turn back at ${fmtT(card.turnBack.tMin)}, limited by ${card.turnBack.limitedBy === 'eva-time' ? 'EVA time' : card.turnBack.limitedBy}.` : null;
-  return { routeId: route.id, svg: card.svg, text: card.text, filenameBase: `marswalk-cuff-${route.id}`, turnBack: tb };
+  return { routeId: route.id, svg: card.svg, text: card.text, filenameBase: `heymars-cuff-${route.id}`, turnBack: tb };
 }
 
 function save(name: string, body: string, type: string) {

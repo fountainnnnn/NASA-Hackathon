@@ -74,7 +74,7 @@ export function PlaybackBar({ markers = [], sunElevationDeg, clockLabel = 'missi
   const hy = curve ? sunY : BASE;
 
   return (
-    <div className={css.bar} role="group" aria-label="Playback">
+    <div className={css.bar} role="group" aria-label="Playback" data-avoid>
       <svg
         ref={svg} className={css.arc} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" tabIndex={0} role="slider"
         aria-label="Scenario time" aria-valuemin={0} aria-valuemax={Math.round(durationS)} aria-valuenow={Math.round(t)} aria-valuetext={formatMissionTime(t)}

@@ -6,7 +6,7 @@
  */
 import { useMemo } from 'react';
 import { useWorld } from '@/state/world';
-import { groundAt, useScene } from '@/components/Scene/sceneCtx';
+import { renderedGroundAt, useScene } from '@/components/Scene/sceneCtx';
 import type { GroundApi } from './model';
 
 export function useSceneGround(): GroundApi {
@@ -15,9 +15,11 @@ export function useSceneGround(): GroundApi {
   return useMemo<GroundApi>(() => ({
     exag,
     toLocal: (lon, lat) => v.rt.geo.toLocal(v.rt.meta, lon, lat),
-    y: (x, z, hAbs) => {
-      const mesh = groundAt(v, x, z, exag);
-      return hAbs == null ? mesh : Math.max((hAbs - v.rt.meta.hRef) * exag, mesh);
-    },
+    // the rendered surface, so feet, wheels and footings touch what is drawn (the 20 m DEM between mesh vertices can sit
+    // a few metres above or below the triangles; hAbs is accepted for other hosts but not used here)
+    y: (x, z) => renderedGroundAt(v, x, z, exag),
   }), [v, exag]);
 }
+
+export { SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG } from '@/components/Scene/atmosphere';
+export { fadeBasicMaterial } from '@/components/Scene/lineFx';

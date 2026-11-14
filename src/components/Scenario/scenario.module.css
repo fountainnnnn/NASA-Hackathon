@@ -40,21 +40,47 @@
 .tick {
   font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-size: 10px;
-  color: var(--text-2, #a39c95);
+  color: var(--text-1, #ece7e1);
   pointer-events: none;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 3px #000, 0 0 3px #000;
+  background: #0d0b0b;
+  padding: 1px 4px;
+  border-radius: var(--r-1, 2px);
 }
 
 .contour {
   font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-size: 10px;
   color: var(--text-1, #ece7e1);
-  background: rgba(13, 11, 11, 0.85);
+  background: #0d0b0b;
   padding: 1px 4px;
   border-radius: var(--r-1, 2px);
   pointer-events: none;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+.toggle {
+  display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; cursor: pointer;
+  font: 400 var(--t-small, 12px) var(--font-sans, "Schibsted Grotesk", system-ui, sans-serif);
+  color: var(--text-1, #ece7e1); background: rgba(13, 11, 11, 0.92);
+  border: 1px solid var(--line-strong, rgba(236,231,225,0.22)); border-radius: var(--r-1, 2px);
+}
+.toggle:hover { background: var(--bg-2, #161313); }
+.toggle:focus-visible { outline: 1.5px solid var(--data, #5cc8ff); outline-offset: 2px; }
+
+.parked {
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
+  font-size: var(--t-micro, 11px);
+  color: var(--text-1, #ece7e1);
+  background: rgba(13, 11, 11, 0.92);
+  border: 1px solid var(--line, rgba(236, 231, 225, 0.1));
+  border-radius: var(--r-1, 2px);
+  padding: 3px 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  display: grid;
+  gap: 1px;
+}
+.parked .sub { color: var(--text-2, #a39c95); }

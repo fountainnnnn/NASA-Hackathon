@@ -8,9 +8,9 @@ const mono = Martian_Mono({ variable: "--font-martian", subsets: ["latin"], weig
 // wordmark and GO / HOLD / NO GO only
 const display = Michroma({ variable: "--font-michroma", subsets: ["latin"], weight: "400", display: "swap" });
 
-const title = "MarsWalk Copilot: plan a Marswalk on real NASA terrain";
+const title = "HeyMars: plan a Marswalk on real NASA terrain";
 const description =
-  "Click anywhere on Mars and Scout reads the data. In Jezero Crater, drag to plan a Marswalk on real NASA terrain. Made by Ng Yu Hang, team Ecliptical, for NASA Space Apps Challenge 2026 Singapore.";
+  "Click anywhere on Mars and MarsAgent reads the data. In Jezero Crater, drag to plan a Marswalk on real NASA terrain. Made by Ng Yu Hang, team Ecliptical, for NASA Space Apps Challenge 2026 Singapore.";
 
 export const metadata: Metadata = {
   title,

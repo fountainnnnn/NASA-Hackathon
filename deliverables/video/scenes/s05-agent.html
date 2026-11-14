@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<template>
+  <style>
+    /* How it works, the plain version: your click goes to MarsAgent, MarsAgent calls tools, the verdict lands on the map.
+       Row geometry (frame px, centre y 385): click 187..437, arrow, MarsAgent 517..767, arrow, tools 847..1323 (2x2),
+       arrow, verdict 1403..1733. Total 1546 wide, centred on 960. Icons: Lucide (ISC). */
+    [data-composition-id="s05"] .s05-node { position: absolute; top: 300px; height: 170px; background: var(--bg-1); border: 1px solid var(--line-strong); border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+    [data-composition-id="s05"] .s05-ic { width: 56px; height: 56px; color: var(--text-1); }
+    [data-composition-id="s05"] .s05-ic svg, [data-composition-id="s05"] .s05-ci svg { width: 100%; height: 100%; display: block; }
+    [data-composition-id="s05"] .s05-lab { font-size: 34px; line-height: 1.15; font-weight: 500; color: var(--text-1); white-space: nowrap; }
+    [data-composition-id="s05"] .s05-chip { position: absolute; width: 230px; height: 76px; background: var(--bg-1); border: 1px solid var(--line-strong); border-radius: 8px; display: flex; align-items: center; gap: 14px; padding: 0 20px; font-size: 32px; color: var(--text-1); white-space: nowrap; }
+    [data-composition-id="s05"] .s05-ci { width: 36px; height: 36px; color: var(--text-2); flex: none; }
+    [data-composition-id="s05"] .s05-words { display: flex; gap: 18px; font-size: 32px; font-weight: 600; white-space: nowrap; }
+    [data-composition-id="s05"] .s05-arrows { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; fill: none; stroke: var(--text-2); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    [data-composition-id="s05"] .s05-cap { position: absolute; left: 0; top: 610px; width: 1920px; text-align: center; font-size: 64px; line-height: 1.15; font-weight: 500; letter-spacing: -0.02em; color: var(--text-1); white-space: nowrap; }
+  </style>
+  <div id="s05-root" class="rk-scene on-stage" data-composition-id="s05" data-width="1920" data-height="1080" data-duration="2.6" data-qa-center="x" data-qa-center-from="1.4">
+    <div id="s05-ground" class="rk-ground is-stage clip" data-start="0" data-duration="2.6" data-track-index="0"></div>
+    <div id="s05-world" class="rk-world" style="top: 40px;" data-qa-camera>
+      <div id="s05-diag" style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform: scale(1.1); transform-origin: 960px 385px;">
+      <div id="s05-click" class="s05-node" data-qa="box" style="left: 187px; width: 250px;"><div class="s05-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/></svg></div><div class="s05-lab">Your click</div></div>
+      <div id="s05-agent" class="s05-node" data-qa="box" style="left: 517px; width: 250px;"><div class="s05-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="22" x2="18" y1="12" y2="12"/><line x1="6" x2="2" y1="12" y2="12"/><line x1="12" x2="12" y1="6" y2="2"/><line x1="12" x2="12" y1="22" y2="18"/></svg></div><div class="s05-lab">MarsAgent</div></div>
+      <div id="s05-t0" class="s05-chip" data-qa="box" style="left: 847px; top: 301px;"><div class="s05-ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>Terrain</div>
+      <div id="s05-t1" class="s05-chip" data-qa="box" style="left: 1093px; top: 301px;"><div class="s05-ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></div>Sun</div>
+      <div id="s05-t2" class="s05-chip" data-qa="box" style="left: 847px; top: 393px;"><div class="s05-ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9"/><path d="M7.8 4.7a6.14 6.14 0 0 0-.8 7.5"/><circle cx="12" cy="9" r="2"/><path d="M16.2 4.8c2 2 2.26 5.11.8 7.47"/><path d="M19.1 1.9a9.96 9.96 0 0 1 0 14.1"/><path d="M9.5 18h5"/><path d="m8 22 4-11 4 11"/></svg></div>Comms</div>
+      <div id="s05-t3" class="s05-chip" data-qa="box" style="left: 1093px; top: 393px;"><div class="s05-ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14v-4"/><path d="M22 14v-4"/><path d="M6 14v-4"/><rect x="2" y="6" width="16" height="12" rx="2"/></svg></div>Battery</div>
+      <div id="s05-verdict" class="s05-node" data-qa="box" style="left: 1403px; width: 330px;"><div class="s05-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></div><div class="s05-words"><span id="s05-w0" style="color: var(--go)">GO</span><span id="s05-w1" style="color: var(--caution)">HOLD</span><span id="s05-w2" style="color: var(--nogo)">NO GO</span></div></div>
+      <svg class="s05-arrows" data-qa-ignore viewBox="0 0 1920 1080">
+        <g id="s05-a0"><line x1="447" y1="385" x2="505" y2="385"/><polyline points="495,375 507,385 495,395"/></g>
+        <g id="s05-a1"><line x1="777" y1="385" x2="835" y2="385"/><polyline points="825,375 837,385 825,395"/></g>
+        <g id="s05-a2"><line x1="1333" y1="385" x2="1391" y2="385"/><polyline points="1381,375 1393,385 1381,395"/></g>
+      </svg>
+      </div>
+      <div id="s05-cap" class="s05-cap">MarsAgent runs real tools. The tools do the maths.</div>
+    </div>
+  </div>
+  <script>
+    (() => {
+      const $ = (i) => document.getElementById(i);
+      const tl = gsap.timeline({ paused: true });
+      // left to right, as the data flows: click, agent, four tools, verdict
+      RK.pop(tl, $("s05-click"), 0.0, { dur: 0.45 });
+      RK.words(tl, $("s05-cap"), 0.15, { stagger: 0.05, dur: 0.45 });
+      [0, 1, 2].forEach((i) => tl.fromTo($("s05-a" + i), { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.3, ease: RK.E.out }, [0.25, 0.6, 1.2][i]));
+      RK.pop(tl, $("s05-agent"), 0.4, { dur: 0.45 });
+      RK.pop(tl, [$("s05-t0"), $("s05-t1"), $("s05-t2"), $("s05-t3")], 0.75, { dur: 0.4, stagger: 0.08 });
+      RK.pop(tl, $("s05-verdict"), 1.35, { dur: 0.45 });
+      tl.fromTo([$("s05-w0"), $("s05-w1"), $("s05-w2")], { opacity: 0.25 }, { opacity: 1, duration: 0.2, stagger: 0.1 }, 1.55);
+      tl.fromTo($("s05-world"), { scale: 1 }, { scale: 1.03, duration: 2.6, ease: "none", transformOrigin: "960px 540px" }, 0);
+      window.__timelines["s05"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

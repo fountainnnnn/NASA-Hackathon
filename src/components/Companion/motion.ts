@@ -41,12 +41,37 @@ export function parkAtEdge(p: Vec, w: number, h: number, margin = 32): Vec & { a
 }
 
 export interface BubblePlacement { left: number; top: number; width: number; height: number }
+export interface Rect { left: number; top: number; right: number; bottom: number }
+
+const overlapArea = (a: Rect, b: Rect) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
 
 /**
- * Place the bubble near Scout (centre `scout`) without covering `avoid` (the cursor or the placed ring) and inside the viewport.
- * Order tried: right of Scout, above-right, below-right, then mirrored to the left.
+ * Nearest spot to `c` where a Scout-sized box (side `size`) touches none of `rects` and stays inside the viewport.
+ * Searches outward in rings of 16 directions; falls back to `c` clamped when the screen is full.
  */
-export function placeBubble(scout: Vec, size: number, bw: number, bh: number, vw: number, vh: number, avoid?: Vec, margin = 12, gap = 18, topInset = 0): BubblePlacement {
+export function nudgeClear(c: Vec, size: number, rects: Rect[], pad = 6, vw = Infinity, vh = Infinity): Vec {
+  const h = size / 2 + pad;
+  const free = (x: number, y: number) => x - size / 2 >= 2 && y - size / 2 >= 2 && x + size / 2 <= vw - 2 && y + size / 2 <= vh - 2
+    && rects.every((r) => x + h <= r.left || x - h >= r.right || y + h <= r.top || y - h >= r.bottom);
+  const clamp = (v: Vec): Vec => ({ x: Math.min(vw - size / 2 - 2, Math.max(size / 2 + 2, v.x)), y: Math.min(vh - size / 2 - 2, Math.max(size / 2 + 2, v.y)) });
+  const start = clamp(c);
+  if (free(start.x, start.y)) return start;
+  for (let rad = 8; rad <= 560; rad += 8) {
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2;
+      const x = start.x + Math.cos(a) * rad, y = start.y + Math.sin(a) * rad;
+      if (free(x, y)) return { x, y };
+    }
+  }
+  return start;
+}
+
+/**
+ * Place the bubble near Scout (centre `scout`) without covering `avoid` (the cursor or the placed ring), the HUD rects
+ * in `keepClear`, and inside the viewport. Order tried: right of Scout, above-right, below-right, then mirrored to the
+ * left, then a sweep of the viewport; the first spot that touches nothing wins, otherwise the one that overlaps least.
+ */
+export function placeBubble(scout: Vec, size: number, bw: number, bh: number, vw: number, vh: number, avoid?: Vec, margin = 12, gap = 18, topInset = 0, keepClear: Rect[] = []): BubblePlacement {
   const clampX = (x: number) => Math.max(margin, Math.min(x, vw - margin - bw));
   const clampY = (y: number) => Math.max(margin + topInset, Math.min(y, vh - margin - bh));
   const hits = (l: number, t: number) => !!avoid && avoid.x > l - 20 && avoid.x < l + bw + 20 && avoid.y > t - 20 && avoid.y < t + bh + 20;
@@ -55,6 +80,17 @@ export function placeBubble(scout: Vec, size: number, bw: number, bh: number, vw
   for (const l of [rightL, leftL]) {
     for (const t of [scout.y - bh - gap, scout.y - 16, (avoid?.y ?? scout.y) + 26]) candidates.push([clampX(l), clampY(t)]);
   }
-  const ok = candidates.find(([l, t]) => !hits(l, t)) ?? candidates[0];
-  return { left: ok[0], top: ok[1], width: bw, height: bh };
+  for (let t = margin + topInset; t <= vh - margin - bh; t += 24) for (const l of [rightL, leftL, margin, vw - margin - bw]) candidates.push([clampX(l), clampY(t)]);
+  const scoutBox: Rect = { left: scout.x - size / 2 - 4, top: scout.y - size / 2 - 4, right: scout.x + size / 2 + 4, bottom: scout.y + size / 2 + 4 };
+  const cost = ([l, t]: [number, number]) => {
+    const b: Rect = { left: l - 4, top: t - 4, right: l + bw + 4, bottom: t + bh + 4 };
+    return keepClear.reduce((a, r) => a + overlapArea(b, r), 0) + overlapArea(b, scoutBox) * 4 + (hits(l, t) ? 1e6 : 0);
+  };
+  let best = candidates[0], bestCost = cost(best);
+  for (const c of candidates) {
+    if (bestCost === 0) break;
+    const k = cost(c);
+    if (k < bestCost) { best = c; bestCost = k; }
+  }
+  return { left: best[0], top: best[1], width: bw, height: bh };
 }

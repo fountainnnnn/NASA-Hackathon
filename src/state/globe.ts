@@ -65,6 +65,8 @@ export interface GlobeState {
   /** Register a scenario's touchdown samples (so `globe_scatter` can show them). maxSlopeDeg splits cyan/red. */
   setScatter(scenarioId: string, points: Float32Array, maxSlopeDeg?: number): void;
   clearScatter(scenarioId?: string): void;
+  /** Take one marker off the globe (for example a verdict tag that is out of date). */
+  removeMarker(id: string): void;
   /** Allowlisted command reducer. Invalid commands are skipped and reported; valid ones still apply. */
   applyGlobeCommands(cmds: GlobeCommand[]): { applied: number; errors: string[] };
 }
@@ -240,6 +242,7 @@ export const useGlobeStore = create<GlobeState>((set, get) => ({
     const { [scenarioId]: _gone, ...rest } = s.scatter; void _gone;
     return { scatter: rest, scatterShown: s.scatterShown.filter((r) => r.scenarioId !== scenarioId) };
   }),
+  removeMarker: (id) => set((s) => ({ markers: s.markers.filter((m) => m.id !== id) })),
   applyGlobeCommands: (cmds) => {
     const s = get();
     const { next, applied, errors } = reduceGlobeCommands(s, cmds);

@@ -95,6 +95,11 @@ export interface RoverImage {
   url: string;                   // medium/large jpg
   pageUrl?: string;              // mars.nasa.gov page
   credit: string;                // "NASA/JPL-Caltech"
+  /** Spacecraft clock at exposure, s (raw API extended.sclk; else read from the image id). */
+  sclk?: number;
+  /** Remote sensing mast pointing at exposure, degrees (raw API extended.mastEl / mastAz); 0 = level, negative = down. */
+  mastElDeg?: number;
+  mastAzDeg?: number;
 }
 
 /* ---------------------------------------------------------------- world model */
@@ -161,6 +166,8 @@ export interface RouteResult {
   reasons: InfeasibleReason[];
   /** When no_path_slope: smallest maxSlopeDeg (≤45, 1° steps) that would yield a path, or null. */
   minFeasibleSlopeDeg?: number | null;
+  /** Steepest 20 m cell inside the target's 40 m planning cell, deg (what the solver judged at the target). */
+  targetSlopeDeg?: number;
   turnBackIndex?: { leg: number; vertex: number } | null; // where reserve would be hit if infeasible by battery
   constraintsUsed: MissionConstraints;
   gridResM: number; demResM: number;
@@ -224,7 +231,10 @@ export interface Dem { meta: DemMeta; elev: Float32Array /* NaN = nodata, row-ma
  *  through src/lib/terrain/client.ts which exposes this interface with Promises. */
 export interface TerrainApi {
   init(dem: Dem): Promise<{ gridWidth: number; gridHeight: number; cellResM: number }>;
-  planRoute(req: { from: LonLat; to: LonLat; stops?: LonLat[]; roundTrip: boolean; constraints: MissionConstraints }): Promise<Omit<RouteResult, 'id' | 'label' | 'from' | 'to' | 'stops'>>;
+  /** findMinSlope: false skips the search for the smallest working slope limit when a leg has no path (faster sweeps). */
+  planRoute(req: { from: LonLat; to: LonLat; stops?: LonLat[]; roundTrip: boolean; constraints: MissionConstraints; findMinSlope?: boolean }): Promise<Omit<RouteResult, 'id' | 'label' | 'from' | 'to' | 'stops'>>;
+  /** Point nearest to `to` that can be reached from `from` (and back) under maxSlopeDeg, within maxRadiusM of `to`. */
+  nearestReachable(req: { from: LonLat; to: LonLat; maxSlopeDeg: number; maxRadiusM?: number }): Promise<{ point: LonLat | null; movedM: number | null; slopeDeg: number | null; reason?: string }>;
   analyze(req: { center: LonLat; radiusM: number; limitDeg: number }): Promise<TerrainAnalysis>;
   hazards(req: { route: RouteResult; k: number; limitDeg: number }): Promise<Omit<HazardSegment, 'routeId'>[]>;
   /** Slope (deg) at 20 m posting for the shader overlay; same layout as dem.elev. */

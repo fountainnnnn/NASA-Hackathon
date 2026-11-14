@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
         source: "/data/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
       },
+      {
+        // Dev-only fallback copy of CesiumJS (gitignored). Production loads the pinned version from jsDelivr with SRI
+        // (src/components/Planet/cesiumCdn.ts). The path is unversioned, so it is not cached as immutable.
+        source: "/cesium/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=3600" }],
+      },
     ];
   },
 };

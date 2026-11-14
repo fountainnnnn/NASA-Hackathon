@@ -17,6 +17,16 @@ export interface TerrainUniforms {
   uWideRect: { value: THREE.Vector4 };  // context extent: x0 (west), z0 (north), width, height, local metres
   uPatchRect: { value: THREE.Vector4 }; // patch extent: xMin, zMin, xMax, zMax, local metres
   uBlendM: { value: number };
+  // native-resolution CTX tile (public/data/ctx_tiles) swapped in near the camera: same mosaic, same tone, finer posting
+  tDetail: { value: THREE.Texture };
+  uDetailRect: { value: THREE.Vector4 }; // u0, v0, du, dv in the base texture's UV space
+  uDetailMix: { value: number };         // 0 = off, 1 = on (eased when a tile arrives)
+  // HiRISE orthoimage around the base (public/data/hirise), draped near the ground: single channel, byte values already
+  // matched to the CTX mosaic's tone, plus a coverage mask
+  tHirise: { value: THREE.Texture };
+  tHiriseMask: { value: THREE.Texture };
+  uHiriseRect: { value: THREE.Vector4 }; // x0 (west), z0 (north), width, height, local metres
+  uHiriseMix: { value: number };         // 0 = off, 1 = on (eased with camera height)
 }
 
 const GLSL_INFERNO = /* glsl */ `
@@ -43,6 +53,8 @@ export function createTerrainMaterial() {
     tWide: { value: dummy }, uHasWide: { value: 0 }, uWideGain: { value: 1 }, uWideRect: { value: new THREE.Vector4(0, 0, 1, 1) },
     uPatchRect: { value: new THREE.Vector4(0, 0, 0, 0) }, uBlendM: { value: 1000 },
     uOp: { value: new THREE.Vector4(1, 0, 0, 0) }, uSlopeOp: { value: 0 }, uLimit: { value: 15 },
+    tDetail: { value: dummy }, uDetailRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uDetailMix: { value: 0 },
+    tHirise: { value: dummy }, tHiriseMask: { value: dummy }, uHiriseRect: { value: new THREE.Vector4(0, 0, 1, 1) }, uHiriseMix: { value: 0 },
   };
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.96, metalness: 0 });
   material.onBeforeCompile = (shader) => {
@@ -56,8 +68,8 @@ vValid = aValid; vElevN = aElev; vTUv = uv; vXZ = position.xz;`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
 varying float vValid; varying float vElevN; varying vec2 vTUv; varying vec2 vXZ;
-uniform sampler2D tCtx, tDay, tNight, tGeo, tPal, tSlope, tWide;
-uniform vec4 uHas, uOp, uWideRect, uPatchRect; uniform vec2 uHas2; uniform float uSlopeOp, uLimit, uHasWide, uWideGain, uBlendM;
+uniform sampler2D tCtx, tDay, tNight, tGeo, tPal, tSlope, tWide, tDetail, tHirise, tHiriseMask;
+uniform vec4 uHas, uOp, uWideRect, uPatchRect, uDetailRect, uHiriseRect; uniform vec2 uHas2; uniform float uSlopeOp, uLimit, uHasWide, uWideGain, uBlendM, uDetailMix, uHiriseMix;
 ${GLSL_INFERNO}`)
       .replace('#include <map_fragment>', `
 if (vValid < 0.5) discard;
@@ -66,6 +78,20 @@ vec3 hyps = mix(vec3(0.20,0.09,0.06), vec3(0.62,0.40,0.26), smoothstep(0.0, 1.0,
 vec3 col = hyps;
 if (uHas.x > 0.5) {
   float g = texture2D(tCtx, vTUv).r;
+  if (uDetailMix > 0.0) {
+    vec2 du = (vTUv - uDetailRect.xy) / uDetailRect.zw;
+    float e = min(min(du.x, 1.0 - du.x), min(du.y, 1.0 - du.y));
+    if (e > 0.0) g = mix(g, texture2D(tDetail, du).r, smoothstep(0.0, 0.03, e) * uDetailMix);
+  }
+  if (uHiriseMix > 0.0) {
+    // HiRISE 25 cm controlled mosaic at about 1.3 m per pixel; fades over its outer 120 m and wherever the mosaic has no data
+    vec2 hu = (vXZ - uHiriseRect.xy) / uHiriseRect.zw;
+    float he = min(min(hu.x * uHiriseRect.z, (1.0 - hu.x) * uHiriseRect.z), min(hu.y * uHiriseRect.w, (1.0 - hu.y) * uHiriseRect.w));
+    if (he > 0.0) {
+      float w = smoothstep(0.0, 120.0, he) * texture2D(tHiriseMask, hu).r * uHiriseMix;
+      g = mix(g, pow(texture2D(tHirise, hu).r, 2.2), w); // byte values in the CTX encoding: decode like the sRGB CTX texture
+    }
+  }
   vec3 ctxCol = vec3(g) * vec3(1.00, 0.80, 0.64); // cosmetic warm tint: CTX is greyscale
   col = mix(hyps, ctxCol, uOp.x);
 }
@@ -96,6 +122,6 @@ if (uHasWide > 0.5) {
 diffuseColor.rgb *= col;
 `);
   };
-  material.customProgramCacheKey = () => 'marswalk-terrain-v2';
+  material.customProgramCacheKey = () => 'marswalk-terrain-v4';
   return { material, uniforms, dummy };
 }

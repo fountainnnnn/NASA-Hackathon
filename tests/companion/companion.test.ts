@@ -1,8 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { emitAsk, emitClickPoint, onAsk, onClickPoint, TRAIL_MAX, useCompanion } from '@/state/companion';
 import { arcPoint, parkAtEdge, placeBubble, springStep } from '@/components/Companion/motion';
-import { firstLine, formatReadout, splitAnswer, timeAgo, tokenizeAnswer } from '@/components/Companion/text';
-import { monoScout } from '@/components/Companion/scoutArt';
+import { firstLine, formatReadout, richTokens, splitAnswer, timeAgo, tokenizeAnswer } from '@/components/Companion/text';
 
 const st = () => useCompanion.getState();
 beforeEach(() => st().reset());
@@ -56,7 +55,7 @@ describe('event bus', () => {
     const offA = onAsk(ask), offP = onClickPoint(pt);
     emitAsk('  hello '); emitAsk('   ');
     emitClickPoint({ lon: 1, lat: 2 });
-    expect(ask).toHaveBeenCalledTimes(1); expect(ask).toHaveBeenCalledWith('hello');
+    expect(ask).toHaveBeenCalledTimes(1); expect(ask).toHaveBeenCalledWith('hello', { origin: 'panel' });
     expect(pt).toHaveBeenCalledWith({ lon: 1, lat: 2 });
     offA(); offP();
     emitAsk('x'); emitClickPoint({ lon: 0, lat: 0 });
@@ -113,6 +112,17 @@ describe('answer text', () => {
     expect(tokenizeAnswer('H2O and 5 meters', []).filter((x) => x.kind === 'num').map((x) => x.text)).toEqual(['5']);
     expect(tokenizeAnswer('no numbers', [])).toEqual([{ text: 'no numbers', kind: 'text' }]);
   });
+  it('panel prose: units must be whole words; ordinals and years stay text (QA 3.5)', () => {
+    const nums = (t: string) => richTokens(t).filter((x) => x.num).map((x) => x.text);
+    expect(nums('10,000 simulated touchdowns')).toEqual(['10,000']);
+    expect(nums('Median slope 2.1°, 95th percentile 6.4°.')).toEqual(['2.1°', '6.4°']);
+    expect(nums('the 90th percentile')).toEqual([]);
+    expect(nums('Curiosity landing-site constraints (JPL, 2006), not the Mars 2020 requirements')).toEqual([]);
+    expect(nums('1 h 16 min, 84.2 % left, 7.76 km, -2,493 m')).toEqual(['1 h', '16 min', '84.2 %', '7.76 km', '-2,493 m']);
+    expect(nums('2,540 m high, 12 m/s wind')).toEqual(['2,540 m', '12 m/s']);
+    expect(nums('Turn back at T+03:05, limited by daylight')).toEqual(['03', '05']); // no trailing comma
+    expect(richTokens('a 3 b').map((x) => x.text).join('')).toBe('a 3 b');
+  });
   it('firstLine and timeAgo', () => {
     expect(firstLine('\n  Hello there\nsecond')).toBe('Hello there');
     expect(firstLine('x'.repeat(100), 10)).toHaveLength(10);
@@ -129,19 +139,82 @@ describe('bubble anatomy and readout', () => {
   it('formats the pointer readout', () => {
     expect(formatReadout({ lat: 18.4402, lon: 77.4501, elevM: -2540.4 })).toEqual(['18.44N 77.45E  -2540 m']);
     expect(formatReadout({ lat: -4, lon: -10.005, elevM: null, slopeDeg: 3.14, unit: 'Isidis Planitia' }, true))
-      .toEqual(['4.00S 10.01W  no elevation', 'slope 3.1°  Isidis Planitia']);
+      .toEqual(['4.00S 10.01W', 'slope 3.1°  Isidis Planitia']);
   });
 });
 
-describe('scout art', () => {
-  const idle = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><g stroke="#10141B"><ellipse cx="80" cy="143" rx="45" ry="8" fill="#5CC8FF" opacity=".28" stroke="none"/><path d="M50 43" fill="none" stroke="#F2A66E" stroke-width="7"/><path d="M80 25" fill="#E0884A"/><circle cx="80" cy="73" r="27" fill="#5CC8FF"/><circle cx="80" cy="73" r="17" fill="#10141B" stroke="none"/><circle cx="80" cy="11" r="5" fill="#5CC8FF"/></g></svg>';
-  it('goes monochrome with the accent only on the lens', () => {
-    const m = monoScout(idle);
-    expect(m).not.toMatch(/E0884A|F2A66E|ellipse|10141B/i);
-    expect(m.match(/#5cc8ff/gi)).toHaveLength(1);
-    expect(m).toContain('currentColor');
+/* ------------------------------------------------------------------ MarsAgent thread */
+import { fmtElapsed, lineTime, narrator, stepTime, useThread } from '@/state/thread';
+import { revealed } from '@/components/Companion/reveal';
+
+describe('MarsAgent thread', () => {
+  beforeEach(() => useThread.getState().reset());
+  it('a turn streams lines, records real elapsed times and finishes with an answer', async () => {
+    const id = useThread.getState().begin({ text: 'Plan', origin: 'drag', at: { lon: 77.4, lat: 18.4 } });
+    const n = narrator(id);
+    n.say('Reading the ground').done('Read the ground: -2,493 m');
+    const r = await n.run('Planning with A*', () => 42, (x) => `Planned: ${x}`);
+    expect(r).toBe(42);
+    n.step({ kind: 'calculation', title: 'Battery', code: ['used = 1'] });
+    n.finish({ answer: { text: 'GO.' }, report: true });
+    const t = useThread.getState().turns[0];
+    expect(t.narration.map((l) => l.text)).toEqual(['Read the ground: -2,493 m', 'Planned: 42']);
+    expect(t.narration.every((l) => l.status === 'done' && typeof l.tMs === 'number')).toBe(true);
+    expect(t.status).toBe('done'); expect(t.report).toBe(true); expect(t.steps[0].title).toBe('Battery');
+    expect(useThread.getState().cardTurnId).toBe(id);
   });
-  it('lens turns caution yellow in the warning state', () => {
-    expect(monoScout(idle.replace('r="27" fill="#5CC8FF"', 'r="27" fill="#FFB020"'))).toContain('#f3d250');
+  it('panel turns can leave the map card alone; a failed line is kept as an error', () => {
+    const a = useThread.getState().begin({ text: 'x', origin: 'map', at: { lon: 0, lat: 0 } });
+    useThread.getState().begin({ text: 'y', origin: 'panel' }, { showCard: false });
+    expect(useThread.getState().cardTurnId).toBe(a);
+    const n = narrator(useThread.getState().turns[1].id);
+    n.say('Reaching the model').fail('The model is not configured');
+    expect(useThread.getState().turns[1].narration[0]).toMatchObject({ status: 'error', text: 'The model is not configured' });
+  });
+  it('reveal: finished lines show one by one in their true state; the answer only when complete', () => {
+    const id = useThread.getState().begin({ text: 'x', origin: 'tool' });
+    const n = narrator(id);
+    n.say('one').done(); n.note('two'); n.finish({ answer: { text: 'ok' } });
+    const t = useThread.getState().turns[0];
+    expect(revealed(t, 0)).toMatchObject({ complete: false, current: null });
+    expect(revealed(t, 1).lines.map((l) => l.state)).toEqual(['done']); // finished work never shows as running
+    expect(revealed(t, 1).complete).toBe(false);
+    const all = revealed(t, 2);
+    expect(all.lines.map((l) => l.state)).toEqual(['done', 'done']);
+    expect(all.complete).toBe(true);
+  });
+  it('reveal: a running line is on screen at once, with the lines before it, whatever the pace', () => {
+    const id = useThread.getState().begin({ text: 'x', origin: 'tool' });
+    const n = narrator(id);
+    n.note('Read the ground'); n.note('Read the limits');
+    const slow = n.say('Planning a round trip with A*');
+    let t = useThread.getState().turns[0];
+    const r = revealed(t, 0);
+    expect(r.lines.map((l) => [l.text, l.state])).toEqual([['Read the ground', 'done'], ['Read the limits', 'done'], ['Planning a round trip with A*', 'now']]);
+    slow.done('Planned a round trip with A*: 3.88 km out, 3.88 km back');
+    t = useThread.getState().turns[0];
+    expect(t.narration[2]).toMatchObject({ status: 'done', text: 'Planned a round trip with A*: 3.88 km out, 3.88 km back' });
+  });
+  it('each line carries its OWN duration, not the time since the turn started', async () => {
+    const id = useThread.getState().begin({ text: 'x', origin: 'tool' });
+    const n = narrator(id);
+    await new Promise((r) => setTimeout(r, 60)); // time passes before the line's work starts
+    await n.run('Waiting 30 ms', () => new Promise((r) => setTimeout(r, 30)), () => 'Waited 30 ms');
+    n.note('Read something already known');
+    const [a, b] = useThread.getState().turns[0].narration;
+    expect(a.tMs!).toBeGreaterThanOrEqual(25);
+    expect(a.tMs!).toBeLessThan(55); // not the 90+ ms since the turn began
+    expect(b.tMs).toBeUndefined();
+    expect(lineTime(b.tMs)).toBe('');
+  });
+  it('elapsed labels: ms under 100 ms, seconds above', () => {
+    expect(fmtElapsed(4.2)).toBe('4 ms');
+    expect(fmtElapsed(1240)).toBe('1.24 s');
+    expect(fmtElapsed(23_400)).toBe('23 s');
+    expect(fmtElapsed(undefined)).toBe('');
+    expect(lineTime(4.2)).toBe(''); // under 5 ms a line shows no time
+    expect(lineTime(12)).toBe('12 ms');
+    expect(stepTime(0.3)).toBe('under 1 ms');
+    expect(stepTime(1240)).toBe('1.24 s');
   });
 });

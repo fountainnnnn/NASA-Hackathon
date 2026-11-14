@@ -11,6 +11,7 @@ export function createInProcessTerrainApi(): TerrainApi {
   return {
     async init(dem: Dem) { engine = createTerrainEngine(dem); return engine.info; },
     async planRoute(req) { return need().planRoute(req); },
+    async nearestReachable(req) { return need().nearestReachable(req); },
     async analyze(req) { return need().analyze(req); },
     async hazards(req) { return need().hazards(req); },
     async slopeField() { return need().slopeField().slice(); },
@@ -83,6 +84,7 @@ export function createTerrainClient(): TerrainApi {
       );
     },
     planRoute: (req) => withFallback(() => call('planRoute', [req]), (f) => f.planRoute(req)),
+    nearestReachable: (req) => withFallback(() => call('nearestReachable', [req]), (f) => f.nearestReachable(req)),
     analyze: (req) => withFallback(() => call('analyze', [req]), (f) => f.analyze(req)),
     hazards: (req) => withFallback(() => call('hazards', [req]), (f) => f.hazards(req)),
     slopeField: () => withFallback(() => call('slopeField', []), (f) => f.slopeField()),

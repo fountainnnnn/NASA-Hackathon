@@ -1,70 +1,117 @@
 {
-  "drift": 0.015,
+  "drift": 0.012,
+  "music": {
+    "sections": {
+      "shaker": "s02",
+      "drop": {
+        "scene": "s03",
+        "at": 0.4
+      },
+      "outro": {
+        "scene": "s10",
+        "at": 1.2
+      }
+    },
+    "src": "assets/bgm/bed.wav",
+    "volume": 0.5,
+    "fadeIn": 0.3,
+    "fadeOut": 1.6
+  },
   "scenes": [
     {
       "id": "s01",
       "file": "scenes/s01-title.html",
-      "duration": 2.5,
+      "duration": 2.2,
       "sfx": []
     },
     {
       "id": "s02",
-      "file": "scenes/s02-c02.html",
-      "duration": 3.5,
+      "file": "scenes/s02-hook.html",
+      "duration": 3.2,
       "sfx": [],
       "in": {
         "type": "zoom-in",
-        "dur": 0.5
+        "dur": 0.4
       }
     },
     {
       "id": "s03",
-      "file": "scenes/s03-c03.html",
-      "duration": 5.5,
+      "file": "scenes/s03-orbit.html",
+      "duration": 3,
       "sfx": [],
       "in": {
         "type": "zoom-out",
-        "dur": 0.5
+        "dur": 0.4
       }
     },
     {
       "id": "s04",
-      "file": "scenes/s04-c04.html",
-      "duration": 5,
+      "file": "scenes/s04-click.html",
+      "duration": 4.4,
       "sfx": [],
       "in": {
         "type": "zoom-in",
-        "dur": 0.5
+        "dur": 0.4
       }
     },
     {
       "id": "s05",
-      "file": "scenes/s05-c05.html",
-      "duration": 6,
+      "file": "scenes/s05-agent.html",
+      "duration": 2.6,
       "sfx": [],
       "in": {
         "type": "zoom-out",
-        "dur": 0.5
+        "dur": 0.4
       }
     },
     {
       "id": "s06",
-      "file": "scenes/s06-c06.html",
-      "duration": 5.5,
+      "file": "scenes/s06-steps.html",
+      "duration": 3.2,
       "sfx": [],
       "in": {
         "type": "zoom-in",
-        "dur": 0.5
+        "dur": 0.4
       }
     },
     {
       "id": "s07",
-      "file": "scenes/s07-link.html",
-      "duration": 4,
+      "file": "scenes/s07-replan.html",
+      "duration": 3.8,
       "sfx": [],
       "in": {
         "type": "zoom-out",
-        "dur": 0.5
+        "dur": 0.4
+      }
+    },
+    {
+      "id": "s08",
+      "file": "scenes/s08-sims.html",
+      "duration": 4.4,
+      "sfx": [],
+      "in": {
+        "type": "zoom-in",
+        "dur": 0.4
+      }
+    },
+    {
+      "id": "s09",
+      "file": "scenes/s09-report.html",
+      "duration": 3.4,
+      "sfx": [],
+      "in": {
+        "type": "zoom-out",
+        "dur": 0.4
+      }
+    },
+    {
+      "id": "s10",
+      "file": "scenes/s10-close.html",
+      "duration": 2.4,
+      "sfx": [],
+      "in": {
+        "type": "zoom-out",
+        "dur": 0.4
       }
     }
   ]

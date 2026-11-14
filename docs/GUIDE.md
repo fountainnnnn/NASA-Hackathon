@@ -1,4 +1,4 @@
-# NASA Space Apps 2026 — Project Submission Guide (local copy)
+# NASA Space Apps 2026 project submission guide (local copy)
 
 Source: https://www.spaceappschallenge.org/resources/project-submission-guide/ (fetched 2026-11-14)
 
@@ -18,7 +18,7 @@ Source: https://www.spaceappschallenge.org/resources/project-submission-guide/ (
 | --- | --- |
 | Project Name | Name of the project |
 | High-Level Project Summary | What you built, how it addresses the challenge, why it matters |
-| Link to Project Demo | Public link: video ≤30 s **or** deck ≤7 slides (incl. title + intro) |
+| Link to Project Demo | Public link to the demo. We submit a video of 30 s or less |
 | Link to Final Project | Public link (site, repo, Drive, etc.), no login/permission/registration |
 | Detailed Project Description | What it does, how it works, benefits, goals, tools/languages/hardware/software |
 | Use of Super Intelligence (SI) | Whether and how AI tools were used (data collection only, judges don't see this answer) |
@@ -35,8 +35,8 @@ Source: https://www.spaceappschallenge.org/resources/project-submission-guide/ (
 Angola NSPMO, Bahrain Space Agency, Brazilian Space Agency, CSA, ESA, ISRO, Italian Space Agency, JAXA, KASA, MBRSC (UAE), CONAE (Argentina), NASRDA (Nigeria), Paraguayan Space Agency, Senegalese Space Studies Agency, Spanish Space Agency, Turkish Space Agency, UK Space Agency.
 
 ## Demo requirements
-- **Video ≤30 s** or **deck ≤7 slides**. Over the limit means **not eligible for Global Judging**.
-- Hosted externally, publicly accessible. English. A video may be spoken in another language with **English subtitles**; decks must be in English.
+- **Video of 30 s or less** (our format). Over the limit means **not eligible for Global Judging**.
+- Hosted externally, publicly accessible. English. A video may be spoken in another language with **English subtitles**.
 - Judging criteria: **Impact, Creativity, Validity, Relevance, Presentation** (see the 2026 Judging and Awards Guide).
 
 ### 30-second video script
@@ -44,10 +44,8 @@ Angola NSPMO, Bahrain Space Agency, Brazilian Space Agency, CSA, ESA, ISRO, Ital
 - 0:02 The challenge and why you chose it
 - 0:05 Project title and tagline
 - 0:10 How it works: visuals/prototype, user experience, how NASA + partner data made it possible
-- 0:20–0:30 The future: what it can do for people and the world
+- 0:20 to 0:30 The future: what it can do for people and the world
 
-### 7-slide deck must cover
-Team name, team member names, the challenge chosen, an image of the project, the user experience, and how NASA/space-agency data makes it possible. Readable fonts, few words.
 
 ## Submitting
 - All members confirmed at the **same Local Event**.
@@ -61,4 +59,4 @@ Team name, team member names, the challenge chosen, an image of the project, the
 - New website? Optionally request a FortiGuard Web Filter Classification (Company Name: "N/A") so judges' networks don't block it.
 
 ## Certificate
-Submitting a project unlocks it: Profile → Participant Information → "2026 NASA Space Apps Challenge" → **Download Participant Certificate** (PDF, Letter size, use desktop). The name comes from **Full Name** in your profile.
+After you submit, the certificate is at: Profile → Participant Information → "2026 NASA Space Apps Challenge" → **Download Participant Certificate** (PDF, Letter size, use desktop). The name comes from **Full Name** in your profile.

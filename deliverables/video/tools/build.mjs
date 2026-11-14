@@ -102,8 +102,8 @@ const html = `<!DOCTYPE html>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js" integrity="sha384-sG0Hv1tP1lZCk9KQmrIbY/XNwi+OY84GQqhMscbnsoBFqAz8KNCil1kvfL3Hbbk2" crossorigin="anonymous"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #fff; }
-      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #fff; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #060505; }
+      #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #060505; }
       .scene { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
 ${head}
     </style>

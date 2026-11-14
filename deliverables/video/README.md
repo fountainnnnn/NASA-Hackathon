@@ -1,48 +1,45 @@
-# MarsWalk Copilot demo video (29.0 s, 1920x1080, silent)
+# HeyMars demo video (29.0 s, 1920x1080, 60 fps)
 
-## Phase B: two commands from this folder
+Story, captions and timings: `STORYBOARD.md`. Everything is driven by `film.config.json`.
 
-```bash
-node capture.mjs http://localhost:3000        # or the Railway URL. Records the app, cuts footage/c02..c06.mp4
-npm run build:film && npm run render:final    # generate scenes, assemble index.html, render renders/marswalk-demo.mp4
-```
-
-Gate before upload (must print 30.0 or less, target 29.0):
+## Phase 2: capture, cut, render (from this folder)
 
 ```bash
-npm run gate        # ffprobe duration of renders/marswalk-demo.mp4
+# the app must be running: npx next build && npx next start -p 3990 (repo root), or use the Railway URL
+node capture.mjs http://localhost:3990            # records the shots, writes footage/marks.json, cuts footage/c*.mp4
+node capture.mjs http://localhost:3990 --live     # same, but c04 asks a free question: ONE paid MarsAgent call
+node capture.mjs <url> --only click,replan --headed   # redo some shots in a visible window
+npm run build:film                                # scenes from config + real boxes, index.html, music
+npm run qa                                        # layout QA, must be 0 errors
+npm run render:final && npm run gate              # renders/heymars-demo.mp4; gate prints the duration (<= 30.0)
+node tools/film-check.mjs renders/heymars-demo.mp4   # contact sheets in .film/, read them
 ```
+Chrome-based tools (qa, render, capture, stills) need to run outside the Claude sandbox on macOS.
 
-Also run `npm run qa` (layout QA, must report 0 errors) and look at 2 or 3 frames per scene.
-Chrome-based tools (qa, render, capture) need to run outside the Claude sandbox on macOS.
+## How a footage scene works
 
-Set the real link: edit `"link"` in `film.config.json` (currently the placeholder `[link]`), then rerun `npm run build:film`.
-Faster draft: `npx hyperframes render --fps 30 --quality draft --output renders/draft.mp4` (with the `.bin` PATH, see `render:final`).
+- Capture: the app at 1440x810 CSS px, device scale 2, recorded with the DevTools screencast (2880x1620 JPEG frames
+  with timestamps) only while a shot runs. `capture.mjs` also stores the boxes (CSS px) of the elements the film frames
+  and points at, per state (`clicked`, `click`, `steps`, `route`, `replan`, `walk`, `report`, `report2`); the drive logic follows `scripts/qa-layout.mjs`.
+- Cut: `tools/cut-footage.mjs` turns each shot into a clip of exactly its slot length using `film.config.json` "cuts"
+  (mark windows, idle waits skipped as jump cuts, at most 1.5x faster by default, last frame held if short).
+- Scene: `tools/gen-scenes.mjs` places the clip in a camera that frames boxes ("card@click"), draws callouts at boxes,
+  and adds the caption band. Things drawn on the WebGL canvas (the comms-shadow stretch) have no DOM box: read their
+  position off the footage and put it in `film.config.json` "boxes", e.g. `"route": { "shadow": [x, y, w, h] }`.
+- Until a clip exists the scene shows a still of the approved mockup (`tools/pending-stills.mjs`) or a slate, both
+  labelled CAPTURE PENDING.
 
-## Timeline (29.0 s)
+## What capture.mjs drives by code (all real app behaviour)
 
-| Scene | Time | Content |
-| --- | --- | --- |
-| s01 | 0.0-2.5 | Title, name and team |
-| s02 | 2.0-5.5 | Terrain footage (c02): "Mars maps show regions. Astronauts plan one walk." |
-| s03 | 5.0-10.5 | Click and pin (c03): "Point at Mars. Ask. It plans." |
-| s04 | 10.0-15.0 | Ask and route (c04): "The agent calls tools. The tools do the math." |
-| s05 | 14.5-20.5 | Constraint and replan, Sources (c05): "Change a limit. It replans." plus the data credit line |
-| s06 | 20.0-25.5 | Rover photos or terrain (c06): "Built for the first walks on Mars." |
-| s07 | 25.0-29.0 | Link |
+- c03 orbit: the app's own camera flight (`window.__planet.view`, `?qa=1`) from orbit to Jezero, for a smooth move.
+- "Take me to Jezero" and "Back to Mars" are sent through the app's ask channel (`window.__mw.ask`), the same path a
+  typed verb takes.
+- Target points come from the app's projector (`__mw.projectJezero`), then the real mouse glides there and clicks.
+- Without `--live` no model is called: the ask line gets the fixed verb "Walk here and back".
+Selectors are written against `docs/UI_SPEC.md` and `tests/e2e/selectors.ts`; every miss is printed as a WARN and the
+shot goes on. Check the WARN lines and `footage/marks.json` boxes after each capture.
 
-Joins are 0.5 s zoom transitions, so scene times overlap. Until `footage/cNN.mp4` exists, a scene shows a grey "CAPTURE PENDING" frame.
-
-## What capture.mjs does (selectors, all from src/components/HUD)
-
-1. Goto the URL, wait for the loading overlay (`role=progressbar`) to hide, then for the canvas (`aria-label` "3D terrain...").
-2. A small orbit drag on the canvas, then a click at 30%, 55% of the canvas (override: `--click 0.30,0.55`). ASSUMPTION: that spot is on the western delta.
-3. If an "Ask the copilot" opener button is visible, click it. Type into the input labelled "Question for the copilot" and press Enter.
-4. Wait for the `/api/agent` response and an `img` named "Elevation profile".
-5. Type the second prompt, wait again for the response and the profile.
-6. Click a button named "Sources", hold 1.6 s, press Escape.
-7. Look for the text "Rover photos near the destination"; if absent it only logs a warning and c06 shows whatever is on screen.
-
-Other assumptions: the app shows a visible pointer is not needed, because capture draws a cursor overlay that follows real mouse events; WebGL runs headless through SwiftShader (slow, so waits are generous, the 120 s overload timeout covers terrain load); the hazard highlight appears on its own after the replan (not triggered by a click, capture does not press "Steepest stretch"); "AI-generated" tags for AI art (mascot) are not added by the video, check frames for the mascot and add a tag in `tools/gen-scenes.mjs` if it is visible.
-
-Capture speeds idle waits up to 1.6x and holds a short window on its last frame (printed by `tools/cut-footage.mjs`). Check that line after every capture.
+## Set before the final render
+- `film.config.json` "link": the real URL (now `[link]`).
+- Captions with numbers (s07 2.2 km and 20 m, s09 708 and 1.1 m) must match what the captured app shows.
+- Music: `scenes.json` "music" (original bed from `tools/music.py`); remove it for a silent film.

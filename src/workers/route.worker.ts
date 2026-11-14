@@ -2,7 +2,7 @@
 import type { Dem, DemMeta } from '../lib/contracts';
 import { createTerrainEngine, type TerrainEngine } from '../lib/terrain/engine';
 
-type Req = { id: number; method: 'init' | 'planRoute' | 'analyze' | 'hazards' | 'slopeField'; args: unknown[] };
+type Req = { id: number; method: 'init' | 'planRoute' | 'nearestReachable' | 'analyze' | 'hazards' | 'slopeField'; args: unknown[] };
 const ctx = self as unknown as {
   postMessage(msg: unknown, transfer?: Transferable[]): void;
   onmessage: ((e: MessageEvent<Req>) => void) | null;
@@ -27,6 +27,7 @@ ctx.onmessage = (e) => {
         break;
       }
       case 'planRoute': result = need().planRoute(args[0] as Parameters<TerrainEngine['planRoute']>[0]); break;
+      case 'nearestReachable': result = need().nearestReachable(args[0] as Parameters<TerrainEngine['nearestReachable']>[0]); break;
       case 'analyze': result = need().analyze(args[0] as Parameters<TerrainEngine['analyze']>[0]); break;
       case 'hazards': result = need().hazards(args[0] as Parameters<TerrainEngine['hazards']>[0]); break;
       case 'slopeField': {

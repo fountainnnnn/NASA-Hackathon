@@ -89,10 +89,11 @@ const DR = [-1, -1, -1, 0, 0, 1, 1, 1];
  * 8-connected A* over the planning grid (cell indices r*W+c).
  *
  * Edge i->j allowed iff elev[j] valid AND |atan(dh/horiz)| <= maxSlope AND slopeMaxDeg[j] <= maxSlope.
- * START-CELL RULE: the start cell is never "entered", so its own slopeMaxDeg is not checked (the
- * crew may already stand on steep ground and must be able to leave it). The goal cell IS checked
- * like any other cell; a goal on ground steeper than the limit yields no_path. A start/goal cell
- * with NaN elevation or NaN slope returns 'nodata_endpoint'.
+ * ENDPOINT RULE (symmetric): every cell on the path must be admissible, the start cell included. A start
+ * or goal cell steeper than the limit yields no_path. Because the edge test |dh| <= horiz·tan(limit) is
+ * symmetric and both endpoints are held to the same cell rule, solvePath(a, b).ok === solvePath(b, a).ok
+ * for every pair (tested), so a round trip never has one leg without the other. A start/goal cell with
+ * NaN elevation or NaN slope returns 'nodata_endpoint'.
  *
  * Cost: 'shortest' = 3D edge length (m); 'fastest' = 3D length / Tobler speed (minutes).
  * Heuristic: straight-line ground distance (using the smallest E-W spacing in the grid so it never
@@ -104,13 +105,14 @@ export function solvePath(grid: PlanningGrid, start: number, goal: number, param
       !(elev[goal] === elev[goal]) || !(slopeMaxDeg[goal] === slopeMaxDeg[goal])) {
     return { ok: false, reason: 'nodata_endpoint', expanded: 0 };
   }
+  const maxSlope = params.maxSlopeDeg;
+  if (!(slopeMaxDeg[start] <= maxSlope) || !(slopeMaxDeg[goal] <= maxSlope)) return { ok: false, reason: 'no_path', expanded: 0 };
   if (start === goal) return { ok: true, cells: [start], cost: 0, expanded: 0 };
 
   const P = prep(grid);
   const { g, came, closed, dxRow, dxMid, dy, dxMin } = P;
   g.fill(Infinity); came.fill(-1); closed.fill(0);
 
-  const maxSlope = params.maxSlopeDeg;
   const tanMax = Math.tan(maxSlope * DEG);
   const fastest = params.objective === 'fastest';
   const vMaxMpm = params.suitSpeedFactor * 100; // 6 km/h = 100 m/min at factor 1

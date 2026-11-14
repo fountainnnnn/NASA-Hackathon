@@ -5,49 +5,45 @@
    (tools/build.mjs) and by tools/qa.mjs. Namespace: rk- / window.RK (historical; keep it). */
 
 /* ── Tokens ─────────────────────────────────────────────────────────────── */
+/* HeyMars tokens (docs/DESIGN_SYSTEM.md): near-black, bone text, a hue only when it means something. */
 :root {
-  --font: "Inter", "Helvetica Neue", Arial, sans-serif;   /* the brand font; @font-face rules go in assets/kit/fonts.css */
-  --ink: #121316;
-  --muted: #65656d;
-  --quiet: #8b8b93;          /* the second tone of a two-tone headline at display sizes */
-  --faint: #b4b4bb;
-  --line: rgba(18, 19, 22, 0.09);
-  --line-strong: rgba(18, 19, 22, 0.16);
-  --canvas: #ffffff;
-  --surface: #f5f5f7;
-  --surface-2: #f8f8f8;
-  --panel: #fbfbfc;
-  --fill: #f1f2f6;
-  --thread: #faf9f7;
-  /* the dark stage (site: pinned product story) */
-  --stage: #17171a;
-  --stage-2: #212126;
-  --stage-ink: #f4f4f6;
-  --stage-quiet: rgba(244, 244, 246, 0.56);
-  --stage-line: rgba(255, 255, 255, 0.09);
-  /* status (content colour: tints, never saturated blocks) */
-  --booked: #0f6f38;
-  --booked-soft: rgba(15, 111, 56, 0.11);
-  --pending: #80520c;
-  --pending-soft: rgba(128, 82, 12, 0.11);
-  --overdue: #c2453c;
-  --overdue-soft: rgba(194, 69, 60, 0.11);
-  /* assistant-panel tints (pastel, from the product's own chat UI) */
-  --ask-peach: #fcf3ec;      /* #f4cfb2 22% on white */
-  --ask-lilac: #f8f4fc;      /* #d9c8ec 22% on white */
-  --ask-sage: #f3f9f5;       /* #c6dfcc 22% on white */
-  --ask-composer: #fdfbfd;   /* #ead9e8 10% on white */
-  /* elevation (design system: wide, soft, low-opacity) */
-  --shadow-lg: 0 40px 140px rgba(0, 0, 0, 0.10), 0 4px 16px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 20px 70px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-stage: 0 36px 100px -24px rgba(0, 0, 0, 0.6);
-  /* legacy names kept so older markup renders on-brand: the "accent" is ink */
-  --accent: #121316;
-  --accent-soft: rgba(18, 19, 22, 0.06);
-  --accent-line: rgba(18, 19, 22, 0.28);
-  --yolk: #121316;
+  --font: "Schibsted Grotesk", system-ui, sans-serif;
+  --mono: "Martian Mono", ui-monospace, monospace;
+  --disp: "Michroma", "Schibsted Grotesk", sans-serif;
+  --bg-0: #060505; --bg-1: #0d0b0b; --bg-2: #161313; --bg-3: #1e1a19;
+  --text-1: #ece7e1; --text-2: #a39c95; --text-3: #8a837d;
+  --hm-accent: #e0884a; --data: #5cc8ff; --go: #58c98a; --caution: #f3d250; --nogo: #e0544c;
+  --ink: #ece7e1;
+  --muted: #a39c95;
+  --quiet: #8a837d;
+  --faint: #6f6862;
+  --line: rgba(236, 231, 225, 0.10);
+  --line-strong: rgba(236, 231, 225, 0.22);
+  --canvas: #060505;
+  --surface: #0d0b0b;
+  --surface-2: #161313;
+  --panel: #0d0b0b;
+  --fill: #161313;
+  --thread: #0d0b0b;
+  --stage: #060505;
+  --stage-2: #0d0b0b;
+  --stage-ink: #ece7e1;
+  --stage-quiet: #a39c95;
+  --stage-line: rgba(236, 231, 225, 0.10);
+  --booked: #58c98a; --booked-soft: rgba(88, 201, 138, 0.14);
+  --pending: #f3d250; --pending-soft: rgba(243, 210, 80, 0.14);
+  --overdue: #e0544c; --overdue-soft: rgba(224, 84, 76, 0.14);
+  --ask-peach: #161313; --ask-lilac: #161313; --ask-sage: #161313; --ask-composer: #161313;
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-stage: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --accent: #ece7e1;
+  --accent-soft: rgba(236, 231, 225, 0.06);
+  --accent-line: rgba(236, 231, 225, 0.28);
+  --yolk: #ece7e1;
 }
 
+/* (HeyMars tokens above replace the launch-film defaults) */
 /* ── Scene frame ────────────────────────────────────────────────────────── */
 .rk-scene {
   position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
@@ -186,3 +182,27 @@
 .stage-ui .t-muted, .stage-ui .t-cap { color: #a0a0a9; }
 .stage-ui .rk-grounded { text-decoration-color: rgba(244, 244, 246, 0.42); }
 .stage-ui .rk-caret { background: var(--stage-ink); }
+
+/* ── HeyMars film components ────────────────────────────────────────────── */
+.hm-mono { font-family: var(--mono); font-stretch: 87.5%; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.hm-wordmark { position: absolute; left: 0; width: 1920px; text-align: center; font-family: var(--disp); font-size: 132px; line-height: 1.1; letter-spacing: 0.06em; color: var(--text-1); white-space: nowrap; }
+.hm-tagline { position: absolute; left: 0; width: 1920px; text-align: center; font-size: 60px; line-height: 1.15; font-weight: 500; letter-spacing: -0.015em; color: var(--text-1); white-space: nowrap; }
+.hm-scrim { position: absolute; left: 0; top: 0; width: 1920px; height: 880px; background: var(--bg-0); }
+/* the caption band: a flat near-black plate under the footage, one caption line + the data credit */
+.hm-band { position: absolute; left: 0; top: 880px; width: 1920px; height: 200px; background: var(--bg-0); border-top: 1px solid var(--line-strong); }
+.hm-cap { position: absolute; left: 0; top: 904px; width: 1920px; text-align: center; font-size: 56px; line-height: 1.15; font-weight: 500; letter-spacing: -0.015em; color: var(--text-1); white-space: nowrap; }
+.hm-credit { position: absolute; left: 0; top: 986px; width: 1920px; text-align: center; font-size: 30px; line-height: 1.2; color: var(--text-3); white-space: nowrap; }
+/* callout label: a flat plate, never a pill; hairline + ring drawn in .hm-lines */
+.hm-tag { position: absolute; background: var(--bg-1); border: 1px solid var(--line-strong); border-radius: 8px; padding: 9px 20px 11px; font-size: 34px; line-height: 1.2; font-weight: 500; color: var(--text-1); white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.hm-lines { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; pointer-events: none; }
+.hm-pending { position: absolute; right: 96px; top: 40px; background: #3a2a0c; border: 1px solid var(--caution); color: var(--caution); border-radius: 6px; padding: 6px 14px 8px; font-size: 28px; font-weight: 600; white-space: nowrap; }
+/* EDL timeline over the landing shot */
+.hm-edl { position: absolute; left: 96px; width: 1728px; height: 150px; background: rgba(6,5,5,.88); border: 1px solid var(--line-strong); border-radius: 10px; }
+.hm-edl-rail { position: absolute; left: 120px; top: 74px; width: 1488px; height: 2px; background: var(--line-strong); }
+.hm-edl-fill { position: absolute; left: 120px; top: 73px; width: 1488px; height: 4px; background: var(--text-1); transform-origin: 0 50%; }
+.hm-edl-tick { position: absolute; top: 62px; width: 2px; height: 26px; background: var(--text-1); }
+.hm-edl-mark { position: absolute; padding: 12px 0 0; height: 58px; font-size: 32px; line-height: 1.2; color: var(--text-1); white-space: nowrap; }
+.hm-edl-mark b { font-weight: 500; }
+.hm-edl-mark .hm-mono { color: var(--text-2); font-size: 30px; }
+/* numbers inside a caption line: Martian Mono is wide, so it sits a step smaller and tighter than the sans */
+.hm-cap .hm-mono, .s02-cap .hm-mono, .hm-tag .hm-mono, .s02-min .hm-mono { font-size: 0.88em; letter-spacing: -0.06em; font-weight: 500; }

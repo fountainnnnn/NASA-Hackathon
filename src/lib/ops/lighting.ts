@@ -6,7 +6,7 @@
 import type { RouteResult } from '../contracts';
 import type { DaylightCheck, SafeStartResult, SunSample, Timeline } from '../opsContracts';
 import { MIN_SUN_ELEVATION_DEG } from './assumptions';
-import { marsState, sunPositionFromState } from './mars24';
+import { ltstHours, marsState, sunPositionFromState } from './mars24';
 import type { SunOptions } from './mars24';
 import { buildTimeline } from './timeline';
 
@@ -78,6 +78,35 @@ function checkPoints(tl: Timeline, spacingMin: number) {
     pts.push({ tMin: end, lat: last.lat, lon: last.lon });
   }
   return pts.sort((a, b) => a.tMin - b.tMin);
+}
+
+/**
+ * The next instant at or after `fromUtc` when Local True Solar Time at `lonEastDeg` reads `hours` (0 to 24), to about
+ * one second. LTST advances by 24 h per sol, so the answer lies within one sol of `fromUtc`.
+ */
+export function nextLtstUtcMs(lonEastDeg: number, hours: number, fromUtc: number): number {
+  const solHours = SOL_MS / 3_600_000;
+  const now = ltstHours(marsState(fromUtc), lonEastDeg);
+  const ahead = (((hours - now) % 24) + 24) % 24; // LTST hours still to go
+  let t = fromUtc + (ahead / 24) * solHours * 3_600_000;
+  // the equation of time makes LTST run slightly unevenly; two Newton steps land within a second
+  for (let i = 0; i < 2; i++) {
+    let d = hours - ltstHours(marsState(t), lonEastDeg);
+    if (d > 12) d -= 24; else if (d < -12) d += 24;
+    t += (d / 24) * SOL_MS;
+  }
+  return t < fromUtc ? t + SOL_MS : t;
+}
+
+/**
+ * Minutes from `startUtc` until the sun at a place first drops below `minElevationDeg` (searched in 2 minute steps up to
+ * `maxMin`). 0 when the sun is already below it at the start; `maxMin` when it stays up the whole window.
+ */
+export function daylightLeftMin(p: { lon: number; lat: number }, startUtc: number, maxMin: number, minElevationDeg: number = MIN_SUN_ELEVATION_DEG): number {
+  const el = (m: number) => sunPositionFromState(marsState(startUtc + m * MIN_MS), p.lat, p.lon).elevationDeg;
+  if (el(0) < minElevationDeg) return 0;
+  for (let m = 2; m <= maxMin; m += 2) if (el(m) < minElevationDeg) return m - 2;
+  return maxMin;
 }
 
 export interface SafeStartOptions {

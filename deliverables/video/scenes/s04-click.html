@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<template>
+  <style>
+    [data-composition-id="s04"] .hm-cam { position: absolute; left: 0; top: 0; width: 1440px; height: 810px; transform-origin: 0 0; }
+    [data-composition-id="s04"] .hm-media { position: absolute; left: 0; top: 0; width: 1440px; height: 810px; object-fit: cover; }
+    [data-composition-id="s04"] .hm-slate { background: #1e1a19; border: 1px solid var(--line-strong); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 0 140px; text-align: center; }
+    [data-composition-id="s04"] .hm-slate b { font-size: 56px; font-weight: 600; color: var(--text-2); letter-spacing: 0.02em; }
+    [data-composition-id="s04"] .hm-slate span { font-size: 30px; line-height: 1.35; color: var(--text-3); white-space: normal; }
+  </style>
+  <div id="s04-root" class="rk-scene on-stage" data-composition-id="s04" data-width="1920" data-height="1080" data-duration="4.4" data-qa-hold="4.4" data-qa-endhold="4.4">
+    <div id="s04-ground" class="rk-ground is-stage clip" data-start="0" data-duration="4.4" data-track-index="0"></div>
+    <div id="s04-cam" class="hm-cam" style="transform: translate(177.78px, 0px) scale(1.0864);">
+      <img id="s04-m0" class="hm-media clip" src="footage/pending/map.png" data-start="0" data-duration="4.4" data-track-index="1" alt="">
+    </div>
+    <div id="s04-co0-tag" class="hm-tag" data-qa="box" style="left: 515.32px; top: 608.22px; opacity: 0;">Answer at your cursor</div>
+    <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
+      <circle id="s04-co0-ring" cx="635.32" cy="608.22" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s04-co0-line" opacity="0" x1="515.32" y1="608.22" x2="619.32" y2="608.22" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
+    </svg>
+    <div id="s04-pending" class="hm-pending" data-qa-ignore>CAPTURE PENDING: approved mockup still, real footage replaces it</div>
+    <div id="s04-band" class="hm-band"></div>
+    <div id="s04-cap0" class="hm-cap">Click any spot on Mars and ask.</div>
+    <div id="s04-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
+  </div>
+  <script>
+    (() => {
+      const $ = (i) => document.getElementById(i);
+      const tl = gsap.timeline({ paused: true });
+      // camera (app CSS px -> frame px): translate then scale, origin 0 0
+      tl.set($("s04-cam"), { x: 177.78, y: 0, scale: 1.0864, transformOrigin: "0 0" }, 0);
+      tl.fromTo($("s04-cam"), { x: 177.78, y: 0, scale: 1.0864 }, { x: -698.01, y: 0, scale: 2.1645, duration: 1, ease: RK.E.io, immediateRender: false }, 1.2);
+      gsap.set($("s04-co0-tag"), { xPercent: -100, yPercent: -50 });
+      // callout 0: "Answer at your cursor" at (635.32, 608.22)
+      tl.set([$("s04-co0-ring"), $("s04-co0-line"), $("s04-co0-tag")], { opacity: 0 }, 0);
+      tl.fromTo($("s04-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "635.32px 608.22px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.4);
+      tl.fromTo($("s04-co0-line"), { opacity: 1, strokeDashoffset: 104 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.48);
+      RK.rise(tl, $("s04-co0-tag"), 2.62, { y: 10, dur: 0.45, fade: 0.12 });
+      RK.words(tl, $("s04-cap0"), 0.35, { stagger: 0.05, dur: 0.45 });
+      window.__timelines["s04"] = tl;
+    })();
+  </script>
+</template>
+</body>
+</html>

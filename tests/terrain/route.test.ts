@@ -4,7 +4,7 @@ import type { LonLat, MissionConstraints, PlanningGrid, RouteLeg } from '@/lib/c
 import { groundDistanceM, pixelCentreLonLat } from '@/lib/geo/frame';
 import { computeSlopeField } from '@/lib/terrain/slope';
 import { buildPlanningGrid, gridCellLonLat, gridLonLatToCell } from '@/lib/terrain/grid';
-import { planRoute } from '@/lib/terrain/route';
+import { nearestReachable, planRoute } from '@/lib/terrain/route';
 import { solvePath } from '@/lib/terrain/astar';
 import { createTerrainEngine } from '@/lib/terrain/engine';
 import { findHazards } from '@/lib/terrain/hazards';
@@ -203,6 +203,7 @@ describe('A* constraints', () => {
 /** Independent O(n^2) Dijkstra on the same edge rules and cost models. */
 function dijkstra(g: PlanningGrid, s: number, t: number, limit: number, objective: 'shortest' | 'fastest', f: number): number {
   const N = g.width * g.height;
+  if (!(g.slopeMaxDeg[s] <= limit)) return Infinity; // same endpoint rule as the solver: the start cell must be admissible
   const dist = new Float64Array(N).fill(Infinity);
   const done = new Uint8Array(N);
   dist[s] = 0;
@@ -277,5 +278,77 @@ describe('hazards, engine', () => {
     const out = eng.analyze({ center: { lon: dem.meta.lonMax + 1, lat: dem.meta.latMax }, radiusM: 100, limitDeg: 15 });
     expect(out.validPct).toBe(0);
     expect(out.elevationM).toBeNull();
+  });
+});
+
+describe('round trips are all or nothing (QA round 1, P0 half route)', () => {
+  const P = (limit: number) => ({ maxSlopeDeg: limit, objective: 'fastest' as const, suitSpeedFactor: 0.6 });
+  it('solvePath(a, b).ok === solvePath(b, a).ok over random pairs, including steep endpoints', () => {
+    const rand = rng(2026);
+    let steepEnds = 0, okPairs = 0;
+    for (const limit of [8, 12, 15, 25]) {
+      for (let t = 0; t < 120; t++) {
+        const a = Math.floor(rand() * grid.width * grid.height), b = Math.floor(rand() * grid.width * grid.height);
+        const ab = solvePath(grid, a, b, P(limit)), ba = solvePath(grid, b, a, P(limit));
+        expect(ab.ok, `cells ${a} -> ${b} at ${limit} deg`).toBe(ba.ok);
+        if (grid.slopeMaxDeg[a] > limit || grid.slopeMaxDeg[b] > limit) { steepEnds++; expect(ab.ok).toBe(false); }
+        if (ab.ok) okPairs++;
+      }
+    }
+    expect(steepEnds).toBeGreaterThan(20);
+    expect(okPairs).toBeGreaterThan(50);
+  });
+
+  it('a target on ground steeper than the limit gives no legs, zero totals and the smallest limit that works', () => {
+    // a cell on the ridge flank: steeper than 15 deg, but reachable at some larger limit
+    let target = -1;
+    for (let i = 0; i < grid.slopeMaxDeg.length && target < 0; i++) if (grid.slopeMaxDeg[i] > 16 && grid.slopeMaxDeg[i] < 30 && grid.elev[i] === grid.elev[i]) target = i;
+    expect(target).toBeGreaterThan(-1);
+    const to = gridCellLonLat(grid, target % grid.width, (target / grid.width) | 0);
+    const res = planRoute(grid, { from: pix(20, 25), to, roundTrip: true, constraints: C({ maxSlopeDeg: 15 }) });
+    expect(res.legs).toEqual([]);
+    expect(res.feasible).toBe(false);
+    expect(res.reasons).toEqual(['no_path_slope']);
+    expect(Object.values(res.totals).every((v) => v === 0)).toBe(true);
+    expect(res.targetSlopeDeg).toBeCloseTo(grid.slopeMaxDeg[target], 6);
+    expect(res.minFeasibleSlopeDeg).toBeGreaterThanOrEqual(Math.ceil(grid.slopeMaxDeg[target]));
+    const at = planRoute(grid, { from: pix(20, 25), to, roundTrip: true, constraints: C({ maxSlopeDeg: res.minFeasibleSlopeDeg! }) });
+    expect(at.legs.length).toBe(2);
+    // the sweep variant stops at the first failed leg and skips the limit search
+    const fast = planRoute(grid, { from: pix(20, 25), to, roundTrip: true, constraints: C({ maxSlopeDeg: 15 }), findMinSlope: false });
+    expect(fast.legs).toEqual([]);
+    expect(fast.minFeasibleSlopeDeg).toBeUndefined();
+  });
+
+  it('round trip length is the sum of both legs and each leg mirrors the other end to end', () => {
+    const rand = rng(11);
+    let n = 0;
+    for (let t = 0; t < 40; t++) {
+      const a = pix(Math.floor(rand() * 120), Math.floor(rand() * 120)), b = pix(Math.floor(rand() * 120), Math.floor(rand() * 120));
+      const res = planRoute(grid, { from: a, to: b, roundTrip: true, constraints: C({ maxSlopeDeg: 20 }) });
+      if (!res.legs.length) { expect(Object.values(res.totals).every((v) => v === 0)).toBe(true); continue; }
+      n++;
+      expect(res.legs.length).toBe(2);
+      expect(res.totals.lengthM).toBeCloseTo(res.legs[0].lengthM + res.legs[1].lengthM, 6);
+      expect(res.legs[0].path[0]).toEqual(res.legs[1].path.at(-1));
+      expect(res.legs[0].path.at(-1)).toEqual(res.legs[1].path[0]);
+    }
+    expect(n).toBeGreaterThan(10);
+  });
+
+  it('nearest reachable point: admissible, connected to the start, and closer than any other reachable cell', () => {
+    let target = -1;
+    for (let i = 0; i < grid.slopeMaxDeg.length && target < 0; i++) if (grid.slopeMaxDeg[i] > 20 && grid.elev[i] === grid.elev[i]) target = i;
+    const to = gridCellLonLat(grid, target % grid.width, (target / grid.width) | 0);
+    const from = pix(20, 25);
+    const near = nearestReachable(grid, from, to, 15, 2000);
+    expect(near.point).not.toBeNull();
+    expect(near.slopeDeg!).toBeLessThanOrEqual(15);
+    expect(near.movedM!).toBeGreaterThan(0);
+    expect(near.movedM!).toBeCloseTo(groundDistanceM(near.point!, to), 6);
+    const plan = planRoute(grid, { from, to: near.point!, roundTrip: true, constraints: C({ maxSlopeDeg: 15 }) });
+    expect(plan.legs.length).toBe(2);
+    expect(nearestReachable(grid, from, to, 15, 1).point).toBeNull();
+    expect(nearestReachable(grid, to, from, 15).reason).toBe('start_blocked');
   });
 });

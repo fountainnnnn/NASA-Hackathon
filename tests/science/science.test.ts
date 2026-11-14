@@ -65,12 +65,12 @@ describe('suggestStops', () => {
 
 describe('roverImagesNear', () => {
   const p = { lon: 77.2002, lat: 18.4 }; // nearest waypoint is sol 10 (~22 m) then sol 20 (~33 m)
-  it('uses the nearest sol from cache, preferring human-eye cameras', async () => {
+  it('uses the nearest sol from cache, preferring the Navcam landscape view (QA round 2: no Hazcam as an extra frame)', async () => {
     const cache = { sol: 10, images: [img('a', 10, 'SKYCAM'), img('b', 10, 'REAR_HAZCAM_LEFT'), img('c', 10, 'NAVCAM_LEFT'), img('d', 10, 'MCZ_LEFT')] };
     const { s, m } = await loaded({ '/data/rover_cache/10.json': cache });
     const r = await s.roverImagesNear(p, 100, 3);
     expect(r?.sol).toBe(10);
-    expect(r!.images.map((i) => i.id)).toEqual(['d', 'c', 'b']);
+    expect(r!.images.map((i) => i.id)).toEqual(['c', 'd']);
     expect(m.calls.some((c) => c.startsWith('/api/rover-images'))).toBe(false);
   });
   it('falls back from cache to the API route', async () => {

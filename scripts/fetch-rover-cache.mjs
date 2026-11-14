@@ -22,7 +22,17 @@ const FULL = {
   FRONT_HAZCAM_LEFT_B: 'Front Hazard Camera Left (B)', FRONT_HAZCAM_RIGHT_B: 'Front Hazard Camera Right (B)',
   REAR_HAZCAM_LEFT: 'Rear Hazard Camera Left', REAR_HAZCAM_RIGHT: 'Rear Hazard Camera Right',
 };
-const rank = (c) => (c.startsWith('MCZ_') ? 0 : c.startsWith('NAVCAM_') ? 1 : c.startsWith('FRONT_HAZCAM_') ? 2 : c.startsWith('REAR_HAZCAM_') ? 3 : 99);
+// Navcam first: wide landscape frames at eye height (mirrors cameraRank in src/lib/science/rover.ts)
+const rank = (c) => (c.startsWith('NAVCAM_') ? 0 : c.startsWith('MCZ_') ? 1 : c.startsWith('FRONT_HAZCAM_') ? 2 : c.startsWith('REAR_HAZCAM_') ? 3 : 99);
+const num = (v) => { const n = v == null ? NaN : Number(v); return Number.isFinite(n) ? n : undefined; };
+/** viewScore in rover.ts: camera class, then how far the mast points from the horizon (Navcam -25° to 20°, Mastcam-Z -8° to 12°). */
+const BAND = { 0: [-25, 20], 1: [-8, 12] };
+const score = (i) => {
+  const r = rank(i.camera), b = BAND[r];
+  let s = r * 100;
+  if (b && i.mastElDeg != null) { if (i.mastElDeg < b[0] || i.mastElDeg > b[1]) s += 250; s += Math.abs(i.mastElDeg + 5); }
+  return s;
+};
 
 function normalise(raw, sol) {
   const out = [];
@@ -35,22 +45,29 @@ function normalise(raw, sol) {
     if (m && (Number(m[1]) < 400 || Number(m[2]) < 400)) continue; // subframe crop
     const url = r.image_files?.medium ?? r.image_files?.large;
     if (!url || !r.imageid || !/^https:\/\/mars\.nasa\.gov\//.test(url)) continue;
+    const sclk = num(r.extended?.sclk), mastElDeg = num(r.extended?.mastEl), mastAzDeg = num(r.extended?.mastAz);
     out.push({
       id: r.imageid, sol: r.sol ?? sol, earthDate: (r.date_taken_utc ?? '').slice(0, 10),
       camera, cameraFull: FULL[camera] ?? camera, url, pageUrl: r.link,
       credit: camera.startsWith('MCZ_') ? 'NASA/JPL-Caltech/ASU' : 'NASA/JPL-Caltech',
+      ...(sclk != null ? { sclk } : {}), ...(mastElDeg != null ? { mastElDeg } : {}), ...(mastAzDeg != null ? { mastAzDeg } : {}),
     });
   }
   return out;
 }
 
-/** Up to 12: 4 Mastcam-Z, 4 Navcam, 3 front Hazcam, then fill (rear Hazcam / leftovers). Spread within a camera. */
+/**
+ * Up to 12 distinct looks, best view first (score above): a frame within 60 s of one already kept is the same look (a
+ * stereo partner or the next mosaic tile) and is skipped, so the app can choose between genuinely different frames.
+ */
 function pick(images) {
-  const spread = (arr, n) => (arr.length <= n ? arr : Array.from({ length: n }, (_, i) => arr[Math.floor((i * arr.length) / n)]));
-  const g = (lo, hi) => images.filter((i) => rank(i.camera) >= lo && rank(i.camera) <= hi);
-  let picked = [...spread(g(0, 0), 4), ...spread(g(1, 1), 4), ...spread(g(2, 2), 3)];
-  for (const im of [...g(3, 3), ...images]) if (picked.length < MAX_IMAGES && !picked.includes(im)) picked.push(im);
-  return picked.slice(0, MAX_IMAGES);
+  const picked = [];
+  for (const im of [...images].sort((a, b) => score(a) - score(b))) {
+    if (picked.length >= MAX_IMAGES) break;
+    if (im.sclk != null && picked.some((p) => p.sclk != null && Math.abs(p.sclk - im.sclk) < 60)) continue;
+    picked.push(im);
+  }
+  return picked;
 }
 
 async function getJson(url, tries = 3) {
@@ -82,4 +99,6 @@ for (const sol of [...chosen].sort((a, b) => a - b)) {
     console.log(`sol ${sol}: ${images.length} images`);
   } catch (e) { console.log(`sol ${sol}: ${e.message}`); }
 }
-console.log(`wrote ${index.length} files to ${OUT}`);
+// the app reads this list to pick the nearest cached sol without probing for files that are not there
+await writeFile(join(OUT, 'index.json'), JSON.stringify({ source: 'NASA Mars 2020 raw images API, normalised by scripts/fetch-rover-cache.mjs', sols: index }) + '\n');
+console.log(`wrote ${index.length} files and index.json to ${OUT}`);

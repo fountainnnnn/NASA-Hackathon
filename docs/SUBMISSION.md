@@ -1,52 +1,24 @@
-> The paste-ready, filled-in draft lives in docs/SUBMISSION_DRAFT.md. This file is the original blank template and checklist.
+# Submission day checklist
 
-# Submission draft — fill in, then paste into the Project tab
+The paste-ready text for every form field is in `docs/SUBMISSION_DRAFT.md`. The full list of rules and their status is in `docs/REQUIREMENTS_CHECKLIST.md`. The official guide is summarised in `docs/GUIDE.md`.
 
-Deadline: **Sun Nov 15, 11:59 p.m. local event time**
+Deadline: Sun 15 Nov 2026, 23:59 SGT. Target: submit at 18:00 SGT.
 
-## Project Name
-TODO
+## Before pasting
 
-## High-Level Project Summary
-<!-- What did you build? How does it address the challenge? Why does it matter? -->
-TODO
+- [ ] Push the latest commits to https://github.com/fountainnnnn/NASA-Hackathon.
+- [ ] Redeploy the live app and check that it shows HeyMars: https://web-production-9b58e394.up.railway.app
+- [ ] Render the final 30 s video, check its length with ffprobe, upload it publicly and replace every `TODO(link)` with its URL.
+- [ ] Resolve every `TODO(verify)` in SUBMISSION_DRAFT.md.
 
-## Link to Project Demo
-<!-- Video ≤30 s (English subs if spoken in another language) OR deck ≤7 slides. Public link. -->
-TODO
+## On the Project tab
 
-## Link to Final Project
-<!-- Public, no login. Tested in a private window? [ ] -->
-TODO
-
-## Detailed Project Description
-- What it does:
-- How it works:
-- Benefits:
-- What we hope to achieve:
-- Tools / languages / hardware / software:
-
-## Use of Super Intelligence (SI)
-<!-- Be specific. AI images/video need a visible watermark; AI code/data/audio need acknowledgement in text + metadata. -->
-TODO
-
-## NASA Data
-<!-- At least one NASA dataset/resource. Name it + link it + say how it was used. -->
-- TODO
-
-## Space Agency Partner Data and Other References
-- TODO
-
----
-
-## Pre-submit checklist
-- [ ] Every teammate confirmed at the same Local Event
-- [ ] All fields filled, all English
-- [ ] Demo ≤30 s or ≤7 slides; covers team name, members, challenge
-- [ ] All links public, opened in a private window
-- [ ] ≥1 NASA dataset named
-- [ ] AI-generated media watermarked; AI code/data acknowledged in README + metadata
-- [ ] No NASA logos/branding in generated content
-- [ ] No people under 18 in any media
-- [ ] Ticked Terms + Original Work → **Submit for Judging** → saw the success banner
-- [ ] Downloaded participant certificate
+- [ ] Every field filled from SUBMISSION_DRAFT.md, all in English.
+- [ ] Demo link: the video (30 s or less), covering name, team and challenge.
+- [ ] Final Project link: live app and repository, both opened in a private window.
+- [ ] At least one NASA dataset named (the NASA Data table has all of them).
+- [ ] No AI-generated images in the app or video; AI code and the AI-assisted music script acknowledged in text and metadata.
+- [ ] No NASA logos or branding in generated content.
+- [ ] No people under 18 in any media.
+- [ ] Save Progress, then tick Terms and Conditions and Confirm All Work is Original, click Submit for Judging, and see the success banner.
+- [ ] Download the participant certificate (optional).

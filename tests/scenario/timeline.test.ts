@@ -3,7 +3,7 @@ import { DEFAULT_CONSTRAINTS } from '@/lib/contracts';
 import {
   batteryLeftAt, batteryUsedAt, buildTimeline, nextStop, sampleAtOdometer, sampleAtTime, slopeAhead, ROVER_SPEED_KMH,
 } from '@/components/Scenario/model';
-import { rulerTicks } from '@/components/Scenario/ruler';
+import { rulerTicks, tickLabel } from '@/components/Scenario/ruler';
 import { SYN_CONSTRAINTS, buildSyntheticRoute, synGround, synLocal } from '@/components/Scenario/synthetic';
 
 const ground = synGround();
@@ -169,13 +169,22 @@ describe('rover assist', () => {
 });
 
 describe('route ruler', () => {
+  it('labels long ticks as mission elapsed time', () => {
+    expect(tickLabel(3600)).toBe('T+01:00');
+    expect(tickLabel(600)).toBe('T+00:10');
+    expect(tickLabel(5430)).toBe('T+01:31');
+  });
   it('ticks every 100 m and every 10 minutes of moving time', () => {
     const ticks = rulerTicks(tl);
     const d = ticks.filter((t) => t.kind === 'distance');
     const m = ticks.filter((t) => t.kind === 'time');
     expect(d[0].odometerM).toBe(100);
     expect(d[1].odometerM).toBe(200);
-    expect(m.map((t) => t.label).slice(0, 2)).toEqual(['10 min', '20 min']);
+    // labels are mission elapsed time at the tick (T+hh:mm), never "60 min"
+    for (const t of m) expect(t.label).toMatch(/^T\+\d{2}:\d{2}$/);
+    const elapsed = m.map((t) => { const [h, mm] = t.label!.slice(2).split(':').map(Number); return h * 60 + mm; });
+    expect(elapsed[0]).toBeGreaterThanOrEqual(10);
+    for (let i = 1; i < elapsed.length; i++) expect(elapsed[i]).toBeGreaterThanOrEqual(elapsed[i - 1] + 10);
     const movingMin = route.legs.reduce((q, l) => q + l.timeMin, 0);
     expect(m.length).toBe(Math.floor(movingMin / 10 + 1e-9));
   });

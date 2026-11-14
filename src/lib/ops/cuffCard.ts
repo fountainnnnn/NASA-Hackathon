@@ -23,6 +23,8 @@ export interface CuffInput {
   minSunElevationDeg?: number;
   maxRows?: number;
   constraints?: MissionConstraints;
+  /** The route's verdict. A NO GO card says so on its first line ("NO GO, PLANNING ONLY"). */
+  verdict?: 'GO' | 'HOLD' | 'NO GO' | null;
 }
 
 /* ------------------------------------------------------------------ formatting */
@@ -173,7 +175,7 @@ export function buildCuffCard(input: CuffInput): CuffCard {
     if (!okAt(tbMin)) {
       let found: number | null = null;
       for (let T = Math.floor(tbMin); T >= 0; T--) if (okAt(T)) { found = T; break; }
-      if (found === null) warnings.push(`DAYLIGHT: walk-back is below ${minSun} deg sun for any turn-back time`);
+      if (found === null) warnings.push(`DAYLIGHT: walk-back is below ${minSun}° sun for any turn-back time`);
       else { tbMin = found; limitedBy = 'daylight'; }
     }
   }
@@ -206,17 +208,19 @@ export function buildCuffCard(input: CuffInput): CuffCard {
   if (turnBack) abortRules.push(`Not at the far point by ${fmtT(tbMin, true)}: TURN BACK (limit: ${limitedBy}).`);
   abortRules.push(`Battery below ${k.batteryReservePct}%: ABORT, walk back now.`);
   abortRules.push(`EVA clock past ${hhmm(k.evaMaxMin)}: ABORT.`);
-  abortRules.push(`Slope above ${k.maxSlopeDeg} deg on the path: do not cross, detour or turn back.`);
-  if (startMs !== null) abortRules.push(`Sun below ${minSun} deg: ABORT.`);
+  abortRules.push(`Slope above ${k.maxSlopeDeg}° on the path: do not cross, detour or turn back.`);
+  if (startMs !== null) abortRules.push(`Sun below ${minSun}°: ABORT.`);
   abortRules.push('Link lost outside a planned shadow: stop, retrace to last WP with link.');
 
   // ---- text block
   const W = 60;
   const head: { t: string; c: 'h' | 't' | 'w' | 'd' }[] = [];
-  head.push({ t: `MARSWALK CUFF CARD  ${route.id || 'ROUTE'}  ${route.roundTrip ? 'ROUND TRIP' : 'ONE WAY'}`, c: 'h' });
+  const nogo = input.verdict === 'NO GO';
+  if (nogo) head.push({ t: 'NO GO, PLANNING ONLY. DO NOT WALK THIS ROUTE', c: 'w' });
+  head.push({ t: `HEYMARS CUFF CARD  ${route.id || 'ROUTE'}  ${route.roundTrip ? 'ROUND TRIP' : 'ONE WAY'}${input.verdict && !nogo ? `  ${input.verdict}` : ''}`, c: 'h' });
   head.push({ t: `${startMs !== null ? 'START ' + fmtUtc(startMs) : 'START TIME NOT SET'}`, c: 't' });
-  head.push({ t: `EVA ${fmtT(tl.totalMin)}  DIST ${(tl.totalDistM / 1000).toFixed(2)}km  MAXSLP ${route.totals.maxSlopeDeg.toFixed(1)}deg`, c: 't' });
-  head.push({ t: `LIM SLOPE ${k.maxSlopeDeg}deg BAT RES ${k.batteryReservePct}% EVA ${k.evaMaxMin}min`, c: 'd' });
+  head.push({ t: `EVA ${fmtT(tl.totalMin)}  DIST ${(tl.totalDistM / 1000).toFixed(2)}km  MAXSLP ${route.totals.maxSlopeDeg.toFixed(1)}°`, c: 't' });
+  head.push({ t: `LIM SLOPE ${k.maxSlopeDeg}° BAT RES ${k.batteryReservePct}% EVA ${k.evaMaxMin}min`, c: 'd' });
   head.push({ t: '-'.repeat(W), c: 'd' });
   head.push({ t: 'WP T+hh:mm DIST    BAT  HDG LAT/LON', c: 'd' });
   const body = rows.map((r) => ({
@@ -232,27 +236,28 @@ export function buildCuffCard(input: CuffInput): CuffCard {
   const text = lines.map((l) => l.t).join('\n');
 
   // ---- markdown
-  const md: string[] = [`### MarsWalk cuff card — ${route.id || 'route'} (${route.roundTrip ? 'round trip' : 'one way'})`, ''];
-  md.push(`${startMs !== null ? `Start ${fmtUtc(startMs)}` : 'Start time not set'} · EVA ${fmtT(tl.totalMin)} · ${(tl.totalDistM / 1000).toFixed(2)} km · max slope ${route.totals.maxSlopeDeg.toFixed(1)}°`, '');
+  const md: string[] = [`### HeyMars cuff card, ${route.id || 'route'} (${route.roundTrip ? 'round trip' : 'one way'})`, ''];
+  if (nogo) md.push('**NO GO, planning only. Do not walk this route.**', '');
+  md.push(`${startMs !== null ? `Start ${fmtUtc(startMs)}` : 'Start time not set'}, EVA ${fmtT(tl.totalMin)}, ${(tl.totalDistM / 1000).toFixed(2)} km, max slope ${route.totals.maxSlopeDeg.toFixed(1)}°`, '');
   md.push('| WP | T+ | Dist km | Batt % | Hdg | Lat | Lon | Note |', '|---:|---|---:|---:|---:|---|---|---|');
   for (const r of rows) {
-    md.push(`| ${r.n} | ${fmtT(r.elapsedMin)} | ${(r.cumDistM / 1000).toFixed(2)} | ${Math.round(r.batteryPct)} | ${r.headingToNextDeg ?? '—'} | ${r.latStr} | ${r.lonStr} | ${r.label}${r.shadowAhead ? ' · LOS shadow ahead' : ''} |`);
+    md.push(`| ${r.n} | ${fmtT(r.elapsedMin)} | ${(r.cumDistM / 1000).toFixed(2)} | ${Math.round(r.batteryPct)} | ${r.headingToNextDeg ?? 'n/a'} | ${r.latStr} | ${r.lonStr} | ${r.label}${r.shadowAhead ? ', LOS shadow ahead' : ''} |`);
   }
   md.push('');
   if (turnBack) md.push(`**${turnBack.label}** (return walk ${Math.round(returnWalkMin)} min; limited by ${limitedBy}).`, '');
-  if (warnings.length) md.push(...warnings.map((w) => `- ⚠ ${w}`), '');
+  if (warnings.length) md.push(...warnings.map((w) => `- WARNING: ${w}`), '');
   md.push('**Abort rules**', ...abortRules.map((r, i) => `${i + 1}. ${r}`));
   const markdown = md.join('\n');
 
-  // ---- SVG 600x900
+  // ---- SVG 600x900, black on white for print (headers and warnings bold, so nothing depends on colour)
   const fs = 14, lh = 19, x0 = 24;
-  const col = { h: '#ffb454', t: '#d7e0ea', w: '#ff7b72', d: '#7d8da1' };
+  const col = { h: '#000000', t: '#000000', w: '#000000', d: '#3d3d3d' };
   const texts = lines.slice(0, Math.floor((900 - 60) / lh)).map((l, i) =>
-    `<text x="${x0}" y="${44 + i * lh}" fill="${col[l.c]}" xml:space="preserve">${esc(l.t)}</text>`).join('');
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" font-family="Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="${fs}"><rect width="600" height="900" fill="#0b0f14"/><rect x="8" y="8" width="584" height="884" rx="6" fill="none" stroke="#2a3441"/>${texts}</svg>`;
+    `<text x="${x0}" y="${44 + i * lh}" fill="${col[l.c]}"${l.c === 'h' || l.c === 'w' ? ' font-weight="700"' : ''} xml:space="preserve">${esc(l.t)}</text>`).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" font-family="Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="${fs}"><rect width="600" height="900" fill="#ffffff"/><rect x="8" y="8" width="584" height="884" rx="6" fill="none" stroke="#000000"/>${texts}</svg>`;
 
   return {
-    title: `MarsWalk cuff card ${route.id || ''}`.trim(), routeId: route.id,
+    title: `HeyMars cuff card ${route.id || ''}`.trim(), routeId: route.id,
     startUtc: startMs === null ? null : new Date(startMs).toISOString(),
     rows, warnings, turnBack, abortRules, text, markdown, svg,
   };

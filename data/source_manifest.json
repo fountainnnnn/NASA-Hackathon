@@ -497,7 +497,7 @@
       ],
       "processing": [
         "Mars Trek search (rows=2100, q=*) holds 1783 nomenclature items, only 1 near the DEM, so the USGS Gazetteer centre-point shapefile was used as the main source.",
-        "Kept features with centre inside DEM bbox ±0.2°; type reduced to the singular head word; diameter in km as published; Trek-only names added if missing."
+        "Kept features with centre inside DEM bbox \u00b10.2\u00b0; type reduced to the singular head word; diameter in km as published; Trek-only names added if missing."
       ]
     },
     "public/data/layers.json": {
@@ -1260,6 +1260,36 @@
       "credit": "NASA/JPL Solar System Dynamics (Horizons)",
       "raws": [],
       "processing": "scripts/fetch-horizons.mjs: queried Horizons API, rounded (range 6 dp au, light time 4 dp min, az/el 2 dp deg), retrieved 2026-11-14T14:35:50.721Z"
+    },
+    "public/data/hirise/jezero_base.jpg": {
+      "output": "public/data/hirise/jezero_base.jpg",
+      "outputBytes": 2782870,
+      "outputSha256": "7545b75318b1aa1f6f33a0d8744c6be6ebbb7f5988d16008901e4b647e8c19d4",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/tiles/Mars/EQ/JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd/1.0.0/default/default028mm/15/{row}/{col}.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd/1.0.0/WMTSCapabilities.xml"
+      ],
+      "productLabel": "JEZ_hirise_soc_006_orthoMosaic_25cm_Eqc_latTs0_lon0_first_dd",
+      "mission": "Mars Reconnaissance Orbiter",
+      "instrument": "High Resolution Imaging Science Experiment (HiRISE), controlled orthomosaic (Mars 2020 TRN basemap)",
+      "projection": "Geographic (EPSG 104905, equirectangular in degrees), Mars 2000 sphere R=3396190 m",
+      "credit": "NASA/JPL-Caltech/University of Arizona/USGS (MRO HiRISE via JPL Mars Trek)",
+      "generatedBy": "scripts/prepare-hirise.mjs",
+      "generatedOn": "2026-11-14T21:59:26.114Z",
+      "resolution": "1.27 m/px N-S, 1.21 m/px E-W (WMTS level 15 of the 25 cm mosaic)",
+      "extent": {
+        "lonMin": 77.36387729644775,
+        "lonMax": 77.47374057769775,
+        "latMin": 18.397057056427002,
+        "latMax": 18.484947681427002
+      },
+      "processing": [
+        "Fetched 357 WMTS tiles (level 15, rows 13018..13034, cols 46851..46871); cached in data/raw/hirise_tiles/.",
+        "Stitched and cropped to 5120x4096 px on pixel boundaries (no resampling).",
+        "Linear radiometric match to the CTX 6 m mosaic over the same window: v' = 0.7702 v + 56.17.",
+        "Nodata (alpha < 128) filled with the CTX mean and masked out in mask.png (1/8 resolution, eroded by one cell)."
+      ]
     }
   }
 }

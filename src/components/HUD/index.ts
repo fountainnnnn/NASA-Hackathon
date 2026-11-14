@@ -1,3 +1,5 @@
 export { Intro, useIntro } from './Intro';
-export { Credit, Hint, Toasts, TopLeft, TopRight } from './Chrome';
 export { SourcesSheet } from './Sources';
+export { TopBar } from './TopBar';
+export { Rail } from './Rail';
+export { StatusLine, Timeline, useSimLoaded } from './Timeline';

@@ -179,16 +179,16 @@ export function LandingCaption({ phases, result, maxSlopeDeg }: { phases: EdlPha
   const alt = altitudeKmAt(phases, Math.min(t, endS));
   const done = t >= endS && result;
   return (
-    <div style={{ position: 'absolute', left: '50%', bottom: 118, transform: 'translateX(-50%)', textAlign: 'center', pointerEvents: 'auto', maxWidth: 'min(560px, 92%)' }}>
+    <div data-avoid data-caption style={{ position: 'absolute', left: 'calc((100% - var(--log-w, 0px)) / 2)', bottom: 'calc(var(--inset, 0px) + 44px)', transform: 'translateX(-50%)', textAlign: 'center', pointerEvents: 'auto', width: 'max-content', maxWidth: 'calc(100vw - var(--log-w, 0px) - 16px)' }}>
       {done ? (
-        <div className={css.contour} style={{ fontSize: 13, padding: '6px 10px' }}>
+        <div className={css.contour} style={{ fontSize: 13, padding: '6px 10px', whiteSpace: 'normal' }}>
           {Math.round(result.okFraction * 100)} % of {result.samples.toLocaleString('en-US')} simulated touchdowns land at or under {maxSlopeDeg ?? '?'} degrees
         </div>
       ) : p ? (
-        <div className={css.contour} style={{ fontSize: 13, padding: '6px 10px', display: 'grid', gap: 2 }}>
+        <div className={css.contour} style={{ fontSize: 13, padding: '6px 10px', display: 'grid', gap: 2, whiteSpace: 'normal' }}>
           <span style={{ fontFamily: 'var(--font-sans, system-ui)', fontWeight: 600 }}>{p.label}</span>
           {alt != null && <span style={{ color: 'var(--text-2, #a39c95)' }}>{alt.toFixed(1)} km above the surface</span>}
-          <a href={p.source.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-3, #6a645f)', fontFamily: 'var(--font-sans, system-ui)', fontSize: 11 }}>{p.source.title}</a>
+          <a href={p.source.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-2, #a39c95)', fontFamily: 'var(--font-sans, system-ui)', fontSize: 11 }}>{p.source.title}</a>
         </div>
       ) : null}
     </div>

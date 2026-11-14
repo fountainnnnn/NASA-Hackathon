@@ -93,7 +93,19 @@ export type GlobeCommand =
 /* ---------------------------------------------------------------- companion (src/state/companion.ts) */
 
 export type ScoutMood = 'idle' | 'listening' | 'thinking' | 'drawing' | 'warning';
-export interface CompanionUtterance { id: string; text: string; sources: { title: string; url?: string }[]; unverified: string[]; at: number; point?: LonLat }
+/** Structured answer shown in Scout's bubble instead of paragraphs. Every figure comes from a tool result. */
+export interface AnswerCard {
+  title: string;
+  verdict?: { word: 'GO' | 'HOLD' | 'NO GO'; tone: 'go' | 'caution' | 'nogo' };
+  coords?: string;
+  rows?: { label: string; value: string; unit?: string; src?: string }[];
+  criteria?: { label: string; value: string; limit: string; result: 'pass' | 'fail' | 'no data'; src?: string }[];
+  /** Elevation along the route (m) at cumulative distance (m), and battery left (%) over minutes, with the reserve threshold. */
+  profile?: { dist: number[]; elev: number[]; min: number[]; battery: number[]; reservePct: number };
+  /** Mission Log step with the full calculation. */
+  stepId?: string | null;
+}
+export interface CompanionUtterance { card?: AnswerCard; id: string; text: string; sources: { title: string; url?: string }[]; unverified: string[]; at: number; point?: LonLat }
 export interface CompanionState {
   mode: 'globe' | 'jezero';
   mood: ScoutMood;
