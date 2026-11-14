@@ -1,3 +1,5 @@
+> The paste-ready, filled-in draft lives in docs/SUBMISSION_DRAFT.md. This file is the original blank template and checklist.
+
 # Submission draft — fill in, then paste into the Project tab
 
 Deadline: **Sun Nov 15, 11:59 p.m. local event time**
