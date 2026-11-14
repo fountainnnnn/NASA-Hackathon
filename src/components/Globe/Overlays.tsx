@@ -25,7 +25,7 @@ const facing = (p: THREE.Vector3, cam: THREE.Vector3) => cam.dot(p) > p.lengthSq
 
 const labelStyle = (color: string): React.CSSProperties => ({
   transform: 'translateY(-18px)', whiteSpace: 'nowrap', pointerEvents: 'none', userSelect: 'none',
-  font: '400 11px/1.2 var(--font-mono, "IBM Plex Mono", ui-monospace, monospace)', fontVariantNumeric: 'tabular-nums', color: '#ece7e1',
+  font: '400 11px/1.2 var(--font-mono, "Martian Mono", ui-monospace, monospace)', fontVariantNumeric: 'tabular-nums', color: '#ece7e1',
   background: '#0d0b0b', border: '1px solid rgba(236,231,225,0.10)', borderLeft: `2px solid ${color}`, borderRadius: 2, padding: '2px 6px',
   transition: 'opacity 90ms linear',
 });
@@ -68,7 +68,8 @@ function Marker({ m, exag, demV }: { m: GlobeMarker; exag: number; demV: number 
       <group ref={g} position={pos} quaternion={quat}>
         <lineSegments geometry={RETICLE} renderOrder={20}><lineBasicMaterial color={color} depthTest={false} /></lineSegments>
       </group>
-      <Label world={pos} text={m.label} color={color} />
+      {/* the pointer readout already says where this is, so the click ring carries no label */}
+      {m.kind !== 'click' && <Label world={pos} text={m.label} color={color} />}
     </>
   );
 }

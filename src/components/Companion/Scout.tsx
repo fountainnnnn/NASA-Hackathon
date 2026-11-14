@@ -204,7 +204,7 @@ export function Scout({ projectToScreen, sampleAt }: ScoutProps) {
       const ro = readout.current;
       if (ro) {
         const el = document.elementFromPoint(cursor.x, cursor.y);
-        const over = !cursor.moved || !!el?.closest('[data-companion],button,input,textarea,a,select');
+        const over = !cursor.moved || open || !!el?.closest('[data-companion],button,input,textarea,a,select');
         const info = !over && sample.current ? sample.current(cursor.x, cursor.y) : null;
         if (!info) { ro.style.opacity = '0'; dwellAt = now; }
         else {

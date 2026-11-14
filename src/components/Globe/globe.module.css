@@ -2,12 +2,12 @@
 .fade { position: absolute; inset: 0; background: var(--bg-0, #060505); opacity: 1; pointer-events: none; transition: opacity 600ms cubic-bezier(0.2, 0.7, 0.1, 1); }
 .status {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; text-align: center;
-  font: 400 12px/1.5 var(--font-mono, "IBM Plex Mono", ui-monospace, monospace); color: var(--text-2, #a39c95); max-width: 420px;
+  font: 400 12px/1.5 var(--font-mono, "Martian Mono", ui-monospace, monospace); color: var(--text-2, #a39c95); max-width: 420px;
 }
 .status b { display: block; font-weight: 600; color: var(--text-1, #ece7e1); }
 .info {
   position: absolute; left: 16px; bottom: 16px; max-width: 420px; display: grid; gap: 6px;
-  font: 400 11px/1.4 var(--font-mono, "IBM Plex Mono", ui-monospace, monospace); font-variant-numeric: tabular-nums; color: var(--text-3, #6a645f);
+  font: 400 11px/1.4 var(--font-mono, "Martian Mono", ui-monospace, monospace); font-variant-numeric: tabular-nums; color: var(--text-3, #6a645f);
 }
 .info label { display: flex; align-items: center; gap: 8px; color: var(--text-2, #a39c95); }
 .info input[type='range'] { width: 120px; accent-color: var(--accent, #e0884a); }

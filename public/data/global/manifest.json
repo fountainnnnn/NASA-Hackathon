@@ -1,0 +1,157 @@
+{
+ "texture": {
+  "file": "mars_8k.jpg",
+  "width": 8192,
+  "height": 4096,
+  "lowResFile": "mars_2k.jpg",
+  "lowResWidth": 2048,
+  "lowResHeight": 1024,
+  "title": "Viking MDIM 2.1 colorized global mosaic (232 m/px)",
+  "credit": "NASA/JPL-Caltech/USGS Astrogeology Science Center (Viking Orbiter, MDIM 2.1), served by NASA JPL Mars Trek WMTS",
+  "sourceUrl": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml"
+ },
+ "dem": {
+  "file": "mola_2880.i16.gz",
+  "width": 2880,
+  "height": 1440,
+  "encoding": {
+   "type": "int16le",
+   "scale": 1,
+   "offset": 0,
+   "nodata": -32768
+  },
+  "resKm": 7.4,
+  "title": "MGS MOLA MEGDR topography, 16 ppd binned to 1/8 degree (heights above the MOLA areoid; file is gzip, 2880x1440 Int16 LE, height = value*scale + offset)",
+  "credit": "NASA/GSFC MGS MOLA Science Team (Smith et al.); PDS MGS-M-MOLA-5-MEGDR-L3-V1.0, megt90n000eb",
+  "sourceUrl": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img"
+ },
+ "layers": [
+  {
+   "id": "elevation",
+   "file": "layer_elevation.png",
+   "width": 2048,
+   "height": 1024,
+   "title": "MOLA elevation (hypsometric tint)",
+   "mission": "Mars Global Surveyor",
+   "instrument": "Mars Orbiter Laser Altimeter (MOLA)",
+   "kind": "topographic",
+   "provenance": "observed",
+   "credit": "NASA/GSFC MGS MOLA Science Team; PDS Geosciences Node MEGDR (Smith et al. 2003)",
+   "sourceUrl": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+   "note": "Display only: -8200 m (violet-blue) to +21300 m (white), metres above the MOLA areoid. Point values: read manifest.dem (mola_2880.i16.gz), same footprint, 1/8 degree."
+  },
+  {
+   "id": "geology",
+   "file": "layer_geology.png",
+   "width": 2048,
+   "height": 1024,
+   "valueFile": "layer_geology_idx.u8.gz",
+   "valueEncoding": {
+    "type": "uint8",
+    "scale": 1,
+    "offset": 0,
+    "nodata": 0,
+    "unit": "unit index: value k = k-th unit symbol in sorted order of geology_global.json \"units\" (1-based): AHi,AHtu,AHv,ANa,Aa,Ap,Apu,Av,Ave,HNb,HNhu,HNt,Hp,Hpe,Hpu,Ht,Hto,Htu,Hve,Nhe,Nhu,Nve,eAb,eHb,eHh,eHt,eHv,eNh,eNhm,lAa,lApc,lApd,lAv,lAvf,lHb,lHl,lHt,lHv,lHvf,lNh,lNv,mAl,mNh,mNhm"
+   },
+   "title": "Geologic Map of Mars (USGS SIM 3292), unit raster",
+   "mission": "Multiple (Viking, MGS, Mars Odyssey, MRO, Mars Express data used by the map)",
+   "instrument": "Map compilation (THEMIS, MOLA, HRSC, CTX, HiRISE, Viking VIS); not an instrument product",
+   "kind": "geologic",
+   "provenance": "observed",
+   "credit": "Tanaka, K. L., Skinner, J. A. Jr., Dohm, J. M., Irwin, R. P. III, Kolb, E. J., Fortezzo, C. M., Platz, T., Michael, G. G., Hare, T. M. (2014), USGS SIM 3292",
+   "sourceUrl": "https://pubs.usgs.gov/sim/3292/",
+   "note": "Display raster rasterised at 2048x1024 (~0.18 deg) from the full-resolution polygons; for exact unit lookups use geology_global.json (simplified 0.03 deg). Colours are assigned by this pipeline (not USGS cartographic colours). Geologic units are interpretations at 1:20,000,000. valueFile is gzip (suffix .gz)."
+  },
+  {
+   "id": "hydrogen",
+   "file": "layer_hydrogen.png",
+   "width": 720,
+   "height": 360,
+   "valueFile": "layer_hydrogen.u8.gz",
+   "valueEncoding": {
+    "type": "uint8",
+    "scale": 0.1,
+    "offset": 0,
+    "nodata": 255,
+    "unit": "wt% H2O (water-equivalent hydrogen)"
+   },
+   "title": "Odyssey GRS water-equivalent hydrogen (Boynton et al. 2007)",
+   "mission": "2001 Mars Odyssey",
+   "instrument": "Gamma Ray Spectrometer (GRS)",
+   "kind": "chemical",
+   "provenance": "observed",
+   "credit": "W. V. Boynton et al. (2007), JGR 112, E12S99; PDS ODY-M-GRS-5-ELEMENTS-V1.0 (NASA PDS Geosciences Node)",
+   "sourceUrl": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
+   "note": "Smoothed 5x5 degree bins (10 degree boxcar), 1508 of 2592 bins have data; transparent = no data (high latitudes, where the GRS H signal needs a different model, are NOT covered). Resolution is ~300 km: it describes the regional upper ~1 m, never a site. Resampled bilinearly between valid bin centres for display. valueFile is gzip (suffix .gz). Display: YlGnBu 0..12 wt%."
+  },
+  {
+   "id": "thermalInertia",
+   "file": "layer_thermal_inertia.png",
+   "width": 2048,
+   "height": 1024,
+   "valueFile": "layer_thermal_inertia.i16.gz",
+   "valueEncoding": {
+    "type": "int16le",
+    "scale": 1,
+    "offset": 0,
+    "nodata": -32768,
+    "unit": "J m^-2 K^-1 s^-1/2 (tiu)"
+   },
+   "title": "TES nighttime apparent thermal inertia (Putzig & Mellon 2007)",
+   "mission": "Mars Global Surveyor",
+   "instrument": "Thermal Emission Spectrometer (TES)",
+   "kind": "thermal",
+   "provenance": "observed",
+   "credit": "N. E. Putzig & M. T. Mellon (2007), Icarus 191; PDS MGS-M-TES-5-TIMAP-V1.0 (NASA PDS Geosciences Node)",
+   "sourceUrl": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img",
+   "note": "Night map, 20 pixel/degree (~3 km), derived range 5..5000 tiu; transparent = not computed (poles beyond +/-87 deg, outside 5..5000). Apparent TI from a surface-temperature model, so higher = more rock/induration, lower = dust/sand. valueFile is gzip (suffix .gz). Display: inferno, log scale 25..1200."
+  },
+  {
+   "id": "dust",
+   "file": "layer_dust.png",
+   "width": 1024,
+   "height": 512,
+   "title": "TES Dust Cover Index (Ruff & Christensen 2002), colourised",
+   "mission": "Mars Global Surveyor",
+   "instrument": "Thermal Emission Spectrometer (TES)",
+   "kind": "thermal",
+   "provenance": "observed",
+   "credit": "S. W. Ruff & P. R. Christensen (2002), JGR 107(E12), 5127; image via NASA/JPL Mars Trek \"MGS TES, Global Dust\"",
+   "sourceUrl": "https://trek.nasa.gov/mars/#v=0.1&x=0&y=0&z=1&p=EQ&i=TES_Dust",
+   "note": "DISPLAY ONLY, no valueFile: Mars Trek and ASU serve only the colourised image (blue = more dust-covered, red = less dust, scale not published with the file), the DCI numbers are not on PDS/Trek, so no value is invented for point queries. Spectral index applies to dust thick enough to mask TIR spectra, 3.5 km pixels, coverage about +/-60..70 deg (black = no data -> transparent)."
+  },
+  {
+   "id": "slope",
+   "file": "layer_slope.png",
+   "width": 2048,
+   "height": 1024,
+   "valueFile": "layer_slope.u8.gz",
+   "valueEncoding": {
+    "type": "uint8",
+    "scale": 0.25,
+    "offset": 0,
+    "nodata": 255,
+    "unit": "deg"
+   },
+   "title": "Surface slope from the global MOLA DEM",
+   "mission": "Mars Global Surveyor",
+   "instrument": "Mars Orbiter Laser Altimeter (MOLA), slope computed by this pipeline",
+   "kind": "derived",
+   "provenance": "computed",
+   "credit": "Computed from NASA/GSFC MGS MOLA MEGDR; method: central differences on the 1/8 degree grid",
+   "sourceUrl": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+   "note": "Baseline ~14.8 km (2 pixels of ~7.4 km): this is regional slope, NOT lander-scale slope; it cannot see rocks, scarps under ~km width or crater rims. valueFile is gzip (suffix .gz). Display: viridis 0..20 deg."
+  }
+ ],
+ "geology": {
+  "file": "geology_global.json",
+  "title": "Geologic Map of Mars (SIM 3292)",
+  "authors": "Tanaka, K.L., Skinner, J.A. Jr., Dohm, J.M., Irwin, R.P. III, Kolb, E.J., Fortezzo, C.M., Platz, T., Michael, G.G., Hare, T.M.",
+  "year": 2014,
+  "url": "https://pubs.usgs.gov/sim/3292/",
+  "scale": "1:20,000,000"
+ },
+ "sites": {
+  "file": "sites.json"
+ }
+}

@@ -1,0 +1,319 @@
+{
+  "generatedOn": "2026-11-14T14:31:29.946Z",
+  "generator": "scripts/prepare-global.mjs",
+  "sources": [
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/mars_8k.jpg",
+      "outputBytes": 5188766,
+      "outputSha256": "21634cc91614409babf5e5b9f4d6e5aac5c04f5f5308a3b1db3ce97b4f6caafb",
+      "source": "Viking MDIM 2.1 colorized global mosaic (232 m/px) via JPL Mars Trek WMTS",
+      "url": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml",
+      "tileTemplate": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/{z}/{row}/{col}.jpg",
+      "rawFile": "data/raw/global/mdim/ (512 tiles z4)",
+      "tilesSha256Digest": "a02b1132e49f37e4c7c744062fa5ba90929e3210a8b250bae56a055f6390b562",
+      "processing": [
+        "Read WMTSCapabilities.xml; matrix default028mm level 4 = 32x16 tiles of 256 px, top-left (-180, 90)",
+        "Fetched all 512 JPEG tiles (row/col order as in the template)",
+        "Stitched without resampling into 8192x4096",
+        "JPEG q82 (mozjpeg)"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/mars_2k.jpg",
+      "outputBytes": 417318,
+      "outputSha256": "e8de6285e63ae0e54bdbebb35f01c68e129b2322d294c027d27af710e50703b7",
+      "source": "same as mars_8k.jpg",
+      "url": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml",
+      "processing": [
+        "Lanczos3 downsample of the 8192x4096 stitch to 2048x1024",
+        "JPEG q85 (mozjpeg)"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/mola_2880.i16.gz",
+      "outputBytes": 6639938,
+      "outputSha256": "c70a32e460a04f1ce9ded766c56cb27b4cdca53f42d2926f62732d0924f0614f",
+      "source": "MGS MOLA MEGDR median topography, 16 pixel/degree (megt90n000eb), PDS Geosciences Node; ODY not involved",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+      "rawFile": "data/raw/global/pds/megt_p.img",
+      "sha256": "d18d9b9ab8c5516d02e157dd2cde0f1d0d160c21940e953ba22391269a545e7b",
+      "bytes": 33177600,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Big-endian int16 5760x2880, lon 0..360 E, top row = 90N, heights in m above the MOLA areoid",
+        "Rotated columns by 180 deg so col 0 = lon -180",
+        "2x2 box mean to 2880x1440 (1/8 deg ~ 7.4 km at the equator), rounded to integer metres",
+        "Int16 little-endian, scale 1, offset 0, nodata -32768 (none present), gzip -9"
+      ],
+      "stats": {
+        "minM": -8135,
+        "maxM": 21159
+      }
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_elevation.png",
+      "outputBytes": 937977,
+      "outputSha256": "8397d166f167f9bc3baad2473eb1b523ed67f64e5f7a71acf5f2b51d81202d6a",
+      "source": "derived from public/data/global/mola_2880.i16.gz (MOLA MEGDR)",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+      "processing": [
+        "Area-weighted box resample 2880x1440 -> 2048x1024",
+        "Hypsometric colour ramp -8200..21300 m"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_slope.png",
+      "outputBytes": 564432,
+      "outputSha256": "bbce25262182224751ba14bc66cbc1f9bd0650c2db0e215f656ac5f3064835a7",
+      "source": "computed from mola_2880.i16.gz",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+      "processing": [
+        "Central-difference gradient on the sphere (dx = R cos(lat) dlon, dy = R dlat), slope = atan(|grad|)",
+        "Box resample to 2048x1024",
+        "viridis colour ramp 0..20 deg, 256-colour palette PNG"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_slope.u8.gz",
+      "outputBytes": 719736,
+      "outputSha256": "47a4237a6c2cd1ea7830acaaf640f84127e25b458a126a55dbd80c6d52bcfdac",
+      "source": "computed from mola_2880.i16.gz",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+      "processing": [
+        "Slope in degrees, 2048x1024, uint8 value = deg/0.25 (max 63.5 deg), nodata 255 (none), gzip -9"
+      ],
+      "stats": {
+        "maxSlopeDeg": 29.08
+      }
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/geology_global.json",
+      "outputBytes": 2437962,
+      "outputSha256": "5893aa36adfa97cdcf9ee55282af9aa91726f69819090c339429bf8276d7c1ad",
+      "source": "USGS SIM 3292 shapefile SIM3292_Global_Geology (served by Mars Trek item SIM3292_Global_Geology; publication https://pubs.usgs.gov/sim/3292/)",
+      "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=SIM3292_Global_Geology",
+      "rawFile": "data/raw/global/SIM3292_Global_Geology.zip",
+      "sha256": "0dc3bfdf8f6d4d7b1da98a18c6873f17c2f5a307f485ae64ab865fae65b3ab49",
+      "bytes": 54631846,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Read shapefile (GCS_Mars_2000, lon -180..180 E already) with the Unit and UnitDesc attributes",
+        "1311 polygons, 44 units",
+        "Douglas-Peucker 0.03 deg per ring, tiny holes dropped, coords rounded to 0.001 deg, bbox per polygon",
+        "Colours assigned by hue per epoch (no colours in the dbf)"
+      ],
+      "stats": {
+        "polygons": 1311,
+        "vertices": 137281,
+        "units": 44
+      }
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_geology.png",
+      "outputBytes": 100806,
+      "outputSha256": "6b2c65c9bb6522c87b201e2fd37c757c22aa457e7809e66d76562dee6be99cb1",
+      "source": "rasterised SIM 3292",
+      "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=SIM3292_Global_Geology",
+      "rawFile": "data/raw/global/SIM3292_Global_Geology.zip",
+      "sha256": "0dc3bfdf8f6d4d7b1da98a18c6873f17c2f5a307f485ae64ab865fae65b3ab49",
+      "bytes": 54631846,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Even-odd scanline fill of the full-resolution polygons at 2048x1024, pixel-centre sampling",
+        "Palette PNG; unmapped pixels transparent"
+      ],
+      "stats": {
+        "coveredFraction": 1
+      }
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_geology_idx.u8.gz",
+      "outputBytes": 87974,
+      "outputSha256": "430be0a2751979161b5e838ace3da3aa2451f96af81fbd1ca15bef4f475ce9db",
+      "source": "rasterised SIM 3292",
+      "url": "https://pubs.usgs.gov/sim/3292/",
+      "processing": [
+        "uint8 unit index, 0 = none, gzip -9"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_hydrogen.png",
+      "outputBytes": 13352,
+      "outputSha256": "c249467ca48a56f62aa44735b2ec6dc3e485da8fb1e7806f14d271c6a9b95b98",
+      "source": "ODY GRS element concentration map h2o_sr_5x5",
+      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
+      "rawFile": "data/raw/global/pds/h2o_sr_5x5.tab",
+      "sha256": "5cec0d637755ddb7a451f58d7b24b6fb34f081e3391b40cdfca5410200da0236",
+      "bytes": 186624,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Parsed 2592 ASCII rows (lat, lon E 0..360, wt% H2O, sigma); 9999.999 = no data",
+        "Re-indexed to lon -180..180 and 5 degree bins",
+        "Bilinear between valid bin centres onto a 720x360 grid; no-data bins stay transparent",
+        "YlGnBu ramp 0..12 wt%, palette PNG"
+      ],
+      "stats": {
+        "validBins": 1508,
+        "minWtPct": 1.66,
+        "maxWtPct": 7.39
+      }
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_hydrogen.u8.gz",
+      "outputBytes": 21060,
+      "outputSha256": "5f40b4e637da676fcbf3528ed09c60a7c9feecf0051e05a4bb6e9bdf94caec8b",
+      "source": "same",
+      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
+      "rawFile": "data/raw/global/pds/h2o_sr_5x5.tab",
+      "sha256": "5cec0d637755ddb7a451f58d7b24b6fb34f081e3391b40cdfca5410200da0236",
+      "bytes": 186624,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "uint8 value = wt%/0.1 (max 25.4), nodata 255, 720x360, gzip -9"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_thermal_inertia.png",
+      "outputBytes": 956861,
+      "outputSha256": "a93a00d19c2d0404b54025ea4af8fcf43e7446c2d8bd9db8f98137e489f9c5f6",
+      "source": "MGS TES night thermal inertia map, PDS",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img",
+      "rawFile": "data/raw/global/pds/ti_full.img",
+      "sha256": "faee32838da40045ee7ebd21bed156cc649620312c01165b556d77a2128258f4",
+      "bytes": 51840000,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Big-endian int16 7200x3600, -180..180 E, 20 ppd; values outside 5..5000 treated as nodata",
+        "Area-weighted box resample (valid pixels only) to 2048x1024",
+        "inferno ramp, log10 25..1200 tiu; nodata transparent"
+      ],
+      "validPixelFraction": 0.9688
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_thermal_inertia.i16.gz",
+      "outputBytes": 2370665,
+      "outputSha256": "619870a3514c214bb724b1f4dcba07e2110a1c9bfa3eb18abb17691a16971c7b",
+      "source": "same",
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img",
+      "rawFile": "data/raw/global/pds/ti_full.img",
+      "sha256": "faee32838da40045ee7ebd21bed156cc649620312c01165b556d77a2128258f4",
+      "bytes": 51840000,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Resampled values rounded to integer tiu, int16 LE, nodata -32768, gzip -9"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/layer_dust.png",
+      "outputBytes": 386904,
+      "outputSha256": "3f80b9231da2b85d5dee7bd6dbc384d93f216605ab1e3bf2da8721fdf1b23531",
+      "source": "Mars Trek TES_Dust (MGS TES Global Dust Cover Index, colourised GeoTIFF 2880x1440)",
+      "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=TES_Dust",
+      "rawFile": "data/raw/global/TES_Dust.tif",
+      "sha256": "9b3e7c3e2bc450fa70f953c9700fb89f2e9e2ae0acc4bfce5934154e3e624e44",
+      "bytes": 12453633,
+      "downloadedOn": "cached earlier in this session (2026-11-14)",
+      "processing": [
+        "Read 8-bit RGB GeoTIFF (bbox -180,-90,180,90)",
+        "Pure black = no data -> alpha 0",
+        "Cubic resample to 1024x512 (keeps total size under 25 MB), 128-colour palette PNG",
+        "Values NOT recovered (colour scale unpublished)"
+      ]
+    },
+    {
+      "licence": "NASA data: generally not copyrighted, cite source. USGS data: public domain, cite publication.",
+      "output": "public/data/global/sites.json",
+      "outputBytes": 20158,
+      "outputSha256": "1094ba8d9b01d3276bdf41a46d27dfb23d9dfd67c8ffcaa9f4c7cce52f0897fc",
+      "source": "Mars Trek landing-site bookmarks (searchItems) + NASA mission pages; USGS Gazetteer of Planetary Nomenclature (MARS_nomenclature_center_pts)",
+      "url": "https://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature_center_pts.zip",
+      "catalogUrl": "https://trek.nasa.gov/mars/TrekServices/ws/index/eq/searchItems?rows=2100&start=0&q=*",
+      "rawFile": "data/raw/global/gazetteer_mars_pts.zip",
+      "sha256": "753f29654d14e3f3e75f8bbe2b8fc36d4a6b43e16d9d74c122150a3797c31910",
+      "bytes": 5421247,
+      "downloadedOn": "2026-11-14T14:20:52.203Z",
+      "processing": [
+        "Landing coordinates: bbox centre of the Trek bookmark (Pathfinder: Trek product sojourner_hirise_mosaic bbox; Perseverance: given coordinates)",
+        "Mission pages checked HTTP 200 during this run",
+        "45 IAU features picked by name from the gazetteer, lon converted 0..360 E -> -180..180 E, each linked to its planetarynames page (HTTP status checked)"
+      ],
+      "gazetteerNon200": []
+    }
+  ],
+  "rawDownloads": {
+    "catalog.json": {
+      "url": "https://trek.nasa.gov/mars/TrekServices/ws/index/eq/searchItems?rows=2100&start=0&q=*",
+      "sha256": "c32cd89f264edc7c6f09768ea987c38dcba00cdde97c25992b243330ce4e1c36",
+      "bytes": 1504672,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "mdim_caps.xml": {
+      "url": "https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml",
+      "sha256": "977e2037d634f9dc70f654ce176ca7e5775e336d9d4242d323bf55f1b4be4ec6",
+      "bytes": 7016,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "pds/megt_p.img": {
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img",
+      "sha256": "d18d9b9ab8c5516d02e157dd2cde0f1d0d160c21940e953ba22391269a545e7b",
+      "bytes": 33177600,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "SIM3292_Global_Geology.zip": {
+      "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=SIM3292_Global_Geology",
+      "sha256": "0dc3bfdf8f6d4d7b1da98a18c6873f17c2f5a307f485ae64ab865fae65b3ab49",
+      "bytes": 54631846,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "pds/h2o_sr_5x5.tab": {
+      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
+      "sha256": "5cec0d637755ddb7a451f58d7b24b6fb34f081e3391b40cdfca5410200da0236",
+      "bytes": 186624,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "pds/h2o_sr_5x5.lbl": {
+      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.lbl",
+      "sha256": "1333eef6d604f45af7e9e9f2899e5586b7747b13ad746a389d83ab1adbcf7000",
+      "bytes": 4653,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "pds/ti_full.img": {
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img",
+      "sha256": "faee32838da40045ee7ebd21bed156cc649620312c01165b556d77a2128258f4",
+      "bytes": 51840000,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "pds/global_ti_night_2007.lbl": {
+      "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.lbl",
+      "sha256": "c1c897d9bd5399292166f99d84a29a73e42432cedfb9dd9a81a1441b3004b72b",
+      "bytes": 2415,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "TES_Dust.tif": {
+      "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=TES_Dust",
+      "sha256": "9b3e7c3e2bc450fa70f953c9700fb89f2e9e2ae0acc4bfce5934154e3e624e44",
+      "bytes": 12453633,
+      "downloadedOn": "cached earlier in this session (2026-11-14)"
+    },
+    "gazetteer_mars_pts.zip": {
+      "url": "https://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature_center_pts.zip",
+      "sha256": "753f29654d14e3f3e75f8bbe2b8fc36d4a6b43e16d9d74c122150a3797c31910",
+      "bytes": 5421247,
+      "downloadedOn": "2026-11-14T14:20:52.203Z"
+    }
+  }
+}

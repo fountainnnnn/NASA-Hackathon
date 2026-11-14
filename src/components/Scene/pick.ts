@@ -1,7 +1,11 @@
 import type * as THREE from 'three';
 import type { DemMeta, Dem, GeoApi } from '@/lib/contracts';
+import { emitClickPoint } from '@/state/companion';
 import { useHover } from '@/state/ui';
 import { useWorld, world } from '@/state/world';
+
+/** The Ops pointer tools (drag to plan, lasso) set `until` so the click a drag ends on does not also pick a point. */
+export const clickGuard = { until: 0 };
 
 /** Label of a selected point that lies on the regional context terrain, outside the 20 m DEM. */
 export const OUTSIDE_LABEL = 'Outside high-resolution coverage';
@@ -26,6 +30,7 @@ export function hoverPoint(rt: PickRuntime, p: THREE.Vector3) {
 
 /** Select the clicked ground point. Outside the high-resolution DEM it is still selected, but clearly labelled. */
 export function pickPoint(rt: PickRuntime, p: THREE.Vector3) {
+  if (performance.now() < clickGuard.until) return;
   const { lon, lat } = rt.geo.toLonLat(rt.meta, p.x, p.z);
   if (insideBounds(useWorld.getState().bounds, lon, lat)) {
     world.setSelected(world.makePoint(lon, lat, 'pick', 'Selected point'));
@@ -33,5 +38,5 @@ export function pickPoint(rt: PickRuntime, p: THREE.Vector3) {
     const pt = world.makePoint(lon, lat, 'pick', OUTSIDE_LABEL); // high-res sample is null out here
     world.setSelected({ ...pt, elevationM: elevationAt(rt, lon, lat).elev });
   }
-  useWorld.getState().patch({ askOpen: true });
+  emitClickPoint({ lon, lat }); // Scout (orchestrator) answers
 }

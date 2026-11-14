@@ -1,6 +1,6 @@
 .hud {
   position: absolute; inset: 0; pointer-events: none;
-  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-variant-numeric: tabular-nums;
   color: var(--text-1, #ece7e1);
   font-size: var(--t-small, 12px);
@@ -17,7 +17,7 @@
   background: rgba(6, 5, 5, 0.72); border: 1px solid var(--line, rgba(236,231,225,0.1)); border-radius: var(--r-1, 2px); padding: 10px 12px;
 }
 .n { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 16px; }
-.n .k { font-family: var(--font-sans, "Instrument Sans", system-ui, sans-serif); color: var(--text-2, #a39c95); font-size: var(--t-small, 12px); }
+.n .k { font-family: var(--font-sans, "Schibsted Grotesk", system-ui, sans-serif); color: var(--text-2, #a39c95); font-size: var(--t-small, 12px); }
 .n .v { font-size: 20px; font-weight: 600; }
 .n .u { font-size: 11px; font-weight: 400; color: var(--text-2, #a39c95); margin-left: 3px; }
 .low { color: var(--nogo, #d9423b); }
@@ -30,14 +30,14 @@
   position: absolute; top: 56px; right: 32px; display: grid; gap: 4px; text-align: right;
   background: rgba(6, 5, 5, 0.72); border: 1px solid var(--line, rgba(236,231,225,0.1)); border-radius: var(--r-1, 2px); padding: 8px 12px;
 }
-.times .k { font-family: var(--font-sans, "Instrument Sans", system-ui, sans-serif); color: var(--text-2, #a39c95); margin-right: 10px; }
+.times .k { font-family: var(--font-sans, "Schibsted Grotesk", system-ui, sans-serif); color: var(--text-2, #a39c95); margin-right: 10px; }
 .map {
   position: absolute; right: 32px; bottom: 32px; width: 150px; height: 150px;
   background: rgba(6, 5, 5, 0.72); border: 1px solid var(--line, rgba(236,231,225,0.1)); border-radius: var(--r-1, 2px);
 }
 .toggle {
   display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; cursor: pointer;
-  font: 400 var(--t-small, 12px) var(--font-sans, "Instrument Sans", system-ui, sans-serif);
+  font: 400 var(--t-small, 12px) var(--font-sans, "Schibsted Grotesk", system-ui, sans-serif);
   color: var(--text-1, #ece7e1); background: rgba(13, 11, 11, 0.92);
   border: 1px solid var(--line-strong, rgba(236,231,225,0.22)); border-radius: var(--r-1, 2px);
 }

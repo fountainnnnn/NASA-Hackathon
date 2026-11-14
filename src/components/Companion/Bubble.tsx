@@ -24,11 +24,6 @@ export interface BubbleProps {
   voice: VoiceControl;
 }
 
-const ACTIONS = {
-  globe: ['Could we land here?', "What's the ground like?", 'Take me to Jezero'],
-  jezero: ['Walk here and back', 'Avoid steep ground', 'Show the risky part'],
-} as const;
-
 function Rich({ text, unverified }: { text: string; unverified: string[] }) {
   return (
     <>
@@ -42,7 +37,7 @@ function Rich({ text, unverified }: { text: string; unverified: string[] }) {
 
 export function Bubble({ apiRef, sheet, voice }: BubbleProps) {
   const open = useCompanion((c) => c.bubbleOpen);
-  const mode = useCompanion((c) => c.mode);
+  const actions = useCompanion((c) => c.actions);
   const current = useCompanion((c) => c.current);
   const trail = useCompanion((c) => c.trail);
   const busy = useCompanion((c) => c.busy);
@@ -59,7 +54,7 @@ export function Bubble({ apiRef, sheet, voice }: BubbleProps) {
     size: () => { const el = box.current; return el ? { w: el.offsetWidth, h: el.offsetHeight } : { w: 0, h: 0 }; },
     place: (scout, size, avoid) => {
       const el = box.current; if (!el) return null;
-      const p = placeBubble(scout, size, el.offsetWidth, el.offsetHeight, window.innerWidth, window.innerHeight, avoid);
+      const p = placeBubble(scout, size, el.offsetWidth, el.offsetHeight, window.innerWidth, window.innerHeight, avoid, 12, 18, 40); // 40: keep clear of the icon row
       el.style.transform = `translate3d(${p.left.toFixed(1)}px,${p.top.toFixed(1)}px,0)`;
       el.dataset.placed = '1';
       return p;
@@ -153,8 +148,8 @@ export function Bubble({ apiRef, sheet, voice }: BubbleProps) {
         </ul>
       )}
 
-      <div className={s.actions}>
-        {ACTIONS[mode].map((c) => <button key={c} type="button" className={s.action} disabled={busy} onClick={() => send(c)}>{c}</button>)}
+      <div className={s.actions} hidden={actions.length === 0}>
+        {actions.map((c) => <button key={c} type="button" className={s.action} disabled={busy} onClick={() => send(c)}>{c}</button>)}
       </div>
 
       <form className={s.form} onSubmit={(e) => { e.preventDefault(); send(text); }}>

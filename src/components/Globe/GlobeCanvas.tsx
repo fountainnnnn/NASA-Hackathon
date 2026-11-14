@@ -1,6 +1,6 @@
 'use client';
 import { Canvas } from '@react-three/fiber';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { GLOBE_LAYER_IDS, MAX_EXAGGERATION, MIN_EXAGGERATION, useGlobeStore } from '../../state/globe';
 import { GlobeCameraRig } from './GlobeCameraRig';
 import { CamCtx, type CamState } from './globeCtx';
@@ -40,7 +40,7 @@ function Info() {
  * Whole-Mars globe. Mount inside a positioned parent (it fills it). Renders only while store.mode === 'globe';
  * when the camera falls into Jezero it calls store.setMode('jezero') so the orchestrator can swap canvases.
  */
-export default function GlobeCanvas({ controls = true }: { controls?: boolean }) {
+export default function GlobeCanvas({ controls = true, children }: { controls?: boolean; children?: ReactNode }) {
   const [webgl, setWebgl] = useState<boolean | null>(null);
   useEffect(() => setWebgl(hasWebGL()), []);
   const data = useGlobalData();
@@ -73,6 +73,7 @@ export default function GlobeCanvas({ controls = true }: { controls?: boolean })
             <Planet data={data} />
             <Overlays />
             <GlobeCameraRig fadeRef={fadeRef} reticleRef={reticleRef} />
+            {children}
           </CamCtx.Provider>
         </Canvas>
       )}

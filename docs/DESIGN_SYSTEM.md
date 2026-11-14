@@ -28,15 +28,16 @@ Paste over `:root` in `src/app/globals.css` and alias the old names until call s
   --r-1: 2px; --r-2: 6px; --r-3: 10px;
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 40px;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-  --font-sans: "Instrument Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-sans: "Schibsted Grotesk", system-ui, sans-serif;
+  --font-mono: "Martian Mono", ui-monospace, monospace;
+  --font-display: "Michroma", "Schibsted Grotesk", sans-serif; /* wordmark + GO / HOLD / NO GO only */
   --t-micro: 11px; --t-small: 12px; --t-body: 13px; --t-head: 15px; --t-verdict: 28px;
   --dur-1: 90ms; --dur-2: 180ms; --dur-3: 420ms; --dur-fly: 1400ms;
   --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
 }
 ```
 
-Weights 400 and 600. Numbers are mono with `tabular-nums`. No backdrop blur. Scout's spring: stiffness 170, damping 22.
+Fonts (Google Fonts): Schibsted Grotesk 400/600 for UI text, Martian Mono 400/500 (width 87–100) for every number and readout, Michroma only for the wordmark and verdict words. Numbers are mono with `tabular-nums`. No backdrop blur. Scout's spring: stiffness 170, damping 22.
 
 ## Pointer grammar
 

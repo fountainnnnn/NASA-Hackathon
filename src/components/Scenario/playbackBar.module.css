@@ -3,7 +3,7 @@
   width: min(680px, 100%); box-sizing: border-box; padding: 6px 16px 10px;
   background: rgba(6, 5, 5, 0.78);
   border-top: 1px solid var(--line, rgba(236,231,225,0.1));
-  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-variant-numeric: tabular-nums; color: var(--text-1, #ece7e1);
   user-select: none; touch-action: none;
 }
@@ -18,11 +18,11 @@
 .play:hover { background: var(--bg-2, #161313); }
 .play:focus-visible, .speed:focus-visible { outline: 1.5px solid var(--data, #5cc8ff); outline-offset: 2px; }
 .clock { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
-.sub { font: 400 var(--t-micro, 11px) var(--font-sans, "Instrument Sans", system-ui, sans-serif); color: var(--text-2, #a39c95); }
+.sub { font: 400 var(--t-micro, 11px) var(--font-sans, "Schibsted Grotesk", system-ui, sans-serif); color: var(--text-2, #a39c95); }
 .speeds { display: flex; gap: 2px; align-items: flex-end; }
 .speed {
   position: relative; min-width: 38px; height: 28px; padding: 0 6px; cursor: pointer; background: transparent; border: 0;
-  color: var(--text-2, #a39c95); font: 400 var(--t-small, 12px) var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  color: var(--text-2, #a39c95); font: 400 var(--t-small, 12px) var(--font-mono, "Martian Mono", ui-monospace, monospace);
   border-top: 1px solid var(--line-strong, rgba(236,231,225,0.22));
 }
 .speed:hover { color: var(--text-1, #ece7e1); }

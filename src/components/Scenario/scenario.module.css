@@ -1,6 +1,6 @@
 /* Survey Reticle tokens with fallbacks so the preview page works without globals.css. No pills, no glow, no blur. */
 .tag {
-  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-size: var(--t-micro, 11px);
   font-variant-numeric: tabular-nums;
   color: var(--text-1, #ece7e1);
@@ -15,13 +15,13 @@
   user-select: none;
   transform: translateY(-4px);
 }
-.tag .name { color: var(--text-2, #a39c95); font-family: var(--font-sans, "Instrument Sans", system-ui, sans-serif); }
+.tag .name { color: var(--text-2, #a39c95); font-family: var(--font-sans, "Schibsted Grotesk", system-ui, sans-serif); }
 .tag .row { display: flex; gap: 8px; justify-content: space-between; }
 .tag .unit { color: var(--text-2, #a39c95); }
 .tag .low { color: var(--nogo, #d9423b); }
 
 .mark {
-  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-size: var(--t-micro, 11px);
   font-variant-numeric: tabular-nums;
   color: var(--text-1, #ece7e1);
@@ -38,7 +38,7 @@
 .mark .sub { color: var(--text-2, #a39c95); }
 
 .tick {
-  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-size: 10px;
   color: var(--text-2, #a39c95);
   pointer-events: none;
@@ -48,7 +48,7 @@
 }
 
 .contour {
-  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-family: var(--font-mono, "Martian Mono", ui-monospace, monospace);
   font-size: 10px;
   color: var(--text-1, #ece7e1);
   background: rgba(13, 11, 11, 0.85);

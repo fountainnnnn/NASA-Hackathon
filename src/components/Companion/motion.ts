@@ -46,9 +46,9 @@ export interface BubblePlacement { left: number; top: number; width: number; hei
  * Place the bubble near Scout (centre `scout`) without covering `avoid` (the cursor or the placed ring) and inside the viewport.
  * Order tried: right of Scout, above-right, below-right, then mirrored to the left.
  */
-export function placeBubble(scout: Vec, size: number, bw: number, bh: number, vw: number, vh: number, avoid?: Vec, margin = 12, gap = 18): BubblePlacement {
+export function placeBubble(scout: Vec, size: number, bw: number, bh: number, vw: number, vh: number, avoid?: Vec, margin = 12, gap = 18, topInset = 0): BubblePlacement {
   const clampX = (x: number) => Math.max(margin, Math.min(x, vw - margin - bw));
-  const clampY = (y: number) => Math.max(margin, Math.min(y, vh - margin - bh));
+  const clampY = (y: number) => Math.max(margin + topInset, Math.min(y, vh - margin - bh));
   const hits = (l: number, t: number) => !!avoid && avoid.x > l - 20 && avoid.x < l + bw + 20 && avoid.y > t - 20 && avoid.y < t + bh + 20;
   const rightL = scout.x + size / 2 + gap, leftL = scout.x - size / 2 - gap - bw;
   const candidates: [number, number][] = [];

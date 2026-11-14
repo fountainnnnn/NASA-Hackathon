@@ -24,7 +24,7 @@ export interface Toast { id: number; kind: 'error' | 'info'; text: string }
 export type SheetTab = 'layers' | 'mission' | 'route' | 'ask';
 
 const DEFAULT_LAYERS: Record<LayerId, boolean> = {
-  ctx: true, themisDay: false, themisNight: false, geology: false, slope: true, traverse: true, ellipse: false,
+  ctx: true, themisDay: false, themisNight: false, geology: false, slope: false, traverse: true, ellipse: false,
 };
 const DEFAULT_OPACITY: Record<LayerId, number> = {
   ctx: 1, themisDay: 0.7, themisNight: 0.7, geology: 0.6, slope: 0.6, traverse: 1, ellipse: 1,

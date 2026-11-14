@@ -1,0 +1,157 @@
+{
+  "generatedOn": "2026-11-14T14:31:29.946Z",
+  "checks": {
+    "a_perseverance_dem": {
+      "sampleBilinearM": -2555.7,
+      "sampleNearestPixelM": -2554,
+      "ctx20mReferenceM": -2567,
+      "differenceBilinearM": 11.3,
+      "withinTolerance100m": true,
+      "note": "Global DEM is ~7.4 km/pixel, so one pixel averages crater floor, rim and the surrounding plain; a difference well above 100 m is expected resolution loss, not an error."
+    },
+    "b_olympus_max": {
+      "valueM": 21159,
+      "at": [
+        -133.0625,
+        17.3125
+      ],
+      "expectedApproxM": 21200,
+      "region": "lon -140..-125, lat 14..24"
+    },
+    "b_hellas_min": {
+      "valueM": -8135,
+      "at": [
+        62.1875,
+        -32.8125
+      ],
+      "expectedApproxM": -8000,
+      "region": "lon 50..90, lat -55..-28 (Hellas basin)"
+    },
+    "b_global_extremes": {
+      "min": -8135,
+      "max": 21159
+    },
+    "c_geology_jezero": {
+      "atPerseverance": [
+        {
+          "symbol": "HNt",
+          "name": "Hesperian and Noachian transition unit",
+          "description": "Hesperian and Noachian transition unit (map unit \"HNt\", Hesperian). Geologic Map of Mars, USGS SIM 3292 (Tanaka et al. 2014), mapped at 1:20,000,000 with global THEMIS/MOLA/Viking/CTX-HiRISE context.",
+          "color": "#42bd61"
+        }
+      ],
+      "atJezeroCraterCentre": [
+        "HNt"
+      ],
+      "rasterSymbolAtPerseverance": "HNt",
+      "plausible": true
+    },
+    "d_consistency": {
+      "layers": [
+        {
+          "id": "elevation",
+          "file": "layer_elevation.png",
+          "declared": [
+            2048,
+            1024
+          ],
+          "actual": [
+            2048,
+            1024
+          ],
+          "displayOk": true,
+          "valueFileBytesOk": null,
+          "aspect2to1": true
+        },
+        {
+          "id": "geology",
+          "file": "layer_geology.png",
+          "declared": [
+            2048,
+            1024
+          ],
+          "actual": [
+            2048,
+            1024
+          ],
+          "displayOk": true,
+          "valueFileBytesOk": true,
+          "aspect2to1": true
+        },
+        {
+          "id": "hydrogen",
+          "file": "layer_hydrogen.png",
+          "declared": [
+            720,
+            360
+          ],
+          "actual": [
+            720,
+            360
+          ],
+          "displayOk": true,
+          "valueFileBytesOk": true,
+          "aspect2to1": true
+        },
+        {
+          "id": "thermalInertia",
+          "file": "layer_thermal_inertia.png",
+          "declared": [
+            2048,
+            1024
+          ],
+          "actual": [
+            2048,
+            1024
+          ],
+          "displayOk": true,
+          "valueFileBytesOk": true,
+          "aspect2to1": true
+        },
+        {
+          "id": "dust",
+          "file": "layer_dust.png",
+          "declared": [
+            1024,
+            512
+          ],
+          "actual": [
+            1024,
+            512
+          ],
+          "displayOk": true,
+          "valueFileBytesOk": null,
+          "aspect2to1": true
+        },
+        {
+          "id": "slope",
+          "file": "layer_slope.png",
+          "declared": [
+            2048,
+            1024
+          ],
+          "actual": [
+            2048,
+            1024
+          ],
+          "displayOk": true,
+          "valueFileBytesOk": true,
+          "aspect2to1": true
+        }
+      ],
+      "demBytesOk": true,
+      "texture8k": [
+        8192,
+        4096
+      ],
+      "texture2k": [
+        2048,
+        1024
+      ],
+      "allEquirect2to1": true,
+      "totalBytes": 20871482,
+      "totalMB": 20.87,
+      "under25MB": true
+    }
+  }
+}

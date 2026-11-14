@@ -1,6 +1,6 @@
 'use client';
 import { Canvas } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as THREE from 'three';
 import { buildTerrainGrid } from '@/lib/scene/terrainGrid';
 import { Apron } from './Apron';
@@ -42,7 +42,8 @@ function WebGLFallback() {
   );
 }
 
-export default function SceneCanvas() {
+/** `children` render inside the scene context (orchestrator overlays: crew, drag planner, projector). */
+export default function SceneCanvas({ children }: { children?: ReactNode }) {
   const [webgl, setWebgl] = useState<boolean | null>(null);
   useEffect(() => setWebgl(hasWebGL()), []);
   const rt = useRuntime((s) => s.rt);
@@ -77,6 +78,7 @@ export default function SceneCanvas() {
         <Routes />
         <Pins />
         <CameraRig />
+        {children}
       </SceneCtx.Provider>
     </Canvas>
   );

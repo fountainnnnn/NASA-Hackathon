@@ -4,7 +4,7 @@
   --c-t1: var(--text-1, #ece7e1); --c-t2: var(--text-2, #a39c95); --c-t3: #8a837d; /* sources: 4.6:1 on bg-1 */
   --c-accent: var(--accent, #e0884a); --c-data: var(--data, #5cc8ff); --c-caution: var(--caution, #f3d250);
   --c-line: var(--line, rgba(236, 231, 225, 0.1)); --c-line2: var(--line-strong, rgba(236, 231, 225, 0.22));
-  --c-mono: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  --c-mono: var(--font-mono, "Martian Mono", ui-monospace, monospace);
 }
 
 .root { position: fixed; left: 0; top: 0; width: 40px; height: 40px; z-index: 60; pointer-events: none; will-change: transform; color: var(--c-t1); }
@@ -77,3 +77,4 @@
   .bob, .art, .spin { animation: none !important; }
   .look { transition: none; }
 }
+.actions[hidden] { display: none; }

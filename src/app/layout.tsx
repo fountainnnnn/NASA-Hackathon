@@ -1,13 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { Martian_Mono, Michroma, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
-const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500", "600"], display: "swap" });
+const sans = Schibsted_Grotesk({ variable: "--font-schibsted", subsets: ["latin"], weight: ["400", "600"], display: "swap" });
+// narrowest width axis keeps 11 px readouts compact
+const mono = Martian_Mono({ variable: "--font-martian", subsets: ["latin"], weight: "variable", axes: ["wdth"], display: "swap" });
+// wordmark and GO / HOLD / NO GO only
+const display = Michroma({ variable: "--font-michroma", subsets: ["latin"], weight: "400", display: "swap" });
 
 const title = "MarsWalk Copilot: plan a Marswalk on real NASA terrain";
 const description =
-  "Point at Jezero Crater, ask a question, and an AI copilot plans your Marswalk on real NASA terrain and data. Made by Ng Yu Hang, team Ecliptical, for NASA Space Apps Challenge 2026 Singapore.";
+  "Click anywhere on Mars and Scout reads the data. In Jezero Crater, drag to plan a Marswalk on real NASA terrain. Made by Ng Yu Hang, team Ecliptical, for NASA Space Apps Challenge 2026 Singapore.";
 
 export const metadata: Metadata = {
   title,
@@ -16,11 +19,11 @@ export const metadata: Metadata = {
   openGraph: { title, description, type: "website" },
 };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#120d0e" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#060505" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${sans.variable} ${mono.variable} ${display.variable}`}>
       <body>{children}</body>
     </html>
   );

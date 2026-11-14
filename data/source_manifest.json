@@ -1240,6 +1240,26 @@
         "Registration vs the controlled 6 m mosaic: best integer shift 0,2 px (0,87 m); NCC 0.566 at zero shift.",
         "imageGainToPatch 1.4793: linear-light brightness gain matching the 6 m mosaic over the overlap (applied in the shader)."
       ]
+    },
+    "public/data/earth_link.json": {
+      "output": "public/data/earth_link.json",
+      "outputBytes": 134301,
+      "outputSha256": "a876bdb8a54748acdf4361c805ab3613e8092f312422dde2363d6a7e859c427c",
+      "licence": "NASA data: generally not copyrighted; cite source.",
+      "sourceUrls": [
+        "https://ssd.jpl.nasa.gov/horizons/",
+        "https://ssd-api.jpl.nasa.gov/doc/horizons.html",
+        "https://ssd.jpl.nasa.gov/api/horizons.api"
+      ],
+      "productLabel": "Earth light time (2026-2040) and Earth az/el at Jezero from NASA JPL Horizons",
+      "mission": "Solar System Dynamics",
+      "instrument": "JPL Horizons on-line ephemeris system (DE441 / mar099), observer API",
+      "projection": "n/a (time series)",
+      "datum": "Mars IAU_MARS body-fixed frame; Jezero 18.4446 N, 77.4509 E, -2.567 km (west-positive longitude -77.4509 passed to Horizons)",
+      "resolution": "light time 1 d; Earth az/el 10 min (2026-11-14..21) and 1 h (2026-11-01..2027-01-31)",
+      "credit": "NASA/JPL Solar System Dynamics (Horizons)",
+      "raws": [],
+      "processing": "scripts/fetch-horizons.mjs: queried Horizons API, rounded (range 6 dp au, light time 4 dp min, az/el 2 dp deg), retrieved 2026-11-14T14:35:50.721Z"
     }
   }
 }

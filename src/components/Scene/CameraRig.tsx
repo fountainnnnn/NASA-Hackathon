@@ -101,6 +101,8 @@ export function CameraRig() {
   return (
     <OrbitControls
       ref={ctrl} makeDefault enableDamping dampingFactor={0.09} screenSpacePanning={false}
+      // left-drag is the planner (Ops layer): orbit moves to the right button, pan to the middle one
+      mouseButtons={{ LEFT: -1 as unknown as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE }}
       minDistance={120} maxDistance={MAX_DISTANCE_M} maxPolarAngle={(84 * Math.PI) / 180}
       zoomToCursor target={[0, 0, 0]}
     />

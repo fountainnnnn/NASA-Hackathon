@@ -9,9 +9,8 @@ import { Marker } from './Pins';
 import { lineY, trueHeight, useScene } from './sceneCtx';
 import type { SceneCtxValue } from './sceneCtx';
 
-const OCHRE = '#E0884A', CYAN = '#5CC8FF', GREY = '#9AA0A6', RED = '#FF4D4D';
+const OCHRE = '#E0884A', CYAN = '#5CC8FF', GREY = '#6a645f', RED = '#d9423b';
 const noRaycast = () => null;
-const dashed = (style: 'primary' | 'alternate', grey: boolean) => grey || style === 'alternate';
 
 interface LegGeom { x: number[]; z: number[]; h: (number | null)[]; vertexIndex: number[] }
 const cache = new WeakMap<RouteResult, LegGeom[]>();
@@ -34,41 +33,57 @@ function legGeoms(v: SceneCtxValue, r: RouteResult): LegGeom[] {
 
 type Pt = [number, number, number];
 
+/** Slope status of a stretch: solid ochre, dashed caution, hatched no-go. Style carries it as well as colour. */
+type Status = 'ok' | 'caution' | 'nogo';
+const STATUS_COLOR: Record<Status, string> = { ok: OCHRE, caution: '#f3d250', nogo: '#d9423b' };
+
 function RouteLines({ route, style, geoms, exag }: { route: RouteResult; style: 'primary' | 'alternate'; geoms: LegGeom[]; exag: number }) {
   const v = useScene();
   const pieces = useMemo(() => {
     const meshH = (x: number, z: number) => meshHeightAt(v.grid, x, z, exag);
     const tb = route.turnBackIndex;
-    const out: { pts: Pt[]; grey: boolean }[] = [];
+    const limit = route.constraintsUsed.maxSlopeDeg;
+    const out: { pts: Pt[]; grey: boolean; status: Status }[] = [];
     geoms.forEach((g, li) => {
       const pts: Pt[] = g.x.map((x, i) => [x, lineY(v, x, g.z[i], g.h[i], exag, 3, meshH), g.z[i]]);
       if (pts.length < 2) return;
-      if (!tb || li < tb.leg) out.push({ pts, grey: false });
-      else if (li > tb.leg) out.push({ pts, grey: true });
-      else {
-        const cut = Math.min(pts.length - 1, Math.max(1, g.vertexIndex[Math.min(tb.vertex, g.vertexIndex.length - 1)] ?? 1));
-        out.push({ pts: pts.slice(0, cut + 1), grey: false });
-        if (cut < pts.length - 1) out.push({ pts: pts.slice(cut), grey: true });
+      const seg = route.legs[li]?.segSlopeDeg ?? [];
+      // status of the dense segment i -> i + 1, from the planner's per-vertex-segment slope
+      const statusAt = (i: number): Status => {
+        let s = 0;
+        while (s + 1 < g.vertexIndex.length - 1 && g.vertexIndex[s + 1] <= i) s++;
+        const d = seg[s] ?? 0;
+        return d >= limit ? 'nogo' : d >= 0.8 * limit ? 'caution' : 'ok';
+      };
+      const cutAt = tb && li === tb.leg ? Math.min(pts.length - 1, Math.max(1, g.vertexIndex[Math.min(tb.vertex, g.vertexIndex.length - 1)] ?? 1)) : -1;
+      let startI = 0, cur = statusAt(0);
+      const push = (a: number, b: number, st: Status) => {
+        if (b <= a) return;
+        const grey = !!tb && (li > tb.leg || (li === tb.leg && a >= cutAt));
+        out.push({ pts: pts.slice(a, b + 1), grey, status: st });
+      };
+      for (let i = 1; i < pts.length - 1; i++) {
+        const st = statusAt(i);
+        if (st !== cur || i === cutAt) { push(startI, i, cur); startI = i; cur = st; }
       }
+      push(startI, pts.length - 1, cur);
     });
     return out;
   }, [geoms, exag, route, v]);
-  const color = style === 'primary' ? OCHRE : CYAN;
+  const alt = style === 'alternate';
   return (
     <>
-      {pieces.map((p, i) => (
-        <group key={i}>
-          {/* both transparent + explicit renderOrder, so the halo is drawn first and never tints the route colour */}
-          <Line
-            points={p.pts} color="#1a0d05" lineWidth={8} transparent opacity={0.85} depthWrite={false} renderOrder={10} raycast={noRaycast}
-            dashed={dashed(style, p.grey)} dashSize={60} gapSize={40}
-          />
-          <Line
-            points={p.pts} color={p.grey ? GREY : color} lineWidth={4} transparent depthWrite={false} renderOrder={11} raycast={noRaycast}
-            dashed={dashed(style, p.grey)} dashSize={60} gapSize={40}
-          />
-        </group>
-      ))}
+      {pieces.map((p, i) => {
+        const dash = p.grey || alt || p.status === 'caution' ? { dashed: true, dashSize: 24, gapSize: 16 } : p.status === 'nogo' ? { dashed: true, dashSize: 6, gapSize: 5 } : {};
+        const color = p.grey ? GREY : alt ? CYAN : STATUS_COLOR[p.status];
+        return (
+          <group key={i}>
+            {/* both transparent + explicit renderOrder, so the keyline is drawn first and never tints the route colour */}
+            <Line points={p.pts} color="#060505" lineWidth={3.5} transparent opacity={0.7} depthWrite={false} renderOrder={10} raycast={noRaycast} {...dash} />
+            <Line points={p.pts} color={color} lineWidth={p.status === 'nogo' ? 2.5 : 1.5} transparent depthWrite={false} renderOrder={11} raycast={noRaycast} {...dash} />
+          </group>
+        );
+      })}
     </>
   );
 }
@@ -89,8 +104,8 @@ function Highlight({ ann, n, route, geoms, exag }: { ann: Annotation; n: number;
   const mid = pts[pts.length >> 1];
   return (
     <>
-      <Line points={pts} color="#2a0606" lineWidth={13} transparent opacity={0.85} depthWrite={false} renderOrder={20} raycast={noRaycast} />
-      <Line points={pts} color={RED} lineWidth={8} transparent depthWrite={false} renderOrder={21} raycast={noRaycast} />
+      <Line points={pts} color="#2a0606" lineWidth={5} transparent opacity={0.8} depthWrite={false} renderOrder={20} raycast={noRaycast} />
+      <Line points={pts} color={RED} lineWidth={3} transparent depthWrite={false} renderOrder={21} raycast={noRaycast} />
       <Marker pos={[mid[0], mid[1] + 6 * exag, mid[2]]} kind="hazard" label={`${n}. ${ann.label}`} tone="num" />
     </>
   );

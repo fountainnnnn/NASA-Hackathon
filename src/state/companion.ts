@@ -9,8 +9,11 @@ export interface CompanionStore extends CompanionState {
   doing: string | null;
   /** Interim speech transcript while push-to-talk is active. */
   interim: string;
+  /** Up to four plain verbs under the answer. The orchestrator sets them with each `say`; empty = none. */
+  actions: string[];
   /** Show something. Missing fields default; the utterance is also added to the trail and the bubble opens. */
-  say: (u: { text: string; id?: string; sources?: CompanionUtterance['sources']; unverified?: string[]; point?: LonLat; at?: number }, mood?: ScoutMood) => CompanionUtterance;
+  say: (u: { text: string; id?: string; sources?: CompanionUtterance['sources']; unverified?: string[]; point?: LonLat; at?: number; actions?: string[] }, mood?: ScoutMood) => CompanionUtterance;
+  setActions: (actions: string[]) => void;
   setMood: (mood: ScoutMood) => void;
   setMode: (mode: CompanionState['mode']) => void;
   anchorToCursor: () => void;
@@ -27,9 +30,9 @@ export interface CompanionStore extends CompanionState {
   reset: () => void;
 }
 
-const initial = (): CompanionState & { doing: string | null; interim: string } => ({
+const initial = (): CompanionState & { doing: string | null; interim: string; actions: string[] } => ({
   mode: 'globe', mood: 'idle', anchor: { kind: 'cursor' }, bubbleOpen: false, current: null, trail: [],
-  listening: false, busy: false, doing: null, interim: '',
+  listening: false, busy: false, doing: null, interim: '', actions: [],
 });
 
 let seq = 0;
@@ -41,10 +44,11 @@ export const useCompanion = create<CompanionStore>((set, get) => ({
       id: u.id ?? `u${Date.now().toString(36)}${(seq++).toString(36)}`,
       text: u.text, sources: u.sources ?? [], unverified: u.unverified ?? [], at: u.at ?? Date.now(), point: u.point,
     };
-    set({ current: utt, bubbleOpen: true, busy: false, doing: null, mood: mood ?? 'idle' });
+    set({ current: utt, bubbleOpen: true, busy: false, doing: null, mood: mood ?? 'idle', actions: (u.actions ?? []).slice(0, 4) });
     get().pushTrail(utt);
     return utt;
   },
+  setActions: (actions) => set({ actions: actions.slice(0, 4) }),
   setMood: (mood) => set({ mood }),
   setMode: (mode) => set({ mode }),
   anchorToCursor: () => set({ anchor: { kind: 'cursor' } }),

@@ -1,18 +1,19 @@
+/* Survey Reticle: a thin ring and a mono label, no icons, no fills */
 .pin { position: relative; width: 0; height: 0; font-family: var(--font-sans), system-ui, sans-serif; }
 .pinDot {
-  position: absolute; left: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%;
-  display: grid; place-items: center; color: #14100e; background: var(--accent);
-  border: 2px solid #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%;
+  display: grid; place-items: center; background: transparent; border: 1.5px solid var(--text-1, #ece7e1);
+  box-shadow: 0 0 0 1px rgba(6, 5, 5, 0.7);
 }
+.pinDot svg { display: none; }
 .pinLabel {
-  position: absolute; left: 18px; top: -11px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;
-  font-size: 12px; line-height: 22px; padding: 0 8px; border-radius: 6px; color: #f4efea;
-  background: rgba(14, 11, 12, 0.88); border: 1px solid rgba(255, 255, 255, 0.18);
+  position: absolute; left: 14px; top: -9px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis;
+  font: 400 11px/18px var(--font-mono), monospace; padding: 0 6px; border-radius: 2px; color: var(--text-1, #ece7e1);
+  background: rgba(13, 11, 11, 0.92); border: 1px solid var(--line, rgba(236, 231, 225, 0.1));
 }
-.base .pinDot { background: #f4efea; color: #14100e; }
-.selected .pinDot { background: var(--data); }
-.science .pinDot { background: #7ddba3; }
-.hazard .pinDot { background: #ff6b5e; }
-.info .pinDot { background: #cbb8ff; }
+.base .pinDot { border-radius: 2px; }
+.science .pinDot { border-color: var(--go, #58c98a); }
+.hazard .pinDot { border-color: var(--nogo, #d9423b); }
+.info .pinDot { border-color: var(--text-2, #a39c95); }
 .callout { position: relative; width: 0; height: 0; font-family: var(--font-sans), system-ui, sans-serif; }
 .callout .pinDot { background: #ff4d4d; color: #fff; font: 600 12px/1 var(--font-mono), monospace; }

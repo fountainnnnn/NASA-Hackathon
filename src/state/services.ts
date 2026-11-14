@@ -13,10 +13,15 @@
 import * as THREE from 'three';
 import { create } from 'zustand';
 import type {
-  AgentApi, ChatMessage, ContextMeta, Dem, DemMeta, GeoApi, GeologyFile, LayerInfo, RoverImage, ScienceApi, ScienceSite, TerrainApi,
+  AgentApi, ContextMeta, Dem, DemMeta, GeoApi, GeologyFile, LayerInfo, RoverImage, ScienceApi, TerrainApi,
   ToolDeps, TraverseFile, WorldPoint,
 } from '@/lib/contracts';
-import { fmtLat, fmtLon } from '@/lib/scene/format';
+import { loadEarthLink } from '@/lib/ops/earthLink';
+import type { EarthLinkData } from '@/lib/ops/earthLink';
+import { createGlobalScience } from '@/lib/globalSci';
+import type { GlobalScienceApi } from '@/lib/globalSci';
+import { enableScenarioWasm, jezeroSlopeSource, registerScenarioSources } from '@/lib/scenario';
+import { useGlobeStore } from './globe';
 import { decodeDem, sampleElevation, toLocal, toLonLat } from '@/lib/geo/frame';
 import { createTerrainClient } from '@/lib/terrain/client';
 import { executeTool as runnerExecuteTool, runAgentTurn } from '@/lib/agent/runner';
@@ -25,9 +30,8 @@ import { fetchWithProgress, loadImageTexture, makePaletteTexture, makeSlopeTextu
 import { makePlaceholderDem, PLACEHOLDER_LABEL } from '@/lib/scene/placeholder';
 import { configureWorld, useWorld, world } from './world';
 import type { ContextData } from '@/components/Scene/contextGrid';
-import { insideBounds, NEEDS_HIRES_MESSAGE, OUTSIDE_LABEL } from '@/components/Scene/pick';
 
-export const UNAVAILABLE = 'Copilot unavailable right now. The buttons still work.';
+export const UNAVAILABLE = 'Copilot unavailable right now. Clicks and actions still work.';
 
 export type TexId = 'ctx' | 'themisDay' | 'themisNight' | 'geology';
 export interface GeologyUnit { symbol: string; name: string; color: string }
@@ -216,6 +220,7 @@ async function loadAll() {
       await terrain.init(dem);
       step('terrain', { progress: 0.6 });
       slope = await terrain.slopeField();
+      registerScenarioSources({ jezero20m: jezeroSlopeSource(dem, slope) }); // landing scenarios inside Jezero use the 20 m slopes
       step('terrain', { status: 'done', progress: 1 });
     } catch (e) {
       console.warn('[services] terrain engine failed', e);
@@ -291,151 +296,66 @@ export function ensureGeology(): Promise<void> {
   return geologyJob;
 }
 
-/** One-click presets: if nothing is selected, pick the Skinner Ridge delta site from science_sites.json. */
-export async function ensureDefaultSelection(): Promise<boolean> {
-  if (S().selected) return true;
-  try {
-    const raw = await getJson<ScienceSite[] | { sites: ScienceSite[] }>('/data/science_sites.json');
-    const sites = Array.isArray(raw) ? raw : raw.sites;
-    const site = sites.find((x) => /skinner/i.test(x.id + x.name)) ?? sites.find((x) => x.objectives.includes('delta-sediments')) ?? sites[0];
-    if (!site) return false;
-    const p = world.makePoint(site.lon, site.lat, 'preset', site.name);
-    world.setSelected(p);
-    world.applyCommands([{ type: 'focus_camera', lon: p.lon, lat: p.lat, distanceM: 3500 }]);
-    return true;
-  } catch { return false; }
+/* ------------------------------------------------------------------ global (whole planet) science */
+
+/** Global dataset (public/data/global). `gs` is null until loaded; `error` explains a failed load (no verified data then). */
+export const useGlobal = create<{ gs: GlobalScienceApi | null; error: string | null; earth: EarthLinkData | null }>(() => ({ gs: null, error: null, earth: null }));
+
+let globalJob: Promise<void> | null = null;
+export function startGlobalLoading(): Promise<void> {
+  if (!globalJob) {
+    globalJob = (async () => {
+      enableScenarioWasm(); // Rust/WASM landing Monte Carlo; falls back to the TypeScript engine on any failure
+      // JPL Horizons light time and Earth in the Jezero sky; optional, the app works without it
+      loadEarthLink((...a) => fetch(...a)).then((earth) => useGlobal.setState({ earth })).catch(() => { /* no Earth line then */ });
+      try {
+        const gs = createGlobalScience();
+        await gs.load();
+        useGlobal.setState({ gs, error: null });
+      } catch (e) {
+        console.warn('[services] global science failed to load', e);
+        useGlobal.setState({ gs: null, error: e instanceof Error ? e.message : String(e) });
+      }
+    })();
+  }
+  return globalJob;
 }
 
 /* ------------------------------------------------------------------ tool access for the UI */
 
+const noTerrain: TerrainApi = {
+  init: () => Promise.reject(new Error('Terrain engine is not ready.')),
+  planRoute: () => Promise.reject(new Error('Terrain engine is not ready.')),
+  analyze: () => Promise.reject(new Error('Terrain engine is not ready.')),
+  hazards: () => Promise.reject(new Error('Terrain engine is not ready.')),
+  slopeField: () => Promise.reject(new Error('Terrain engine is not ready.')),
+};
+
+/** Same object the LLM tools get: world, terrain, science, globe facade and global science. Safe before Jezero has loaded. */
 export function toolDeps(): ToolDeps {
   const rt = useRuntime.getState().rt;
-  if (!rt || !rt.terrain) throw new Error('Terrain engine is not ready.');
-  return { world, terrain: rt.terrain, science: rt.science };
+  const gs = useGlobal.getState().gs;
+  return {
+    world,
+    terrain: rt?.terrain ?? noTerrain,
+    science: rt?.science ?? offlineScience,
+    globe: {
+      applyGlobeCommands: (c) => useGlobeStore.getState().applyGlobeCommands(c),
+      snapshot: () => {
+        const g = useGlobeStore.getState();
+        return { mode: g.mode, clicked: g.clicked ? { lon: g.clicked.lon, lat: g.clicked.lat } : null, hovered: g.hovered };
+      },
+    },
+    globalSci: gs ?? undefined,
+  };
 }
 
-async function callTool<T = Record<string, unknown>>(name: string, args: unknown): Promise<T> {
-  const rt = useRuntime.getState().rt;
-  if (!rt) throw new Error('Still loading.');
-  const out = (await rt.agent.executeTool(name, args, toolDeps())) as T & { error?: string; message?: string };
+/** Deterministic path (no LLM): the same executor the copilot uses. Throws with the tool's message on a tool error. */
+export async function callTool<T = Record<string, unknown>>(name: string, args: unknown): Promise<T> {
+  const out = (await runnerExecuteTool(name, args, toolDeps())) as T & { error?: string; message?: string };
   if (out && typeof out === 'object' && 'error' in out && out.error) throw new Error(out.message || String(out.error));
   return out;
 }
-
-const S = () => useWorld.getState();
-const guard = async (fn: () => Promise<void>) => {
-  try { await fn(); } catch (e) { S().toast('error', e instanceof Error ? e.message : 'Something went wrong.'); }
-};
-
-/** "Plan round trip to selection" — deterministic, same executor the LLM uses; the tool draws the route itself. */
-export const planRoundTripToSelection = () => guard(async () => {
-  const sel = S().selected;
-  if (!sel) { S().toast('info', 'Click the terrain to select a destination first.'); return; }
-  // routing runs on the 20 m DEM only: never silently plan on the coarse regional terrain
-  if (!insideBounds(S().bounds, sel.lon, sel.lat)) { S().toast('info', NEEDS_HIRES_MESSAGE); return; }
-  await callTool<{ id: string; feasible: boolean; reasonText: string[] }>('plan_route', { to: 'selected', roundTrip: true });
-  S().patch({ drawerOpen: true, sheetTab: 'route' });
-  // an infeasible route explains itself in the drawer, so no toast
-});
-
-/** "Show steepest stretch" — hazards of the active route, drawn as numbered red highlights. */
-export const showSteepestStretch = () => guard(async () => {
-  const st = S();
-  const routeId = st.profileRouteId ?? st.visibleRouteIds[st.visibleRouteIds.length - 1];
-  if (!routeId) { st.toast('info', 'Plan a route first, then ask for its steepest stretch.'); return; }
-  const r = await callTool<{ segments: { leg: number; startIdx: number; endIdx: number; maxSlopeDeg: number; lengthM: number }[] }>('find_hazard_segments', { routeId, k: 3 });
-  if (!r.segments.length) { S().toast('info', 'No hazard segments were returned for this route.'); return; }
-  const old = S().annotations.filter((a) => a.kind === 'highlight' && a.highlight?.routeId === routeId);
-  const res = world.applyCommands([
-    ...old.map((a) => ({ type: 'remove_annotation' as const, id: a.id })),
-    ...r.segments.map((s, i) => ({
-      type: 'highlight_segment' as const, routeId, leg: s.leg, startIdx: s.startIdx, endIdx: s.endIdx,
-      label: `Steep stretch ${i + 1}: up to ${s.maxSlopeDeg.toFixed(1)}° over ${Math.round(s.lengthM)} m`,
-    })),
-  ]);
-  if (res.errors.length) S().toast('error', res.errors[0]);
-});
-
-function describeContext(ctx: Record<string, unknown>, ana: Record<string, unknown> | null): string {
-  const lines: string[] = [];
-  const pt = ctx.point as { lon: number; lat: number } | undefined;
-  if (pt) lines.push(`Location: ${fmtLat(pt.lat)}, ${fmtLon(pt.lon)}`);
-  lines.push(`Elevation: ${ctx.elevationM == null ? 'no data' : `${ctx.elevationM} m above the areoid`}`);
-  const g = ctx.geology as { symbol: string; name: string; interpretation: string } | null;
-  lines.push(g ? `Geology: ${g.name} (${g.symbol}). ${g.interpretation}` : 'Geology: no verified data here.');
-  const n = (ctx.namedFeaturesNear as { name: string; type: string; distanceKm: number }[]) ?? [];
-  if (n.length) lines.push(`Nearby: ${n.slice(0, 3).map((x) => `${x.name} (${x.type}, ${x.distanceKm} km)`).join('; ')}`);
-  const t = ctx.nearestRoverTraverse as { sol: number; distanceM: number } | null;
-  if (t) lines.push(`Rover traverse: nearest Perseverance point is from sol ${t.sol}, ${t.distanceM} m away`);
-  if (ana) {
-    lines.push(`Terrain within ${ana.radiusM} m: mean slope ${ana.slopeMeanDeg}°, 90th percentile ${ana.slopeP90Deg}°, max ${ana.slopeMaxDeg}°; ${ana.pctAboveLimit}% steeper than the ${ana.limitDeg}° limit; relief ${ana.reliefM} m.`);
-  }
-  return lines.join('\n');
-}
-
-/** Plain summary for a point on the regional context terrain (outside the 20 m DEM). */
-function describeOutside(p: WorldPoint): string {
-  return [
-    `Location: ${fmtLat(p.lat)}, ${fmtLon(p.lon)}`,
-    `${OUTSIDE_LABEL}. This point is on the regional terrain around the Jezero area.`,
-    p.elevationM == null ? 'Elevation: no data' : `Elevation: about ${Math.round(p.elevationM)} m above the areoid, from MOLA at roughly 463 m resolution (the 20 m terrain model does not reach here).`,
-    NEEDS_HIRES_MESSAGE,
-  ].join('\n');
-}
-
-/** "What's here?" — deterministic summary of the selected point shown in the Ask panel. */
-export const whatsHere = () => guard(async () => {
-  if (!S().selected) { S().toast('info', 'Click the terrain to select a point first.'); return; }
-  S().patch({ askOpen: true, sheetTab: 'ask' });
-  S().pushMessage({ role: 'user', text: "What's here?" });
-  const sel = S().selected!;
-  if (!insideBounds(S().bounds, sel.lon, sel.lat)) { // regional context only: no 20 m terrain analysis, no geology
-    S().pushMessage({ role: 'assistant', text: describeOutside(sel) });
-    return;
-  }
-  const [ctx, ana] = await Promise.all([
-    callTool('get_location_context', { target: 'selected' }),
-    callTool('analyze_terrain', { target: 'selected', radiusM: 500 }).catch(() => null),
-  ]);
-  S().pushMessage({ role: 'assistant', text: describeContext(ctx, ana) });
-});
-
-/** Free-text question to the LLM copilot. */
-export async function askCopilot(text: string) {
-  const st = S();
-  const rt = useRuntime.getState().rt;
-  if (st.busy || !text.trim() || !rt) return;
-  st.pushMessage({ role: 'user', text });
-  st.patch({ busy: true, trace: [], askOpen: true });
-  try {
-    const res = await rt.agent.runAgentTurn({
-      userText: text, history: st.history as ChatMessage[], deps: toolDeps(),
-      onTrace: (steps) => S().patch({ trace: steps }),
-    });
-    S().pushMessage({
-      role: 'assistant',
-      text: res.text || (res.offline || res.error ? UNAVAILABLE : 'No answer was returned.'),
-      unverified: res.unverifiedNumbers, offline: res.offline || (!res.text && !!res.error),
-    });
-    // 503 agent_offline and 429 rate_limited both land here: one calm message, buttons keep working
-    S().patch({ history: res.history, trace: res.trace, offline: res.offline || (!res.text && !!res.error) });
-  } catch (e) {
-    S().patch({ offline: true });
-    S().pushMessage({ role: 'assistant', text: UNAVAILABLE, offline: true });
-    console.warn('[services] runAgentTurn failed', e);
-  } finally {
-    S().patch({ busy: false });
-  }
-}
-
-/** Download the GeoJSON mission plan for a route. */
-export const exportPlan = (routeId: string) => guard(async () => {
-  const r = await callTool<{ geojson: unknown; filename: string }>('export_mission_plan', { routeId });
-  const url = URL.createObjectURL(new Blob([JSON.stringify(r.geojson, null, 2)], { type: 'application/geo+json' }));
-  const a = document.createElement('a');
-  a.href = url; a.download = r.filename; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
 
 export async function roverImagesFor(p: WorldPoint): Promise<RoverImage[]> {
   const rt = useRuntime.getState().rt;
@@ -444,4 +364,13 @@ export async function roverImagesFor(p: WorldPoint): Promise<RoverImage[]> {
     const r = await rt.science.roverImagesNear({ lon: p.lon, lat: p.lat }, 2000, 4);
     return r?.images ?? [];
   } catch { return []; }
+}
+
+/** Download the GeoJSON mission plan for a route. */
+export async function exportPlan(routeId: string) {
+  const r = await callTool<{ geojson: unknown; filename: string }>('export_mission_plan', { routeId });
+  const url = URL.createObjectURL(new Blob([JSON.stringify(r.geojson, null, 2)], { type: 'application/geo+json' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = r.filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

@@ -11,6 +11,7 @@ import { decodeDem, sampleElevation, toLocal } from '../../src/lib/geo/frame';
 import { buildTerrainGrid } from '../../src/lib/scene/terrainGrid';
 import type { TerrainGrid } from '../../src/lib/scene/terrainGrid';
 import { configureWorld, resetWorldForTests, useWorld } from '../../src/state/world';
+import { onClickPoint } from '../../src/state/companion';
 
 const DATA = path.resolve(__dirname, '../../public/data');
 const json = <T>(f: string) => JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')) as T;
@@ -133,13 +134,16 @@ describe('picking on the regional terrain', () => {
   });
 
   it('outside the DEM bounds the point is selected, labelled, and carries the coarse MOLA elevation', () => {
+    const clicks: unknown[] = [];
+    const off = onClickPoint((p) => clicks.push(p));
     pickPoint(rt, new THREE.Vector3(800, 0, -600)); // lon 78.25, lat 19.05: outside, inside the context grid
+    off();
     const s = useWorld.getState().selected!;
     expect(insideBounds(useWorld.getState().bounds, s.lon, s.lat)).toBe(false);
     expect(s.label).toBe(OUTSIDE_LABEL);
     expect(OUTSIDE_LABEL).toBe('Outside high-resolution coverage');
     expect(s.elevationM).toBeCloseTo(-2222);
-    expect(useWorld.getState().askOpen).toBe(true);
+    expect(clicks).toHaveLength(1); // Scout is told about the click
     expect(elevationAt(rt, s.lon, s.lat).coarse).toBe(true);
     expect(NEEDS_HIRES_MESSAGE).toBe('Routes need the high-resolution Jezero area. Pick a point inside it.');
   });

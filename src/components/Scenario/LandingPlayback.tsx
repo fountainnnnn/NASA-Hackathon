@@ -155,11 +155,11 @@ export function LandingPlayback({
       <group ref={capsule}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <capsuleGeometry args={[0.35, 0.8, 2, 8]} />
-          <meshStandardMaterial color="#cfcac1" roughness={0.7} metalness={0.2} />
+          <meshBasicMaterial color="#ece7e1" />
         </mesh>
         <mesh position={[0, 0, -0.8]} rotation={[-Math.PI / 2, 0, 0]}>
           <coneGeometry args={[0.5, 0.5, 8]} />
-          <meshStandardMaterial color="#8c6a4c" roughness={0.8} />
+          <meshBasicMaterial color="#a39c95" />
         </mesh>
       </group>
       <instancedMesh ref={inst} args={[undefined, undefined, Math.max(1, points.length)]} frustumCulled={false} renderOrder={4}>

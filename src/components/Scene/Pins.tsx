@@ -12,11 +12,11 @@ const ICONS: Record<Kind, ComponentType<{ size?: number; 'aria-hidden'?: boolean
   base: House, selected: Crosshair, science: FlaskConical, hazard: TriangleAlert, info: Info,
 };
 
-export function Marker({ pos, kind, label, tone }: { pos: [number, number, number]; kind: Kind; label?: string; tone?: 'num'; }) {
+export function Marker({ pos, kind, label, tone, occlude = true }: { pos: [number, number, number]; kind: Kind; label?: string; tone?: 'num'; occlude?: boolean }) {
   const { meshRef } = useScene();
   const Icon = ICONS[kind];
   return (
-    <Html position={pos} center occlude={[meshRef as RefObject<THREE.Object3D>]} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
+    <Html position={pos} center occlude={occlude ? [meshRef as RefObject<THREE.Object3D>] : undefined} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
       <div className={`${styles.pin} ${styles[kind]}`} data-tone={tone}>
         <span className={styles.pinDot}><Icon size={13} aria-hidden /></span>
         {label && <span className={styles.pinLabel}>{label}</span>}
@@ -37,7 +37,7 @@ export function Pins() {
   };
   return (
     <>
-      {base && <Marker pos={at(base.lon, base.lat)} kind="base" label="Base" />}
+      {base && <Marker pos={at(base.lon, base.lat)} kind="base" label="Base" occlude={false} />}
       {selected && <Marker pos={at(selected.lon, selected.lat)} kind="selected" label="Selected" />}
       {annotations.filter((a) => a.kind === 'pin').map((a) => (
         <Marker key={a.id} pos={at(a.lon, a.lat)} kind={a.pinKind === 'base' ? 'info' : a.pinKind ?? 'info'} label={a.label} />
