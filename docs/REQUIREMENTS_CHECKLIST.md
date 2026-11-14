@@ -48,7 +48,7 @@ Boxes are unchecked until someone has verified them. "Where" says which file or 
 - [x] Project Name. Where: SUBMISSION_DRAFT.md.
 - [x] High-Level Project Summary, 130 to 170 words, with numbered inline citations and reference list. Where: SUBMISSION_DRAFT.md.
 - [ ] Link to Project Demo: the 30 s video is the official Demo link. TODO(link) video URL
-- [ ] Link to Final Project: live Railway app plus repo https://github.com/fountainnnnn/NASA-Hackathon. TODO(link) live app URL
+- [ ] Link to Final Project: live Railway app plus repo https://github.com/fountainnnnn/NASA-Hackathon. https://web-production-9b58e394.up.railway.app
 - [x] Detailed Project Description (what, how, benefits, goals, tools).
 - [ ] Use of Super Intelligence (SI), honest and specific. Where: SUBMISSION_DRAFT.md, AI_USE.md.
 - [x] NASA Data, each dataset named, linked, with its use.

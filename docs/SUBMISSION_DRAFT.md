@@ -30,7 +30,7 @@ Video (30 s or less, the official Demo link): TODO(link) video URL
 
 ## Link to Final Project
 
-Live app (Railway): TODO(link). Repository: https://github.com/fountainnnnn/NASA-Hackathon
+Live app (Railway): https://web-production-9b58e394.up.railway.app. Repository: https://github.com/fountainnnnn/NASA-Hackathon
 
 The live app must open in a private window with no login.
 
@@ -38,7 +38,7 @@ The live app must open in a private window with no login.
 
 ## Detailed Project Description
 
-Slides (7): TODO(link) deck URL. Live app: TODO(link). Code: https://github.com/fountainnnnn/NASA-Hackathon
+Slides (7): https://claude.ai/artifact/11V9eTwXy8fzHcq4rFoAnG. Live app: https://web-production-9b58e394.up.railway.app. Code: https://github.com/fountainnnnn/NASA-Hackathon
 
 ### What it does
 

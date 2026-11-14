@@ -9,7 +9,7 @@ MarsWalk Copilot is a 3D map of a roughly 30 km patch of Jezero Crater built fro
 
 - Demo (video, 30 s or less): TODO(link)
 - Demo (slides, 7 or fewer): TODO(link)
-- Live app: TODO(link)
+- Live app: https://web-production-9b58e394.up.railway.app
 - Repository: https://github.com/fountainnnnn/NASA-Hackathon
 
 ## Hero use case
