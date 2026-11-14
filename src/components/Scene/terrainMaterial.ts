@@ -10,6 +10,13 @@ export interface TerrainUniforms {
   uOp: { value: THREE.Vector4 };        // ctx, day, night, geology opacity (0 = layer hidden)
   uSlopeOp: { value: number };          // slope overlay opacity (0 = hidden)
   uLimit: { value: number };            // max slope, degrees
+  // regional context imagery the patch fades into over its outer ~1 km (see contextGrid.ts)
+  tWide: { value: THREE.Texture };
+  uHasWide: { value: number };          // 0/1
+  uWideGain: { value: number };         // linear-light gain matching the context imagery to the 6 m mosaic
+  uWideRect: { value: THREE.Vector4 };  // context extent: x0 (west), z0 (north), width, height, local metres
+  uPatchRect: { value: THREE.Vector4 }; // patch extent: xMin, zMin, xMax, zMax, local metres
+  uBlendM: { value: number };
 }
 
 const GLSL_INFERNO = /* glsl */ `
@@ -33,6 +40,8 @@ export function createTerrainMaterial() {
     tCtx: { value: dummy }, tDay: { value: dummy }, tNight: { value: dummy }, tGeo: { value: dummy },
     tPal: { value: dummy }, tSlope: { value: dummy },
     uHas: { value: new THREE.Vector4(0, 0, 0, 0) }, uHas2: { value: new THREE.Vector2(0, 0) },
+    tWide: { value: dummy }, uHasWide: { value: 0 }, uWideGain: { value: 1 }, uWideRect: { value: new THREE.Vector4(0, 0, 1, 1) },
+    uPatchRect: { value: new THREE.Vector4(0, 0, 0, 0) }, uBlendM: { value: 1000 },
     uOp: { value: new THREE.Vector4(1, 0, 0, 0) }, uSlopeOp: { value: 0 }, uLimit: { value: 15 },
   };
   const material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.96, metalness: 0 });
@@ -41,14 +50,14 @@ export function createTerrainMaterial() {
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>
 attribute float aValid; attribute float aElev;
-varying float vValid; varying float vElevN; varying vec2 vTUv;`)
+varying float vValid; varying float vElevN; varying vec2 vTUv; varying vec2 vXZ;`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
-vValid = aValid; vElevN = aElev; vTUv = uv;`);
+vValid = aValid; vElevN = aElev; vTUv = uv; vXZ = position.xz;`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
-varying float vValid; varying float vElevN; varying vec2 vTUv;
-uniform sampler2D tCtx, tDay, tNight, tGeo, tPal, tSlope;
-uniform vec4 uHas, uOp; uniform vec2 uHas2; uniform float uSlopeOp, uLimit;
+varying float vValid; varying float vElevN; varying vec2 vTUv; varying vec2 vXZ;
+uniform sampler2D tCtx, tDay, tNight, tGeo, tPal, tSlope, tWide;
+uniform vec4 uHas, uOp, uWideRect, uPatchRect; uniform vec2 uHas2; uniform float uSlopeOp, uLimit, uHasWide, uWideGain, uBlendM;
 ${GLSL_INFERNO}`)
       .replace('#include <map_fragment>', `
 if (vValid < 0.5) discard;
@@ -73,9 +82,20 @@ if (uHas2.x > 0.5 && uSlopeOp > 0.0) {
   col = mix(col, vec3(0.95, 0.10, 0.08), red * 0.62 * uSlopeOp);
   col = mix(col, vec3(1.00, 0.62, 0.10), amber * 0.45 * uSlopeOp);
 }
+// soft edge: over the outer uBlendM the patch colour ramps into the regional context imagery, so the high-resolution
+// area has no visible boundary line (same lighting, same hypsometric fallback as the context mesh)
+if (uHasWide > 0.5) {
+  float eEdge = min(min(vXZ.x - uPatchRect.x, uPatchRect.z - vXZ.x), min(vXZ.y - uPatchRect.y, uPatchRect.w - vXZ.y));
+  float tEdge = 1.0 - smoothstep(0.0, uBlendM, eEdge);
+  if (tEdge > 0.0) {
+    float wg = clamp(texture2D(tWide, (vXZ - uWideRect.xy) / uWideRect.zw).r * uWideGain, 0.0, 1.0);
+    vec3 wcol = mix(hyps, vec3(wg) * vec3(1.00, 0.80, 0.64), uOp.x);
+    col = mix(col, wcol, tEdge);
+  }
+}
 diffuseColor.rgb *= col;
 `);
   };
-  material.customProgramCacheKey = () => 'marswalk-terrain-v1';
+  material.customProgramCacheKey = () => 'marswalk-terrain-v2';
   return { material, uniforms, dummy };
 }

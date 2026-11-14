@@ -6,12 +6,14 @@ import * as THREE from 'three';
 import { applyExaggeration, buildTerrainGeometry, marchRay } from '@/lib/scene/terrainGrid';
 import { useRuntime } from '@/state/services';
 import { useHover } from '@/state/ui';
-import { useWorld, world } from '@/state/world';
+import { useWorld } from '@/state/world';
 import { createTerrainMaterial } from './terrainMaterial';
+import { PATCH_BLEND_M } from './contextGrid';
+import { hoverPoint, pickPoint } from './pick';
 import { useScene } from './sceneCtx';
 
 export function Terrain() {
-  const { rt, grid, meshRef } = useScene();
+  const { rt, grid, meshRef, context } = useScene();
   const geom = useMemo(() => buildTerrainGeometry(grid, useWorld.getState().exaggeration), [grid]);
   const { material, uniforms, dummy } = useMemo(createTerrainMaterial, []);
   const appliedExag = useRef(useWorld.getState().exaggeration);
@@ -40,6 +42,16 @@ export function Terrain() {
     uniforms.uOp.value.set(L.ctx ? O.ctx : 0, L.themisDay ? O.themisDay : 0, L.themisNight ? O.themisNight : 0, L.geology ? O.geology : 0);
     uniforms.uSlopeOp.value = L.slope ? O.slope : 0;
     uniforms.uLimit.value = s.constraints.maxSlopeDeg;
+    // regional context imagery: the patch edge fades into it (set once the context data is in the scene)
+    if (context) {
+      const r = context.rect, p = context.patchRect;
+      uniforms.tWide.value = context.data.texture;
+      uniforms.uHasWide.value = 1;
+      uniforms.uWideGain.value = context.data.meta.imageGainToPatch;
+      uniforms.uWideRect.value.set(r.xMin, r.zMin, r.xMax - r.xMin, r.zMax - r.zMin);
+      uniforms.uPatchRect.value.set(p.xMin, p.zMin, p.xMax, p.zMax);
+      uniforms.uBlendM.value = PATCH_BLEND_M;
+    } else uniforms.uHasWide.value = 0;
   });
 
   const raycast = useMemo(() => (raycaster: THREE.Raycaster, out: THREE.Intersection[]) => {
@@ -48,24 +60,17 @@ export function Terrain() {
     if (t != null && meshRef.current) out.push({ distance: t, point: r.at(t, new THREE.Vector3()), object: meshRef.current });
   }, [grid, meshRef]);
 
-  const toLL = (p: THREE.Vector3) => rt.geo.toLonLat(rt.meta, p.x, p.z);
-
   const onMove = (e: ThreeEvent<PointerEvent>) => {
     const now = performance.now();
     if (now - lastHover.current < 80) return;
     lastHover.current = now;
-    const { lon, lat } = toLL(e.point);
-    useHover.getState().set({ lon, lat, elev: rt.geo.sampleElevation(rt.dem, lon, lat) });
+    hoverPoint(useRuntime.getState().rt ?? rt, e.point);
   };
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
     if (e.delta > 5) return; // it was a drag (orbit/pan), not a click
     e.stopPropagation();
-    const { lon, lat } = toLL(e.point);
-    const b = useWorld.getState().bounds;
-    if (lon < b.lonMin || lon > b.lonMax || lat < b.latMin || lat > b.latMax) return;
-    world.setSelected(world.makePoint(lon, lat, 'pick', 'Selected point'));
-    useWorld.getState().patch({ askOpen: true });
+    pickPoint(useRuntime.getState().rt ?? rt, e.point);
   };
 
   return (

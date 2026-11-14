@@ -3,11 +3,15 @@ import { createContext, useContext } from 'react';
 import type { RefObject } from 'react';
 import type * as THREE from 'three';
 import type { TerrainGrid } from '@/lib/scene/terrainGrid';
+import { groundHeight } from './contextGrid';
+import type { ContextScene } from './contextGrid';
 import type { Runtime } from '@/state/services';
 
 export interface SceneCtxValue {
   rt: Runtime;
   grid: TerrainGrid;
+  /** Regional apron around the patch; null when the context data is not loaded. */
+  context: ContextScene | null;
   meshRef: RefObject<THREE.Mesh | null>;
 }
 export const SceneCtx = createContext<SceneCtxValue | null>(null);
@@ -38,4 +42,9 @@ export function lineY(v: SceneCtxValue, x: number, z: number, h: number | null, 
   const mesh = meshH(x, z) + 1 * exag;
   if (h == null) return mesh + offsetM * exag;
   return Math.max((h - v.rt.meta.hRef + offsetM) * exag, mesh);
+}
+
+/** Exaggerated, hRef-relative ground height anywhere in the scene (patch inside its rectangle, apron outside). */
+export function groundAt(v: SceneCtxValue, x: number, z: number, exag: number): number {
+  return groundHeight(v.grid, v.context, x, z, exag);
 }

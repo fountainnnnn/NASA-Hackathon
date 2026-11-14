@@ -1,6 +1,6 @@
 {
   "generatedBy": "scripts/prepare-data.mjs",
-  "generatedOn": "2026-11-14T12:58:39.672Z",
+  "generatedOn": "2026-11-14T13:17:59.920Z",
   "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
   "files": {
     "public/data/dem.i16": {
@@ -36,8 +36,8 @@
     },
     "public/data/dem_meta.json": {
       "output": "public/data/dem_meta.json",
-      "outputBytes": 650,
-      "outputSha256": "da5f0ec8483b0b3ebdeb5179d6dc96cdb2c336003d75afa543bb520e7d9b86c4",
+      "outputBytes": 688,
+      "outputSha256": "fd8cb000f0b23274bdef149a379e4c69a7463722ad8ff280a717d62f79675f39",
       "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
       "sourceUrls": [
         "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0"
@@ -516,6 +516,729 @@
       "raws": [],
       "processing": [
         "Hand-written catalogue assembled by prepare-data.mjs from the generated files."
+      ]
+    },
+    "public/data/context_dem.i16": {
+      "output": "public/data/context_dem.i16",
+      "outputBytes": 265728,
+      "outputSha256": "03ef810341877870fde017b2d11c7b703f216199db555848ac3cae08c5818901",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt44n000hb.img",
+        "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt44n000hb.lbl"
+      ],
+      "productLabel": "megt44n000hb (MGS MOLA MEGDR, 128 pixel/degree topography)",
+      "mission": "Mars Global Surveyor",
+      "instrument": "Mars Orbiter Laser Altimeter (MOLA)",
+      "projection": "Simple cylindrical, 1/128 degree, Mars 2000 sphere",
+      "datum": "Mars 2000 sphere R=3396190 m; MOLA topography above the areoid (GMM-3), same reference as the CTX DEM",
+      "credit": "NASA/GSFC/MGS MOLA (PDS Geosciences Node); NASA/JPL/MSSS/The Caltech Murray Lab/Esri (MRO CTX global mosaic via JPL Mars Trek)",
+      "resolution": "463 m/px (1/128 degree); stored 384x346",
+      "raws": [
+        {
+          "rawFile": "data/raw/context/megt44n000hb.lbl",
+          "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt44n000hb.lbl",
+          "sha256": "bc624a238ba6d71a770a09f959ead96f1c144970fae435b8ca5e26208b42eec5",
+          "bytes": 4820
+        },
+        {
+          "rawFile": "data/raw/context/megt44n000hb_rows3090_3450.bin",
+          "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt44n000hb.img",
+          "sha256": "2b744f191460835f3c0638351f767a88eaf02da321028a788fb6e2aa6d4d8602",
+          "bytes": 8317440,
+          "range": "bytes=71193600-79511039 of megt44n000hb.img (129761280 bytes)"
+        }
+      ],
+      "processing": [
+        "Range request for rows 3090..3450 of megt44n000hb.img (16-bit MSB, metres above the areoid).",
+        "Bilinear resample to 384x346 so the outer edges equal lon 75.9..78.9, lat 17.1..19.8.",
+        "Encoded Int16 LE with scale 0.25 m, offset 0. hRef (median) -2060 m.",
+        "Datum check vs the CTX DEM (4352 footprints): mean -3.02 m, median 1.86 m, sd 25.78 m; flat footprints (1399): median 6.16 m.",
+        "The PDS server sends an incomplete TLS chain, so the download used curl --insecure; integrity is covered by the datum check."
+      ],
+      "generatedOn": "2026-11-14T13:51:13.350Z"
+    },
+    "public/data/context_meta.json": {
+      "output": "public/data/context_meta.json",
+      "outputBytes": 1893,
+      "outputSha256": "2c710c75d35a91c52f65c2f1b5f0d0f009f99cd0cefce456b7e94b185d924dba",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/megt44n000hb.img",
+        "https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml"
+      ],
+      "productLabel": "MGS MOLA MEGDR 128 ppd topography (megt44n000hb) + MRO CTX global mosaic (Caltech beta01, level 9)",
+      "mission": "MGS + MRO",
+      "instrument": "MOLA + CTX",
+      "projection": "n/a (metadata)",
+      "datum": "Mars 2000 sphere R=3396190 m; MOLA topography above the areoid (GMM-3), same reference as the CTX DEM",
+      "credit": "NASA/GSFC/MGS MOLA (PDS Geosciences Node); NASA/JPL/MSSS/The Caltech Murray Lab/Esri (MRO CTX global mosaic via JPL Mars Trek)",
+      "resolution": "n/a",
+      "raws": [],
+      "processing": [
+        "Written by scripts/prepare-context.mjs."
+      ]
+    },
+    "public/data/context.jpg": {
+      "output": "public/data/context.jpg",
+      "outputBytes": 1033414,
+      "outputSha256": "332f628b9715623bd6d8468fc27b3fd4dbf2c9dda620bc1fa5ae745bcadbb066",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/{row}/{col}",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/736",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/727",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/728",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/729",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/730",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/731",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/732",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/733",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/734",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/735",
+        "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/736"
+      ],
+      "productLabel": "CTX_beta01_uncontrolled_5m_Caltech",
+      "mission": "Mars Reconnaissance Orbiter",
+      "instrument": "Context Camera (CTX), global mosaic (uncontrolled, beta01)",
+      "projection": "Geographic (EPSG:104905 Mars 2000 sphere), WMTS default028mm level 9",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "credit": "NASA/JPL/MSSS/The Caltech Murray Lab/Esri (MRO CTX global mosaic via JPL Mars Trek)",
+      "resolution": "WMTS level 9: 40.7 m/px at the equator; stored 4096x3686",
+      "raws": [
+        {
+          "rawFile": "data/raw/context/ctx_caps.xml",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml",
+          "sha256": "16919bec258e3292e07f4a1b42d9d847accc929a0d93fa6cb0989b2ba50aafcf",
+          "bytes": 8057
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/727",
+          "sha256": "d4cda414559b441c5e5f1598206d2003e6eb8ea1990a6c3ea1c1b4b9d6b498bf",
+          "bytes": 105804
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/728",
+          "sha256": "7294f331c1962371b07acad9f10215204119f158053895691415a2d89e6f382b",
+          "bytes": 112970
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/729",
+          "sha256": "f7e0827a708145ba34ed784e41d202543636de2c1fea5364c441f3ec72543946",
+          "bytes": 113306
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/730",
+          "sha256": "2eef190713de86b03b5352c546fb742f021ace787003ae7df99f6d23dfea7a37",
+          "bytes": 127112
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/731",
+          "sha256": "879562c374caf506a9843d6fe89e6b6440425c866b35d0a9ffd910a5d083053c",
+          "bytes": 134002
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/732",
+          "sha256": "a4d1d95d22868f7ac5886e2c04f09d5bdabfa944923fd9a4f2b4119b8cc1937b",
+          "bytes": 115510
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/733",
+          "sha256": "2fed0083fc30e462c7161d8e368318d08b4cb6c404c60b4fb07e51e2514a66fd",
+          "bytes": 95025
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/734",
+          "sha256": "1a26e9dd0c61faf86556188dd61a3fb2684d726e610e5fee6b278acbe04bef9f",
+          "bytes": 128776
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/735",
+          "sha256": "e7895a49c238bff69ca2a5764b79818d88b4a58d2bcbed6ff2266e980e7cc529",
+          "bytes": 125611
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r199_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/199/736",
+          "sha256": "9c304f2781d1fa5f3cb4ab7b3c1ab5bc2f977ed4876864cf5855ed997d92e8ae",
+          "bytes": 111806
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/727",
+          "sha256": "2875865004f320054d540b12560964c05428031569bbf27328a843a5b8373cf9",
+          "bytes": 99098
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/728",
+          "sha256": "a75b6c6eda8b2c607f0d7751248bc36824d84d32acb59d696ba83ad0c31e3a87",
+          "bytes": 119983
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/729",
+          "sha256": "d0c941690079ce421818ceb66ac3fb49d8a60fb46065de71197eaf540948a9c2",
+          "bytes": 115507
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/730",
+          "sha256": "5ab54fe7a3d0ad41aa67c3ffeec58cfc21d0036efc0b6f2072a7c3f92093b6c2",
+          "bytes": 113448
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/731",
+          "sha256": "575ca847140f643d345345179025c76b1f50547bb5dde214d0baa0929182f86e",
+          "bytes": 114224
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/732",
+          "sha256": "ad3c9352009b9bee51c07bf403f1fa65b354b7983734883ae966f42640695e68",
+          "bytes": 107820
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/733",
+          "sha256": "07b900ccf8b023b3d69176109aff96d1b47d0f3b64134c5e05e7071c3ed74fa6",
+          "bytes": 78942
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/734",
+          "sha256": "8bfa92f067786dbae7fa0042cb0884bb6c15c5d5688a4e0f56dfec3dd0b05705",
+          "bytes": 113977
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/735",
+          "sha256": "8ec8a3d0c6f0046b2505f03a346e1f402d6f368c9eea40562584087ddb54b90e",
+          "bytes": 119692
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r200_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/200/736",
+          "sha256": "f1e5b8cfb2c232b192ed782f2470d700090aa851fc713afd9f559a31254381f7",
+          "bytes": 107349
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/727",
+          "sha256": "9c4a937154bbc5efc4dcd505d9ddd636e96bc0dd0955da78532ab6625597d83f",
+          "bytes": 105620
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/728",
+          "sha256": "ae72d778f307b84f0f3cc6ade3b150607991a2ab4ca19e9bb2586da47809d6eb",
+          "bytes": 108178
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/729",
+          "sha256": "3bb30c2cd65537eee7b60e42428c68ea6207db098aded5b42b63cd171f1d9c72",
+          "bytes": 123572
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/730",
+          "sha256": "4858fc0659b1888740188811f684fcc273c41b4f17221b9803f2508ad08bae6e",
+          "bytes": 116495
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/731",
+          "sha256": "069d9959d40b2ca01d03f058df2d024a283363a09f021595ec0e229fd9bdd20d",
+          "bytes": 110813
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/732",
+          "sha256": "31dc49a7d4fb470ff1f1e7f23f97f9435b5dbf213945e3d68fea9922b53c6020",
+          "bytes": 106796
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/733",
+          "sha256": "df2698154308efa495a5993f25c9538ea8b756c32fcfcbcb63434b2dc22bcd97",
+          "bytes": 87025
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/734",
+          "sha256": "d219663a9cd866da662a141f3cdd4716e0f12e2fc4a82c6a4c5a2b2a8e3bf039",
+          "bytes": 123532
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/735",
+          "sha256": "148f32f73bd26edfe49f00f7913799ee916e21df2395e47ebffe99f89d254d76",
+          "bytes": 117934
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r201_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/201/736",
+          "sha256": "f3916086cb384cfff80ee1aa794aa01be152bbae4552ce80abb31761eb5b4d31",
+          "bytes": 107681
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/727",
+          "sha256": "a9b5d4a689fa34a515fb153f9ddfefbbd47361189730c1f899d37e6ae92ff49a",
+          "bytes": 112588
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/728",
+          "sha256": "313f94c9fba6d09bf8e5ae09278a3d7feef44d1826c6f45f3518cb7199c1636e",
+          "bytes": 114145
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/729",
+          "sha256": "c8f59b99b15dd2f06149c2590ba6df00d645b9e20829ddbb9f1b44827e8b4548",
+          "bytes": 115894
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/730",
+          "sha256": "0f02f7c795c4bbde3f4f1278f9e63505de54fa0d6f2879b0d5a02a768499a277",
+          "bytes": 115807
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/731",
+          "sha256": "87221b1f26f9d6db144100a82fae1a612ec3f92f1cc9a7bc454085375429511c",
+          "bytes": 111613
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/732",
+          "sha256": "604241dff3b47d059009f8a99ba1e97452404f65b220840d9e2ed58e41640049",
+          "bytes": 108026
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/733",
+          "sha256": "60be4cb3786c60b15e01fad5725eba40669a3181ced8e132f2d196746b1637f9",
+          "bytes": 85347
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/734",
+          "sha256": "99097ab5fe9d883a521b58a6839ae7dbfc1d1dc7767548096fad57dc5c2e0fe0",
+          "bytes": 119677
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/735",
+          "sha256": "b2b664056220e152e910de4b6a368f2382ba3c10ae13a45c4aab0b8283a0348b",
+          "bytes": 119565
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r202_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/202/736",
+          "sha256": "1bbf97dcc0bcbb2dcbeb24f92fa313ef3dc868b1581981f6a41173166b54b83a",
+          "bytes": 110828
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/727",
+          "sha256": "ac22b85dd45312690903164598eb1b7f0efb6f1507224ccf5a53e59525f79fa0",
+          "bytes": 108885
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/728",
+          "sha256": "2323a38310e1fc850ff1af291fa6ab99c10eac86094e0606afc8b3ab4a496faa",
+          "bytes": 103971
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/729",
+          "sha256": "4dd44daa3bcedb29f38ab47885b2228afcf484cba9000766c8a709543eedbca3",
+          "bytes": 119026
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/730",
+          "sha256": "d237ed95059485ddf32be18725cbc148a35214ea8425555302651c61e64bcc6e",
+          "bytes": 124659
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/731",
+          "sha256": "851232ff94a766f06d694670357a1675b62a6a7f19bd1926773d173b50664465",
+          "bytes": 108051
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/732",
+          "sha256": "a6103764e11e11d2769cbc3d127cbec3ebd8e284df3200bb84e3887f3a7f991b",
+          "bytes": 96974
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/733",
+          "sha256": "802acd3abc8dcb78a6de39bb0f81ad58643ee47819014addf693e4c0e20fcf2c",
+          "bytes": 79377
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/734",
+          "sha256": "2a70eb7e2322f99964f7ff4574f1e0a9f2fb511bdb7a8cac1471db269402eb4d",
+          "bytes": 83351
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/735",
+          "sha256": "85a182646d535a8e8556e7fa5ceb42405282b67158c8e1c99177c08352d6bbdc",
+          "bytes": 128624
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r203_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/203/736",
+          "sha256": "e44c6df24cb30339a6e4c1960eb5e20e9310d66713ae3869f33d38f068228f13",
+          "bytes": 112391
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/727",
+          "sha256": "16aa4e7b2da1d6b66db3fcdbc38ec41f9310ed7db5b05345f7ef623af8723df4",
+          "bytes": 108957
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/728",
+          "sha256": "1d2336c374520b24569c4537877e4433e0cebbbb2c384416393cd127a819081d",
+          "bytes": 116836
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/729",
+          "sha256": "3275d2782d65d35429db854767236515b25387fef4438b3150ca91b69f006440",
+          "bytes": 117477
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/730",
+          "sha256": "01c0718843570828201f13c021e716537667da71ee69ae4656564667ed1baf09",
+          "bytes": 120273
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/731",
+          "sha256": "de81197e2b24cc48350917bd8c2445bac03e37883ddaddc4308dbf81c61693cf",
+          "bytes": 113974
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/732",
+          "sha256": "7054a9db51bb0ea9f26bba6f034dd3ada207dddebe9b19188e6ce8fe8eab8753",
+          "bytes": 106327
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/733",
+          "sha256": "c77a4e43c7adf85eaac6ff091e3f8b62f44c5a8b7073b3ab8629f34952bfbd90",
+          "bytes": 86970
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/734",
+          "sha256": "5c02003ac324c573fd38cbd91be1f0fcec7d14eaf7604428af0baa191ca7d663",
+          "bytes": 80041
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/735",
+          "sha256": "759ea8ca7de25334dd5d9891583b719fa2ff2f5c6aee9121f9dbdab7014e6e9f",
+          "bytes": 127703
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r204_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/204/736",
+          "sha256": "2cae3c82353aa5acd3c80f41d9ad60d6774f950d767ac5f518750e404ca158a1",
+          "bytes": 118850
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/727",
+          "sha256": "34f542d8456e3b6121f4bb5e3f394a1a873061ad4b28f2585b21e00b2c00046c",
+          "bytes": 107743
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/728",
+          "sha256": "8618b037d17ae9363a1b931213f035b8bfc27488fb3eff7ba92596a53142df49",
+          "bytes": 121319
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/729",
+          "sha256": "1e482f77a35c7b7d517be3f158811cc9b7babd85e1393e14a591b8dac3f015fb",
+          "bytes": 107574
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/730",
+          "sha256": "923f5834756f16fdb4b4ca1cdcd8765f65918f32614c66f29925346cb2e2f132",
+          "bytes": 123409
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/731",
+          "sha256": "43a5ca86bfb32d52d5f9512af8b30d220fec1fd5d0873f490177ec88f15c6c03",
+          "bytes": 127231
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/732",
+          "sha256": "00e88547c5e6aff07e97a34db45d08ac60385be23058fda3cf3894679f07ec9e",
+          "bytes": 133830
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/733",
+          "sha256": "db0af60ddd611eca15d58174cabac6e52a3c93a62e191ac1d0b9e68e966c1975",
+          "bytes": 83378
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/734",
+          "sha256": "405f755727db35fa3030f88d59860c8da1a5fa44047b7834cfcc67b4c7d7c9e6",
+          "bytes": 82628
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/735",
+          "sha256": "a1ee2d3146d34d545bed6aeae36aae99ec3ec896f9ff9d543534faa4cf612033",
+          "bytes": 123475
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r205_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/205/736",
+          "sha256": "812ae62f136dc49e88855ffafad9d4d44650e2205488281c6b2cc58d291f6ecc",
+          "bytes": 107582
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/727",
+          "sha256": "170eb52e59a95be8174f6088040c11044e153f8d9be0ba0ff4f7169f87a7934e",
+          "bytes": 90548
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/728",
+          "sha256": "3d38fde6c54fe05e9a969a52db26305af3bfbc3ee5e47a331c2c5a4cb3893283",
+          "bytes": 107994
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/729",
+          "sha256": "c205847b813da151c266b696ac488d48af3363565ff63a2673c95cfc19dff2cc",
+          "bytes": 108124
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/730",
+          "sha256": "2f639d1e5d74ec00f1339fa6e0d84a6f54bd4e0ce0fcdc2089a8a4ce8ff7361d",
+          "bytes": 107913
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/731",
+          "sha256": "2be58b9d2827a3b558f36d5168841b09704618e76a988c5fd8c2978051fc316f",
+          "bytes": 121080
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/732",
+          "sha256": "e2f227260014a51d319544dd92a951afd51787938d91b9e7772aa572fa4fd4b1",
+          "bytes": 139571
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/733",
+          "sha256": "dc07b78fa5128058ff543f113dc37ff272542f644222488da008b037d1725e2d",
+          "bytes": 116239
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/734",
+          "sha256": "1a479714395988cbd543d7996616cede1da328da49afae199a629e52d97bf9b3",
+          "bytes": 84238
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/735",
+          "sha256": "d19fd1523b94879d40cd9d9ff22cd9fd4aaf345c36e9625d99893a9fa57b448c",
+          "bytes": 121264
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r206_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/206/736",
+          "sha256": "7c1294d7662f9931587d143ce50b829125cc8b48151d8f6df479079e833b4311",
+          "bytes": 112418
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c727.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/727",
+          "sha256": "6f6edef882abadb853ff28cb7c9a3a97546bcce217c0e13226cb696d2a835676",
+          "bytes": 89531
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c728.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/728",
+          "sha256": "4060ee28909f36477f84c3e018d347079ddc5c37d52a15895b83d332d459b076",
+          "bytes": 123040
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c729.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/729",
+          "sha256": "50b8224e4e3b859f9744ea5cfb518a0e4c84e4e04d6e9b15ac9cfd237301b911",
+          "bytes": 122961
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c730.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/730",
+          "sha256": "c784a8a363c8d9e877fc4fa7f8d51c4d45351f3d6aca84962dd252dfb9bb0c93",
+          "bytes": 111094
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c731.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/731",
+          "sha256": "43921607361c3a3b2d62bb0d0010b729c723aec99bf59b6c1d0c29c9b06a1d3b",
+          "bytes": 85402
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c732.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/732",
+          "sha256": "f1ed9eaa91b3d469c4bb028950c26b4a2cad0737e3bf6510c45ae51fb2dbdd03",
+          "bytes": 120011
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c733.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/733",
+          "sha256": "0dccc5e862ab81e4e5c8b76e31d73c4abdc7f07fc81e73d42f932e87bd79f0d9",
+          "bytes": 141826
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c734.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/734",
+          "sha256": "bd264c03847fb6bd9593ac9a90f98ec8c740dd0416def87225ca5df5cb1daad4",
+          "bytes": 109780
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c735.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/735",
+          "sha256": "e6a73692f1b419df77c13d3f46761c76583aef06b8ce59c81c9b09e476949f7a",
+          "bytes": 111121
+        },
+        {
+          "rawFile": "data/raw/context/ctx9/z9_r207_c736.png",
+          "url": "https://astro.arcgis.com/arcgis/rest/services/OnMars/CTX/MapServer/tile/9/207/736",
+          "sha256": "ebcc0cddbd6a504f3e24b2bfb2f2d5f775f1cbb3cfafd5553c809dc5fa6db5ed",
+          "bytes": 105434
+        }
+      ],
+      "processing": [
+        "Parsed Trek's WMTSCapabilities.xml; its ResourceURL points at astro.arcgis.com (the trek.nasa.gov tile path returns 404). Fetched 90 level 9 tiles.",
+        "Stitched, then bilinear resample of the fractional window bounded by lon 75.9..78.9, lat 17.1..19.8 to 4096x3686 (box-averaged).",
+        "Greyscale JPEG quality 80 (mozjpeg), 1.03 MB.",
+        "Registration vs the controlled 6 m mosaic: best integer shift 0,2 px (0,87 m); NCC 0.566 at zero shift.",
+        "imageGainToPatch 1.4793: linear-light brightness gain matching the 6 m mosaic over the overlap (applied in the shader)."
       ]
     }
   }

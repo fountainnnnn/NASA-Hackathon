@@ -3,9 +3,8 @@ import { Html } from '@react-three/drei';
 import { Crosshair, FlaskConical, House, Info, TriangleAlert } from 'lucide-react';
 import type { ComponentType, RefObject } from 'react';
 import type * as THREE from 'three';
-import { meshHeightAt } from '@/lib/scene/terrainGrid';
 import { useWorld } from '@/state/world';
-import { useScene } from './sceneCtx';
+import { groundAt, useScene } from './sceneCtx';
 import styles from './scene.module.css';
 
 type Kind = 'base' | 'selected' | 'science' | 'hazard' | 'info';
@@ -34,7 +33,7 @@ export function Pins() {
   const annotations = useWorld((s) => s.annotations);
   const at = (lon: number, lat: number): [number, number, number] => {
     const { x, z } = v.rt.geo.toLocal(v.rt.meta, lon, lat);
-    return [x, meshHeightAt(v.grid, x, z, exag) + 8 * exag, z];
+    return [x, groundAt(v, x, z, exag) + 8 * exag, z];
   };
   return (
     <>

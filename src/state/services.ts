@@ -13,7 +13,7 @@
 import * as THREE from 'three';
 import { create } from 'zustand';
 import type {
-  AgentApi, ChatMessage, Dem, DemMeta, GeoApi, GeologyFile, LayerInfo, RoverImage, ScienceApi, ScienceSite, TerrainApi,
+  AgentApi, ChatMessage, ContextMeta, Dem, DemMeta, GeoApi, GeologyFile, LayerInfo, RoverImage, ScienceApi, ScienceSite, TerrainApi,
   ToolDeps, TraverseFile, WorldPoint,
 } from '@/lib/contracts';
 import { fmtLat, fmtLon } from '@/lib/scene/format';
@@ -24,6 +24,8 @@ import { createScience } from '@/lib/science';
 import { fetchWithProgress, loadImageTexture, makePaletteTexture, makeSlopeTexture } from '@/lib/scene/textures';
 import { makePlaceholderDem, PLACEHOLDER_LABEL } from '@/lib/scene/placeholder';
 import { configureWorld, useWorld, world } from './world';
+import type { ContextData } from '@/components/Scene/contextGrid';
+import { insideBounds, NEEDS_HIRES_MESSAGE, OUTSIDE_LABEL } from '@/components/Scene/pick';
 
 export const UNAVAILABLE = 'Copilot unavailable right now. The buttons still work.';
 
@@ -44,6 +46,8 @@ export interface Runtime {
   textures: Partial<Record<TexId, THREE.Texture>>;
   paletteTexture: THREE.Texture | null;
   slopeTexture: THREE.Texture | null;
+  /** Regional MOLA + CTX-mosaic context around the CTX DEM (null if it failed to load or in placeholder mode). */
+  context: ContextData | null;
   placeholder: boolean;
 }
 
@@ -115,6 +119,21 @@ export function startLoading(): Promise<void> {
 }
 
 const isDev = process.env.NODE_ENV !== 'production';
+
+/** Regional context terrain (MOLA grid + CTX global mosaic crop). Optional: any failure just leaves the apron out. */
+async function loadContext(): Promise<ContextData | null> {
+  try {
+    const meta = await getJson<ContextMeta>('/data/context_meta.json');
+    const [buf, texture] = await Promise.all([
+      fetchWithProgress(`/data/${meta.file}`),
+      loadImageTexture(`/data/${meta.imageFile}`, 'color'),
+    ]);
+    return { meta, dem: decodeDem(meta, buf), texture };
+  } catch (e) {
+    console.warn('[services] regional context terrain unavailable', e);
+    return null;
+  }
+}
 
 /** Fetch the DEM; gunzip it in the browser, or fall back to the plain dem.i16 when DecompressionStream is missing. */
 async function loadDemBuffer(meta: DemMeta): Promise<{ meta: DemMeta; buf: ArrayBuffer }> {
@@ -212,8 +231,11 @@ async function loadAll() {
     return s;
   };
 
+  let context: ContextData | null = null;
+  const contextJob = async () => { context = placeholder ? null : await loadContext(); };
+
   const [science] = await Promise.all([
-    scienceJob(),
+    scienceJob(), contextJob(),
     texJob().then(() => step('textures', { status: 'done', progress: 1 })),
     dataJob(), terrainJob(),
   ]);
@@ -221,7 +243,7 @@ async function loadAll() {
   const slopeTexture = slope ? makeSlopeTexture(slope, meta.width, meta.height) : null;
   const rt: Runtime = {
     meta, dem, geo: geoApi, terrain, science, agent, layers, geologyUnits: [], ellipse: null, traverse, textures, paletteTexture: null,
-    slopeTexture, placeholder,
+    slopeTexture, context, placeholder,
   };
   useRuntime.setState({ rt });
 
@@ -307,7 +329,10 @@ const guard = async (fn: () => Promise<void>) => {
 
 /** "Plan round trip to selection" — deterministic, same executor the LLM uses; the tool draws the route itself. */
 export const planRoundTripToSelection = () => guard(async () => {
-  if (!S().selected) { S().toast('info', 'Click the terrain to select a destination first.'); return; }
+  const sel = S().selected;
+  if (!sel) { S().toast('info', 'Click the terrain to select a destination first.'); return; }
+  // routing runs on the 20 m DEM only: never silently plan on the coarse regional terrain
+  if (!insideBounds(S().bounds, sel.lon, sel.lat)) { S().toast('info', NEEDS_HIRES_MESSAGE); return; }
   await callTool<{ id: string; feasible: boolean; reasonText: string[] }>('plan_route', { to: 'selected', roundTrip: true });
   S().patch({ drawerOpen: true, sheetTab: 'route' });
   // an infeasible route explains itself in the drawer, so no toast
@@ -348,11 +373,26 @@ function describeContext(ctx: Record<string, unknown>, ana: Record<string, unkno
   return lines.join('\n');
 }
 
+/** Plain summary for a point on the regional context terrain (outside the 20 m DEM). */
+function describeOutside(p: WorldPoint): string {
+  return [
+    `Location: ${fmtLat(p.lat)}, ${fmtLon(p.lon)}`,
+    `${OUTSIDE_LABEL}. This point is on the regional terrain around the Jezero area.`,
+    p.elevationM == null ? 'Elevation: no data' : `Elevation: about ${Math.round(p.elevationM)} m above the areoid, from MOLA at roughly 463 m resolution (the 20 m terrain model does not reach here).`,
+    NEEDS_HIRES_MESSAGE,
+  ].join('\n');
+}
+
 /** "What's here?" — deterministic summary of the selected point shown in the Ask panel. */
 export const whatsHere = () => guard(async () => {
   if (!S().selected) { S().toast('info', 'Click the terrain to select a point first.'); return; }
   S().patch({ askOpen: true, sheetTab: 'ask' });
   S().pushMessage({ role: 'user', text: "What's here?" });
+  const sel = S().selected!;
+  if (!insideBounds(S().bounds, sel.lon, sel.lat)) { // regional context only: no 20 m terrain analysis, no geology
+    S().pushMessage({ role: 'assistant', text: describeOutside(sel) });
+    return;
+  }
   const [ctx, ana] = await Promise.all([
     callTool('get_location_context', { target: 'selected' }),
     callTool('analyze_terrain', { target: 'selected', radiusM: 500 }).catch(() => null),

@@ -4,20 +4,25 @@ import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import { meshHeightAt } from '@/lib/scene/terrainGrid';
 import { setAnchor } from '@/state/ui';
 import { useWorld } from '@/state/world';
-import { useScene } from './sceneCtx';
+import { groundAt, useScene } from './sceneCtx';
+import { HAZE_NEAR_M, HAZE_SPAN_M } from './atmosphere';
 
 export function sceneSpan(g: { nx: number; nz: number; dx: number; dz: number }) {
   return Math.max(Math.abs(g.dx) * (g.nx - 1), Math.abs(g.dz) * (g.nz - 1));
 }
 
-/** Initial pose: from the south-east at ~40° tilt, framing the whole tile. */
+/** Farthest the camera may orbit from its target: far enough to take in the whole ~180 x 160 km context region. */
+export const MAX_DISTANCE_M = 420_000;
+/** Initial camera pitch above the horizon (deg). Low enough that the horizon sits inside the 45 deg field of view. */
+export const INITIAL_PITCH_DEG = 17;
+
+/** Initial pose: ~17 km out to the south-east, looking north-west across the crater, low enough to show the horizon. */
 export function initialPose(g: { nx: number; nz: number; dx: number; dz: number }) {
   const span = sceneSpan(g);
-  const dist = span * 0.95;
-  const tilt = (40 * Math.PI) / 180;
+  const dist = span * 0.58;
+  const tilt = (INITIAL_PITCH_DEG * Math.PI) / 180;
   const h = Math.cos(tilt) * dist;
   return { position: [h * Math.SQRT1_2, Math.sin(tilt) * dist, h * Math.SQRT1_2] as [number, number, number], dist, span };
 }
@@ -25,7 +30,8 @@ export function initialPose(g: { nx: number; nz: number; dx: number; dz: number 
 interface Tween { t0: number; dur: number; fromT: THREE.Vector3; toT: THREE.Vector3; fromD: number; toD: number; dir: THREE.Vector3 }
 
 export function CameraRig() {
-  const { rt, grid } = useScene();
+  const v = useScene();
+  const { rt, grid } = v;
   const ctrl = useRef<OrbitControlsImpl>(null);
   const { camera, scene, size } = useThree();
   const pose = useMemo(() => initialPose(grid), [grid]);
@@ -42,15 +48,15 @@ export function CameraRig() {
     const r = s.cameraRequest;
     if (!r || r === prev.cameraRequest || !ctrl.current) return;
     const { x, z } = rt.geo.toLocal(rt.meta, r.lon, r.lat);
-    const y = meshHeightAt(grid, x, z, s.exaggeration);
+    const y = groundAt(v, x, z, s.exaggeration);
     const c = ctrl.current;
     const dir = camera.position.clone().sub(c.target).normalize();
     if (dir.y < 0.25) { dir.y = 0.25; dir.normalize(); }
     tween.current = {
       t0: performance.now(), dur: 550, fromT: c.target.clone(), toT: new THREE.Vector3(x, y, z),
-      fromD: camera.position.distanceTo(c.target), toD: Math.min(pose.span * 2, Math.max(150, r.distanceM ?? 2500)), dir,
+      fromD: camera.position.distanceTo(c.target), toD: Math.min(MAX_DISTANCE_M, Math.max(150, r.distanceM ?? 2500)), dir,
     };
-  }), [camera, grid, pose.span, rt]);
+  }), [camera, grid, rt, v]);
 
   useFrame(() => {
     const c = ctrl.current;
@@ -66,24 +72,25 @@ export function CameraRig() {
     }
     const exag = useWorld.getState().exaggeration;
     // keep the camera above the ground
-    const floor = meshHeightAt(grid, camera.position.x, camera.position.z, exag) + 25;
+    const floor = groundAt(v, camera.position.x, camera.position.z, exag) + 25;
     if (camera.position.y < floor) camera.position.y = floor;
 
-    // adaptive clip planes + fog so depth precision holds from 150 m to 90 km
+    // adaptive clip planes + fog so depth precision holds from 150 m out to the whole region
     const dist = camera.position.distanceTo(c.target);
     const near = Math.max(4, dist * 0.015);
     const persp = camera as THREE.PerspectiveCamera;
     if (Math.abs(near - last.current.near) / near > 0.05) {
-      persp.near = near; persp.far = Math.max(dist * 30, pose.span * 4);
+      persp.near = near; persp.far = dist * 2 + 300_000;
       persp.updateProjectionMatrix();
       last.current.near = near;
     }
-    if (scene.fog instanceof THREE.Fog) { scene.fog.near = dist + pose.span * 0.15; scene.fog.far = dist + pose.span * 1.8; }
+    // aerial perspective in absolute metres from the camera: clear to HAZE_NEAR_M beyond the target, fully hazed HAZE_SPAN_M later
+    if (scene.fog instanceof THREE.Fog) { scene.fog.near = dist + HAZE_NEAR_M; scene.fog.far = dist + HAZE_NEAR_M + HAZE_SPAN_M; }
 
     // project the selected pin for the DOM ask bubble
     const sel = useWorld.getState().selected;
     if (sel) {
-      tmp.set(sel.x, meshHeightAt(grid, sel.x, sel.z, exag) + 8 * exag, sel.z).project(camera);
+      tmp.set(sel.x, groundAt(v, sel.x, sel.z, exag) + 8 * exag, sel.z).project(camera);
       setAnchor({
         x: (tmp.x * 0.5 + 0.5) * size.width, y: (-tmp.y * 0.5 + 0.5) * size.height,
         visible: tmp.z < 1 && Math.abs(tmp.x) < 1.1 && Math.abs(tmp.y) < 1.1,
@@ -94,7 +101,7 @@ export function CameraRig() {
   return (
     <OrbitControls
       ref={ctrl} makeDefault enableDamping dampingFactor={0.09} screenSpacePanning={false}
-      minDistance={120} maxDistance={pose.span * 2} maxPolarAngle={(84 * Math.PI) / 180}
+      minDistance={120} maxDistance={MAX_DISTANCE_M} maxPolarAngle={(84 * Math.PI) / 180}
       zoomToCursor target={[0, 0, 0]}
     />
   );
