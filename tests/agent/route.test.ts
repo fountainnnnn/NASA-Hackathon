@@ -82,6 +82,7 @@ describe('POST /api/agent', () => {
   });
 
   it('rate-limits per IP (20) and by daily cap', async () => {
+    process.env.AGENT_IP_CAPACITY = '20';
     vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => ok()));
     // Client-controlled left-most XFF entries must not reset the limit: the proxy-set right-most hop identifies the client.
     for (let i = 0; i < 20; i++) expect((await POST(req({ messages: msgs }, { 'x-forwarded-for': `spoof-${i}, 1.1.1.1` }))).status).toBe(200);

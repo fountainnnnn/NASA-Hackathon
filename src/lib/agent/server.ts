@@ -6,8 +6,12 @@ import { TOOL_SPECS } from './tools';
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const MAX_BODY_BYTES = 60 * 1024;
 const TIMEOUT_MS = 45_000;
-const IP_CAPACITY = 20;
-const IP_REFILL_PER_MS = IP_CAPACITY / (10 * 60 * 1000);
+/** Per-IP budget counts proxy ROUNDS (one user question can take up to 8). Default 100 per 10 min
+ *  ≈ 12+ full questions per judge; override with AGENT_IP_CAPACITY. */
+function ipCapacity(): number {
+  const n = Number(process.env.AGENT_IP_CAPACITY ?? 100);
+  return Number.isFinite(n) && n > 0 ? n : 100;
+}
 
 const MessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'tool']),
@@ -37,8 +41,9 @@ export function resetAgentLimits() {
 }
 
 function takeIpToken(ip: string, now: number): boolean {
-  const b = buckets.get(ip) ?? { tokens: IP_CAPACITY, ts: now };
-  b.tokens = Math.min(IP_CAPACITY, b.tokens + (now - b.ts) * IP_REFILL_PER_MS);
+  const cap = ipCapacity();
+  const b = buckets.get(ip) ?? { tokens: cap, ts: now };
+  b.tokens = Math.min(cap, b.tokens + (now - b.ts) * (cap / (10 * 60 * 1000)));
   b.ts = now;
   if (b.tokens < 1) {
     buckets.set(ip, b);
@@ -55,8 +60,8 @@ function takeIpToken(ip: string, now: number): boolean {
 function takeDaily(now: number): boolean {
   const day = new Date(now).toISOString().slice(0, 10);
   if (daily.day !== day) daily = { day, count: 0 };
-  const cap = Number(process.env.AGENT_DAILY_CAP ?? 400);
-  if (daily.count >= (Number.isFinite(cap) ? cap : 400)) return false;
+  const cap = Number(process.env.AGENT_DAILY_CAP ?? 2000);
+  if (daily.count >= (Number.isFinite(cap) ? cap : 2000)) return false;
   daily.count += 1;
   return true;
 }

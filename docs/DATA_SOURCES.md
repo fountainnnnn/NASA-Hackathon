@@ -42,7 +42,7 @@ TODO(verify) each step against `scripts/prepare-data.mjs`.
 
 ## Validation file
 
-`data/validation.json` compares the DEM elevation sampled at each Perseverance waypoint with the elevation recorded for that waypoint. Both are heights above the areoid. A small bias is expected because the rover elevation comes from a different product. TODO(verify): number of waypoints, mean residual, standard deviation, maximum absolute residual. Do not quote numbers here until the file exists.
+`data/validation.json` compares the DEM elevation sampled at each Perseverance waypoint with the elevation recorded for that waypoint. Both are heights above the areoid. A small bias is expected because the rover elevation comes from a different product. Result (14 Nov 2026, 708 waypoints inside the DEM): mean residual −0.89 m, median −1.06 m, standard deviation 3.25 m, 95th percentile |residual| 6.44 m, maximum |residual| 11.72 m. The landing waypoint (sol 13) differs by +2.46 m. The five largest residuals cluster near 77.258°E, 18.462°N (sols 1451–1463), a steep area, so they reflect local relief rather than a systematic georeferencing offset.
 
 ## Licence and credit notes
 
