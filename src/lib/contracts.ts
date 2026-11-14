@@ -205,3 +205,65 @@ export interface Annotation {
   highlight?: { routeId: string; leg: number; startIdx: number; endIdx: number };
   createdBy: 'user' | 'agent';
 }
+
+/* ---------------------------------------------------------------- module APIs (implementations owned by one agent each) */
+
+/** lib/geo — owned by terrain agent */
+export interface GeoApi {
+  /** lon/lat → local scene metres (uses DemMeta centre + hRef). */
+  toLocal(meta: DemMeta, lon: number, lat: number): { x: number; z: number };
+  /** inverse of toLocal (exact). */
+  toLonLat(meta: DemMeta, x: number, z: number): LonLat;
+  /** bilinear sample of true elevation (metres) or null if any contributing cell is nodata / out of bounds. */
+  sampleElevation(dem: Dem, lon: number, lat: number): number | null;
+}
+/** Decoded DEM held in memory. */
+export interface Dem { meta: DemMeta; elev: Float32Array /* NaN = nodata, row-major, row 0 = north */ }
+
+/** lib/terrain — owned by terrain agent. Runs inside src/workers/route.worker.ts; the client talks to it
+ *  through src/lib/terrain/client.ts which exposes this interface with Promises. */
+export interface TerrainApi {
+  init(dem: Dem): Promise<{ gridWidth: number; gridHeight: number; cellResM: number }>;
+  planRoute(req: { from: LonLat; to: LonLat; stops?: LonLat[]; roundTrip: boolean; constraints: MissionConstraints }): Promise<Omit<RouteResult, 'id' | 'label' | 'from' | 'to' | 'stops'>>;
+  analyze(req: { center: LonLat; radiusM: number; limitDeg: number }): Promise<TerrainAnalysis>;
+  hazards(req: { route: RouteResult; k: number; limitDeg: number }): Promise<Omit<HazardSegment, 'routeId'>[]>;
+  /** Slope (deg) at 20 m posting for the shader overlay; same layout as dem.elev. */
+  slopeField(): Promise<Float32Array>;
+}
+
+/** lib/science — owned by science agent. Pure functions over loaded files + one fetch for rover images. */
+export interface ScienceApi {
+  load(): Promise<void>; // fetches /data/geology.json, nomenclature.json, traverse.json, science_sites.json
+  geologyAt(p: LonLat): { symbol: string; name: string; description: string; interpretation: string; source: GeologyFile['source'] } | null;
+  namesNear(p: LonLat, radiusKm: number, limit?: number): { name: string; type: string; distanceKm: number; bearingDeg: number }[];
+  nearestTraverse(p: LonLat): { sol: number; lon: number; lat: number; distanceM: number } | null;
+  sitesNear(p: LonLat, radiusKm: number): (ScienceSite & { distanceKm: number })[];
+  /** Candidate stops for a science objective: sites tagged with it + representative points inside mapped units
+   *  associated with it (mapping documented in lib/science/objectives.ts), ranked by distance from `from`. */
+  suggestStops(objective: ScienceObjective, from: LonLat, maxKm: number, limit: number): { lon: number; lat: number; label: string; why: string; unit?: string; siteId?: string; distanceKm: number; sourceUrl: string }[];
+  roverImagesNear(p: LonLat, maxDistanceM: number, limit: number): Promise<{ sol: number; distanceM: number; images: RoverImage[] } | null>;
+  unitList(): { symbol: string; name: string; color: string }[];
+}
+
+/** state/world.ts (Zustand) — owned by scene/UI agent. Agent tools act ONLY through this facade. */
+export interface WorldFacade {
+  snapshot(): WorldSnapshot;
+  setSelected(p: WorldPoint | null): void;
+  setBase(p: WorldPoint): void;
+  setConstraints(c: Partial<MissionConstraints>): MissionConstraints;
+  addRoute(r: Omit<RouteResult, 'id'>): RouteResult;          // assigns id "R<n>"
+  getRoute(id: string): RouteResult | undefined;
+  applyCommands(cmds: SceneCommand[]): { applied: number; errors: string[] };
+  makePoint(lon: number, lat: number, source: WorldPoint['source'], label?: string): WorldPoint; // samples DEM
+}
+export interface WorldSnapshot {
+  selected: WorldPoint | null;
+  base: WorldPoint | null;
+  constraints: MissionConstraints;
+  layers: Record<LayerId, boolean>;
+  routes: { id: string; label: string; feasible: boolean; reasons: InfeasibleReason[]; totals: RouteResult['totals'] }[];
+  visibleRouteIds: string[];
+  annotations: Annotation[];
+  cameraTarget: LonLat | null;
+  demBounds: { lonMin: number; lonMax: number; latMin: number; latMax: number };
+}
