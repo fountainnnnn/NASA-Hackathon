@@ -1,0 +1,95 @@
+[
+  {
+    "id": "octavia-e-butler-landing",
+    "name": "Octavia E. Butler Landing",
+    "lon": 77.450886,
+    "lat": 18.444627,
+    "summary": "NASA named the Perseverance landing site \"Octavia E. Butler Landing\" after the science fiction author. The page shows the landing location marked on a HiRISE image from Mars Reconnaissance Orbiter.",
+    "objectives": [
+      "crater-floor"
+    ],
+    "sourceUrl": "https://www.nasa.gov/image-article/welcome-octavia-e-butler-landing/",
+    "sourceTitle": "Welcome to 'Octavia E. Butler Landing'",
+    "mission": "Mars 2020 Perseverance",
+    "date": "2021-03-05",
+    "coordinateSource": "Perseverance waypoint sol 13 (NASA MMGIS M20_waypoints, site-increment waypoint 3_0)"
+  },
+  {
+    "id": "seitah",
+    "name": "Séítah (Brac sample)",
+    "lon": 77.443059,
+    "lat": 18.433926,
+    "summary": "Séítah is a region of the Jezero crater floor, where Perseverance collected its second sample pair from the Brac rock on sols 262 and 271.",
+    "objectives": [
+      "crater-floor",
+      "astrobiology-samples"
+    ],
+    "sourceUrl": "https://science.nasa.gov/missions/mars-2020-perseverance/to-seitah-and-back",
+    "sourceTitle": "To Séítah and Back",
+    "mission": "Mars 2020 Perseverance",
+    "date": "2021-12-16",
+    "coordinateSource": "Perseverance waypoint sol 278 (nearest waypoint after the sol 262/271 Brac sampling)"
+  },
+  {
+    "id": "skinner-wildcat-ridge",
+    "name": "Skinner Ridge and Wildcat Ridge (delta)",
+    "lon": 77.405925,
+    "lat": 18.458647,
+    "summary": "Two outcrops within about 20 m of each other in Jezero's delta, where Perseverance cored two rock samples at each. The delta is where a river once flowed into a lake and deposited sediment, and NASA says scientists consider its sedimentary rocks one of the best places on Mars to look for potential signs of ancient microbial life.",
+    "objectives": [
+      "delta-sediments",
+      "astrobiology-samples"
+    ],
+    "sourceUrl": "https://science.nasa.gov/resource/two-perseverance-sampling-locations-in-jezeros-delta/",
+    "sourceTitle": "Two Perseverance Sampling Locations in Jezero’s Delta",
+    "mission": "Mars 2020 Perseverance",
+    "date": "2022-09-15",
+    "coordinateSource": "Perseverance waypoint sol 502 (nearest waypoint to the sol 490 Skinner Ridge core and the sol 518 Mastcam-Z mosaic of both sites)"
+  },
+  {
+    "id": "three-forks-sample-depot",
+    "name": "Three Forks sample depot",
+    "lon": 77.407756,
+    "lat": 18.452627,
+    "summary": "Three Forks is the first sample depot on another world, where Perseverance dropped 10 sample tubes on flat ground near the base of the raised, fan-shaped ancient delta. The first tube went down on sol 653 and the last on sol 690.",
+    "objectives": [
+      "astrobiology-samples"
+    ],
+    "sourceUrl": "https://science.nasa.gov/resource/perseverances-three-forks-sample-depot-map/",
+    "sourceTitle": "Perseverance's 'Three Forks' Sample Depot Map",
+    "mission": "Mars 2020 Perseverance",
+    "date": "2023-01-30",
+    "coordinateSource": "Perseverance waypoint sol 652 (last waypoint before the first tube was dropped on sol 653; depot spans roughly 100 m)"
+  },
+  {
+    "id": "cheyava-falls",
+    "name": "Cheyava Falls (leopard-spot rock)",
+    "lon": 77.305191,
+    "lat": 18.497484,
+    "summary": "On a rock nicknamed Cheyava Falls at the northern edge of Neretva Vallis, Perseverance found \"leopard spots\" and collected a core on July 21, 2024. NASA says the rock has features that could indicate past microbial life, but other explanations are being considered.",
+    "objectives": [
+      "astrobiology-samples"
+    ],
+    "sourceUrl": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-rover-scientists-find-intriguing-mars-rock/",
+    "sourceTitle": "NASA’s Perseverance Rover Scientists Find Intriguing Mars Rock",
+    "mission": "Mars 2020 Perseverance",
+    "date": "2024-07-25",
+    "coordinateSource": "Perseverance waypoint sol 1210 (rock imaged by WATSON on sol 1212 per NASA PIA26368)"
+  },
+  {
+    "id": "witch-hazel-hill",
+    "name": "Witch Hazel Hill (Jezero crater rim)",
+    "lon": 77.257928,
+    "lat": 18.46223,
+    "summary": "Witch Hazel Hill is an area on the outer slopes of the Jezero crater rim where the science team sampled rocks that likely predate Jezero crater. The \"Bell Island\" core taken there contains spherules.",
+    "objectives": [
+      "rim-bedrock",
+      "astrobiology-samples"
+    ],
+    "sourceUrl": "https://science.nasa.gov/uncategorized/a-tough-drill-at-witch-hazel-hill/",
+    "sourceTitle": "A Tough Drill at Witch Hazel Hill",
+    "mission": "Mars 2020 Perseverance",
+    "date": "2025-05-14",
+    "coordinateSource": "Perseverance waypoint sol 1478 (nearest waypoint to the sol 1483 Hare Bay / Pine Pond drilling)"
+  }
+]

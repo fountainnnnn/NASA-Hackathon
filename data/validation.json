@@ -1,0 +1,100 @@
+{
+  "count": 708,
+  "skippedOutsideOrNodata": 0,
+  "meanResidualM": -0.891,
+  "medianResidualM": -1.063,
+  "stdResidualM": 3.247,
+  "p95AbsResidualM": 6.442,
+  "maxAbsResidualM": 11.724,
+  "residualDefinition": "DEM bilinear sample minus waypoint elev_geoid (m)",
+  "worstFive": [
+    {
+      "sol": 1454,
+      "lon": 77.25766841,
+      "lat": 18.46230479,
+      "waypointElev": -1927.176392,
+      "demElev": -1938.901,
+      "residual": -11.724
+    },
+    {
+      "sol": 1463,
+      "lon": 77.25773617,
+      "lat": 18.4623458,
+      "waypointElev": -1926.560669,
+      "demElev": -1938.01,
+      "residual": -11.45
+    },
+    {
+      "sol": 1452,
+      "lon": 77.2577676,
+      "lat": 18.46233921,
+      "waypointElev": -1926.361328,
+      "demElev": -1937.477,
+      "residual": -11.116
+    },
+    {
+      "sol": 1461,
+      "lon": 77.25773994,
+      "lat": 18.46230471,
+      "waypointElev": -1927.044678,
+      "demElev": -1937.761,
+      "residual": -10.716
+    },
+    {
+      "sol": 1451,
+      "lon": 77.25780867,
+      "lat": 18.46223044,
+      "waypointElev": -1926.95813,
+      "demElev": -1936.332,
+      "residual": -9.374
+    }
+  ],
+  "landingWaypointSol13": {
+    "sol": 13,
+    "lon": 77.45088572,
+    "lat": 18.44462715,
+    "waypointElev": -2569.91,
+    "demElev": -2567.446,
+    "residual": 2.464
+  },
+  "demEdges": {
+    "lonMin": 77.16046545922367,
+    "lonMax": 77.69897516629472,
+    "latMin": 18.211027390963398,
+    "latMax": 18.721194481872804
+  },
+  "textureBounds": {
+    "ctx": {
+      "lonMin": 77.16046545922367,
+      "lonMax": 77.69897516629472,
+      "latMin": 18.211027390963398,
+      "latMax": 18.721194481872804,
+      "maxAbsDiffDeg": 0,
+      "ok": true
+    },
+    "themisDay": {
+      "lonMin": 77.1604654592237,
+      "lonMax": 77.6989751662947,
+      "latMax": 18.7211944818728,
+      "latMin": 18.211027390963395,
+      "maxAbsDiffDeg": 2.842170943040401e-14,
+      "ok": true
+    },
+    "themisNight": {
+      "lonMin": 77.1604654592237,
+      "lonMax": 77.6989751662947,
+      "latMax": 18.7211944818728,
+      "latMin": 18.211027390963395,
+      "maxAbsDiffDeg": 2.842170943040401e-14,
+      "ok": true
+    },
+    "geology_idx": {
+      "lonMin": 77.16046545922367,
+      "lonMax": 77.69897516629472,
+      "latMin": 18.211027390963398,
+      "latMax": 18.721194481872804,
+      "maxAbsDiffDeg": 0,
+      "ok": true
+    }
+  }
+}

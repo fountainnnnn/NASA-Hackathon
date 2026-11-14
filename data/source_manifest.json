@@ -1,0 +1,522 @@
+{
+  "generatedBy": "scripts/prepare-data.mjs",
+  "generatedOn": "2026-11-14T12:58:39.672Z",
+  "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+  "files": {
+    "public/data/dem.i16": {
+      "output": "public/data/dem.i16",
+      "outputBytes": 4826304,
+      "outputSha256": "aa6302be5d27f4c56f15e95c8d9b74588cb878e13266425623a78240bde322ac",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0"
+      ],
+      "productLabel": "JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0",
+      "mission": "Mars Reconnaissance Orbiter",
+      "instrument": "Context Camera (CTX) stereo DTM, MOLA-controlled",
+      "projection": "Equirectangular (lat_ts 0, lon0 0), Mars 2000 sphere R=3396190 m",
+      "datum": "Mars 2000 sphere R=3396190 m; heights above areoid",
+      "credit": "NASA/JPL/MSSS/USGS (MRO CTX via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/dem.tif",
+          "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0",
+          "sha256": "46fb2e1e9f9c1fdd02939c2a96f3e173a8731bd146fbeb969b2060e0a3c8e97e",
+          "bytes": 9675294,
+          "downloadedOn": "2026-11-14T12:54:48.739Z"
+        }
+      ],
+      "resolution": "20 m/px (native)",
+      "processing": [
+        "Read Float32 GeoTIFF with geotiff.js; origin/pixel scale give outer edges (PixelIsArea).",
+        "Converted projected X,Y to lon/lat edges: lon = X/R, lat = Y/R (equirectangular, lat_ts 0, lon0 0).",
+        "Encoded Int16 LE: v = round((h - -2113) / 0.05); nodata -32768; max quantisation error 0.0250 m.",
+        "hRef = median of 2413152 valid cells."
+      ]
+    },
+    "public/data/dem_meta.json": {
+      "output": "public/data/dem_meta.json",
+      "outputBytes": 650,
+      "outputSha256": "da5f0ec8483b0b3ebdeb5179d6dc96cdb2c336003d75afa543bb520e7d9b86c4",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0"
+      ],
+      "productLabel": "JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0",
+      "mission": "Mars Reconnaissance Orbiter",
+      "instrument": "Context Camera (CTX) stereo DTM, MOLA-controlled",
+      "projection": "Equirectangular (lat_ts 0, lon0 0), Mars 2000 sphere R=3396190 m",
+      "datum": "Mars 2000 sphere R=3396190 m; heights above areoid",
+      "credit": "NASA/JPL/MSSS/USGS (MRO CTX via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/dem.tif",
+          "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_DTM_MOLAtopography_DeltaGeoid_20m_Eqc_latTs0_lon0",
+          "sha256": "46fb2e1e9f9c1fdd02939c2a96f3e173a8731bd146fbeb969b2060e0a3c8e97e",
+          "bytes": 9675294,
+          "downloadedOn": "2026-11-14T12:54:48.739Z"
+        }
+      ],
+      "resolution": "20 m/px (native)",
+      "processing": [
+        "Metadata describing dem.i16."
+      ]
+    },
+    "public/data/ctx.jpg": {
+      "output": "public/data/ctx.jpg",
+      "outputBytes": 2021819,
+      "outputSha256": "2b02db80f33f304c29be7a7d801d0a4a065c56b70d2c41ec8d9fc5b1375932ee",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0"
+      ],
+      "productLabel": "JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0",
+      "mission": "Mars Reconnaissance Orbiter",
+      "instrument": "Context Camera (CTX)",
+      "projection": "Equirectangular (lat_ts 0, lon0 0), Mars 2000 sphere R=3396190 m",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "6 m/px native, resampled to 4096 px wide (7.79 m/px)",
+      "credit": "NASA/JPL/MSSS/USGS (MRO CTX via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/ortho.tif",
+          "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0",
+          "sha256": "842b457afee7c2672022b66e3f60be836c6d52e99474015bfd9ced60099b8615",
+          "bytes": 36269402,
+          "downloadedOn": "2026-11-14T12:55:47.359Z"
+        }
+      ],
+      "processing": [
+        "Cropped ortho columns 0..5320, rows 0..5040 so edges equal the DEM outer edges exactly (grids share an origin and are pixel-aligned).",
+        "Lanczos3 resample to 4096x3880, greyscale JPEG quality 85 (mozjpeg)."
+      ]
+    },
+    "public/data/ctx_2048.jpg": {
+      "output": "public/data/ctx_2048.jpg",
+      "outputBytes": 666781,
+      "outputSha256": "7d54e1a82e5f8ab442a203d06693d95f64fd4b751e24b020030c89563395c478",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0"
+      ],
+      "productLabel": "JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0",
+      "mission": "Mars Reconnaissance Orbiter",
+      "instrument": "Context Camera (CTX)",
+      "projection": "Equirectangular (lat_ts 0, lon0 0), Mars 2000 sphere R=3396190 m",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "6 m/px native, resampled to 2048 px wide (15.59 m/px)",
+      "credit": "NASA/JPL/MSSS/USGS (MRO CTX via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/ortho.tif",
+          "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=JEZ_ctx_B_soc_008_orthoMosaic_6m_Eqc_latTs0_lon0",
+          "sha256": "842b457afee7c2672022b66e3f60be836c6d52e99474015bfd9ced60099b8615",
+          "bytes": 36269402,
+          "downloadedOn": "2026-11-14T12:55:47.359Z"
+        }
+      ],
+      "processing": [
+        "Cropped ortho columns 0..5320, rows 0..5040 so edges equal the DEM outer edges exactly (grids share an origin and are pixel-aligned).",
+        "Lanczos3 resample to 2048x1940, greyscale JPEG quality 85 (mozjpeg)."
+      ]
+    },
+    "public/data/themis_day.png": {
+      "output": "public/data/themis_day.png",
+      "outputBytes": 137124,
+      "outputSha256": "d82583021a88209c15845d8e58ac036c2e6bee2de214170c49d710ff4e7af3e8",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/731.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/732.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/733.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/731.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/732.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/733.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/731.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/732.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/733.png"
+      ],
+      "productLabel": "THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018",
+      "mission": "Mars Odyssey",
+      "instrument": "THEMIS (Thermal Emission Imaging System), IR",
+      "projection": "Geographic (EPSG:104905 Mars 2000 sphere), WMTS default028mm",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "WMTS level 9: 81.4 m/px at equator (finest level; product nominal 100 m)",
+      "credit": "NASA/JPL/ASU (Mars Odyssey THEMIS via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/themisDay_caps.xml",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml",
+          "sha256": "7b1b8f2fd04dc53bfa4f27ac99e05b90f3fd72963a252ef7705258d5e73a62c7",
+          "bytes": 7667,
+          "downloadedOn": "2026-11-14T12:55:50.036Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r202_c731.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/731.png",
+          "sha256": "8480ded8da46e18619bb456739db014334233d5c4a11f114885d8e975a7e1cd5",
+          "bytes": 44329,
+          "downloadedOn": "2026-11-14T12:55:51.736Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r202_c732.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/732.png",
+          "sha256": "c4591df42c52af7140345219897949ea44c5d86177f6a88de9d16be21c15f01c",
+          "bytes": 41428,
+          "downloadedOn": "2026-11-14T12:55:53.256Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r202_c733.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/733.png",
+          "sha256": "84dd91bdd67e105aa651d3fb2f9de995ff5719f280ec409770e58ee2a17e5749",
+          "bytes": 42084,
+          "downloadedOn": "2026-11-14T12:55:54.655Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r203_c731.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/731.png",
+          "sha256": "e1680daa6e7d058463ccd4ed6c1efa1bd7933eb0681e1e644a903f2af0edc46a",
+          "bytes": 45118,
+          "downloadedOn": "2026-11-14T12:55:56.420Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r203_c732.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/732.png",
+          "sha256": "6bd5b939669b9693991d53c366f58174feb8b270521f3f8c0a26db09bc55c340",
+          "bytes": 38738,
+          "downloadedOn": "2026-11-14T12:55:58.299Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r203_c733.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/733.png",
+          "sha256": "7439b64d5bbc73f24cbed1eec3c1dc77532963782d5c4773b43fce28dbab6f78",
+          "bytes": 37120,
+          "downloadedOn": "2026-11-14T12:56:00.285Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r204_c731.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/731.png",
+          "sha256": "b4d30115df885279808d806bb8d78800a577fb1693d0c3387310ee5fe88f182b",
+          "bytes": 43010,
+          "downloadedOn": "2026-11-14T12:56:01.479Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r204_c732.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/732.png",
+          "sha256": "2122795aabeb80fbd090ad5b934af223c63b47455327fd3eff5e9947d6de73aa",
+          "bytes": 41461,
+          "downloadedOn": "2026-11-14T12:56:03.103Z"
+        },
+        {
+          "rawFile": "data/raw/themisDay/z9_r204_c733.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_DayIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/733.png",
+          "sha256": "0067a897d64c26ade7944f8f2b7db6f38b6a7a3a00b8364939da88a7b6bc1052",
+          "bytes": 42217,
+          "downloadedOn": "2026-11-14T12:56:04.954Z"
+        }
+      ],
+      "processing": [
+        "Parsed TileMatrixSet; selected level 9; fetched 9 tiles sequentially.",
+        "Stitched tiles; bilinear resample of the window bounded by the DEM outer edges (fractional-pixel exact) to native sampling.",
+        "Output 392x371 8-bit greyscale PNG (relative brightness, not calibrated)."
+      ]
+    },
+    "public/data/themis_night.png": {
+      "output": "public/data/themis_night.png",
+      "outputBytes": 161408,
+      "outputSha256": "986ad1ca3a3b34fb49c52db4ceea3ec51bd7ce41ba604ef7c87bc354a0f5eec1",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/731.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/732.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/733.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/731.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/732.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/733.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/731.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/732.png",
+        "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/733.png"
+      ],
+      "productLabel": "THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018",
+      "mission": "Mars Odyssey",
+      "instrument": "THEMIS (Thermal Emission Imaging System), IR",
+      "projection": "Geographic (EPSG:104905 Mars 2000 sphere), WMTS default028mm",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "WMTS level 9: 81.4 m/px at equator (finest level; product nominal 100 m)",
+      "credit": "NASA/JPL/ASU (Mars Odyssey THEMIS via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/themisNight_caps.xml",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/WMTSCapabilities.xml",
+          "sha256": "33ca1797dbd3a6b05b729ff29aaf484e14be7bcac4f8e1243f0f294eb4b6e504",
+          "bytes": 7681,
+          "downloadedOn": "2026-11-14T12:56:06.925Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r202_c731.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/731.png",
+          "sha256": "57eae601ec46ba64a4159a4d4ed177c23653a9057afeb0f4f29e35219c5cb9db",
+          "bytes": 55221,
+          "downloadedOn": "2026-11-14T12:56:08.649Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r202_c732.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/732.png",
+          "sha256": "d78d424b970ea474ccb8fb63541e83d6da2d7ace63abc19e7fc291ca022340a6",
+          "bytes": 56407,
+          "downloadedOn": "2026-11-14T12:56:10.165Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r202_c733.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/202/733.png",
+          "sha256": "110b090c02b1ef8b4ed6d2915f68bffbcdb792f2ad104f6b847f4fdf1cf64ddf",
+          "bytes": 52230,
+          "downloadedOn": "2026-11-14T12:56:14.155Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r203_c731.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/731.png",
+          "sha256": "f0983499660aca5c0a28c19373ea97bdc868f944fe571acd18465324055ea8ce",
+          "bytes": 55527,
+          "downloadedOn": "2026-11-14T12:56:15.758Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r203_c732.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/732.png",
+          "sha256": "442e0972bfa7812223c71bf170210c7215334da31832e5570174a147e2e42720",
+          "bytes": 52393,
+          "downloadedOn": "2026-11-14T12:56:17.168Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r203_c733.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/203/733.png",
+          "sha256": "69bbfecfbc49fd961f4c68c81b8d33b31075805ac2ecc63428a32a764e9acc10",
+          "bytes": 49917,
+          "downloadedOn": "2026-11-14T12:56:19.325Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r204_c731.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/731.png",
+          "sha256": "445041dee22cee185517fe5e74af4d038f842d2260d0961b946adea9fd91548f",
+          "bytes": 52585,
+          "downloadedOn": "2026-11-14T12:56:21.061Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r204_c732.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/732.png",
+          "sha256": "c0af5ac17446b360de5ed7a44aff9c7a43dd929686f9682b57be59d31287f149",
+          "bytes": 53869,
+          "downloadedOn": "2026-11-14T12:56:23.239Z"
+        },
+        {
+          "rawFile": "data/raw/themisNight/z9_r204_c733.png",
+          "url": "https://trek.nasa.gov/tiles/Mars/EQ/THEMIS_NightIR_ControlledMosaics_100m_v2_oct2018/1.0.0/default/default028mm/9/204/733.png",
+          "sha256": "938178ac6e3c82d648bf6fadb7d4802d1bc1ca57b8e31fecce8fcdf734d487c6",
+          "bytes": 53274,
+          "downloadedOn": "2026-11-14T12:56:24.768Z"
+        }
+      ],
+      "processing": [
+        "Parsed TileMatrixSet; selected level 9; fetched 9 tiles sequentially.",
+        "Stitched tiles; bilinear resample of the window bounded by the DEM outer edges (fractional-pixel exact) to native sampling.",
+        "Output 392x371 8-bit greyscale PNG (relative brightness, not calibrated)."
+      ]
+    },
+    "public/data/geology.json": {
+      "output": "public/data/geology.json",
+      "outputBytes": 3479783,
+      "outputSha256": "686f688704107ffaadcb2a941a115131f1f81b1dfce01161fc35e7e66a894960",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/8",
+        "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/2",
+        "https://pubs.usgs.gov/publication/sim3464"
+      ],
+      "productLabel": "USGS SIM 3464 Jezero_FeatureServiceFromPro (layer 8 Geologic Units, layer 2 LandingEllipse)",
+      "mission": "Mars 2020 landing-site mapping (map compiled on MRO CTX/HiRISE imagery)",
+      "instrument": "Geologic map, Sun & Stack 2020",
+      "projection": "Source MTM (central meridian 77.5E, Mars 2000 sphere) reprojected server-side to Mars 2000 geographic (outSR)",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "1:75,000 map scale",
+      "credit": "USGS / Sun & Stack 2020 (SIM 3464)",
+      "raws": [
+        {
+          "rawFile": "data/raw/geology_units_0.json",
+          "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/8/query?where=1%3D1&outFields=*&outSR=%7B%22wkt%22%3A%22GEOGCS%5B%5C%22GCS_Mars_2000_Sphere%5C%22%2CDATUM%5B%5C%22D_Mars_2000_Sphere%5C%22%2CSPHEROID%5B%5C%22Mars_2000_Sphere%5C%22%2C3396190.0%2C0.0%5D%5D%2CPRIMEM%5B%5C%22Reference_Meridian%5C%22%2C0.0%5D%2CUNIT%5B%5C%22Degree%5C%22%2C0.0174532925199433%5D%5D%22%7D&geometryPrecision=6&resultOffset=0&resultRecordCount=2000&f=json",
+          "sha256": "533bdc070b28b7e14648337b73b009653c8ce23f56f2eafad63e66665b7c5c74",
+          "bytes": 31237665,
+          "downloadedOn": "2026-11-14T12:57:41.107Z"
+        },
+        {
+          "rawFile": "data/raw/geology_ellipse_0.json",
+          "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/2/query?where=1%3D1&outFields=*&outSR=%7B%22wkt%22%3A%22GEOGCS%5B%5C%22GCS_Mars_2000_Sphere%5C%22%2CDATUM%5B%5C%22D_Mars_2000_Sphere%5C%22%2CSPHEROID%5B%5C%22Mars_2000_Sphere%5C%22%2C3396190.0%2C0.0%5D%5D%2CPRIMEM%5B%5C%22Reference_Meridian%5C%22%2C0.0%5D%2CUNIT%5B%5C%22Degree%5C%22%2C0.0174532925199433%5D%5D%22%7D&geometryPrecision=6&resultOffset=0&resultRecordCount=2000&f=json",
+          "sha256": "141304929b697376a3ed5c673bb10b3192b98045d109617d512322ec903dd79a",
+          "bytes": 17782,
+          "downloadedOn": "2026-11-14T12:57:42.534Z"
+        }
+      ],
+      "processing": [
+        "Paged layer 8 with resultOffset (maxRecordCount 2000), outSR Mars 2000 geographic, geometryPrecision 6.",
+        "Split Esri multipart polygons into outer ring (clockwise) + holes; kept polygons whose outer-ring bbox overlaps the DEM bbox (not clipped).",
+        "Vertices rounded to 5 decimals (~0.6 m) with consecutive duplicates removed; Douglas-Peucker simplification at 1e-5 deg (~0.6 m).",
+        "Units keyed by symbol; \"Crater riim unit\" typo variant merged into \"cr\" (\"Crater rim unit\").",
+        "Colours assigned by this project (not USGS). Added fields: unitOrder, colorNote.",
+        "Landing ellipse (layer 2) outer rings stored in `ellipse`."
+      ]
+    },
+    "public/data/geology_idx.png": {
+      "output": "public/data/geology_idx.png",
+      "outputBytes": 85144,
+      "outputSha256": "eaf311d3cb5cf14e154f126f62d687f57ae214fec47a6d352b04d4808dad2529",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/8",
+        "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/2",
+        "https://pubs.usgs.gov/publication/sim3464"
+      ],
+      "productLabel": "USGS SIM 3464 Jezero_FeatureServiceFromPro (layer 8 Geologic Units, layer 2 LandingEllipse)",
+      "mission": "Mars 2020 landing-site mapping (map compiled on MRO CTX/HiRISE imagery)",
+      "instrument": "Geologic map, Sun & Stack 2020",
+      "projection": "Source MTM (central meridian 77.5E, Mars 2000 sphere) reprojected server-side to Mars 2000 geographic (outSR)",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "1:75,000 map scale",
+      "credit": "USGS / Sun & Stack 2020 (SIM 3464)",
+      "raws": [
+        {
+          "rawFile": "data/raw/geology_units_0.json",
+          "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/8/query?where=1%3D1&outFields=*&outSR=%7B%22wkt%22%3A%22GEOGCS%5B%5C%22GCS_Mars_2000_Sphere%5C%22%2CDATUM%5B%5C%22D_Mars_2000_Sphere%5C%22%2CSPHEROID%5B%5C%22Mars_2000_Sphere%5C%22%2C3396190.0%2C0.0%5D%5D%2CPRIMEM%5B%5C%22Reference_Meridian%5C%22%2C0.0%5D%2CUNIT%5B%5C%22Degree%5C%22%2C0.0174532925199433%5D%5D%22%7D&geometryPrecision=6&resultOffset=0&resultRecordCount=2000&f=json",
+          "sha256": "533bdc070b28b7e14648337b73b009653c8ce23f56f2eafad63e66665b7c5c74",
+          "bytes": 31237665,
+          "downloadedOn": "2026-11-14T12:57:41.107Z"
+        },
+        {
+          "rawFile": "data/raw/geology_ellipse_0.json",
+          "url": "https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/Jezero_FeatureServiceFromPro/FeatureServer/2/query?where=1%3D1&outFields=*&outSR=%7B%22wkt%22%3A%22GEOGCS%5B%5C%22GCS_Mars_2000_Sphere%5C%22%2CDATUM%5B%5C%22D_Mars_2000_Sphere%5C%22%2CSPHEROID%5B%5C%22Mars_2000_Sphere%5C%22%2C3396190.0%2C0.0%5D%5D%2CPRIMEM%5B%5C%22Reference_Meridian%5C%22%2C0.0%5D%2CUNIT%5B%5C%22Degree%5C%22%2C0.0174532925199433%5D%5D%22%7D&geometryPrecision=6&resultOffset=0&resultRecordCount=2000&f=json",
+          "sha256": "141304929b697376a3ed5c673bb10b3192b98045d109617d512322ec903dd79a",
+          "bytes": 17782,
+          "downloadedOn": "2026-11-14T12:57:42.534Z"
+        }
+      ],
+      "processing": [
+        "Even-odd scanline rasterisation of polygons (holes honoured) at pixel centres onto a 2048x1940 grid spanning the DEM outer edges; later polygons overwrite earlier.",
+        "Red channel = index into geology.json unitOrder + 1 (0 = unmapped); G,B = 0."
+      ]
+    },
+    "public/data/traverse.json": {
+      "output": "public/data/traverse.json",
+      "outputBytes": 66489,
+      "outputSha256": "5df50158948fca978c91f0af08f75e58c531739391bfa34c8df7f9621b27fb96",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json"
+      ],
+      "productLabel": "M20_waypoints_sol2022_all",
+      "mission": "Mars 2020 (Perseverance)",
+      "instrument": "Rover localisation (waypoints, NASA MMGIS)",
+      "projection": "Geographic lon/lat as published (east-positive)",
+      "datum": "Mars 2000 sphere; elev_geoid above areoid",
+      "resolution": "per-waypoint",
+      "credit": "NASA/JPL-Caltech (Mars 2020 MMGIS waypoints)",
+      "raws": [
+        {
+          "rawFile": "data/raw/waypoints.json",
+          "url": "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json",
+          "sha256": "bd143ee69241229926abd373e6305b8bbb326d6b5a7b4a8d6935262696f93dc4",
+          "bytes": 603126,
+          "downloadedOn": "2026-11-14T12:57:49.983Z"
+        }
+      ],
+      "processing": [
+        "Kept waypoints with finite sol/lon/lat/elev_geoid/dist_total_m inside the DEM outer edges.",
+        "Fields renamed to contract (elevGeoid, distTotalM); sorted by cumulative distance."
+      ]
+    },
+    "public/data/traverse_path.json": {
+      "output": "public/data/traverse_path.json",
+      "outputBytes": 394906,
+      "outputSha256": "bc8d17e4ea1ce1c486a0f233925537ce54e34919b4b351705fda5d0fa93817db",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=Perseverance_Traverse_Path"
+      ],
+      "productLabel": "Perseverance_Traverse_Path",
+      "mission": "Mars 2020 (Perseverance)",
+      "instrument": "Rover traverse path (Mars Trek vector product)",
+      "projection": "Geographic Mars 2000 (shapefile .prj), lon east-positive",
+      "datum": "Mars 2000 sphere R=3396190 m",
+      "resolution": "vector",
+      "credit": "NASA/JPL-Caltech (Mars 2020 traverse via JPL Mars Trek)",
+      "raws": [
+        {
+          "rawFile": "data/raw/traverse_path.zip",
+          "url": "https://trek.nasa.gov/mars/TrekWS/rest/cat/data/stream?label=Perseverance_Traverse_Path",
+          "sha256": "f49ae0d5b9a78abf7b4f7eee62e589d8c7a17569a42b78f1a1aecec82c3ce425",
+          "bytes": 283131,
+          "downloadedOn": "2026-11-14T12:57:53.524Z"
+        }
+      ],
+      "processing": [
+        "Parsed zipped shapefile (332 LineString segments) with shapefile + JSZip.",
+        "Sorted segments by SCLK_START, concatenated, dropped repeated vertices, kept vertices inside DEM bounds; [lon,lat][] with 6 decimals.",
+        "Segments are joined end-to-start; gaps between drives (if any) appear as straight connectors."
+      ]
+    },
+    "public/data/nomenclature.json": {
+      "output": "public/data/nomenclature.json",
+      "outputBytes": 1039,
+      "outputSha256": "27fb0b324f4019a9f8edef486aee5fc0aea70c313259477e939685950ff94a26",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [
+        "https://trek.nasa.gov/mars/TrekServices/ws/index/eq/searchItems?rows=2100&start=0&q=*",
+        "https://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature_center_pts.zip"
+      ],
+      "productLabel": "IAU Planetary Nomenclature: Mars",
+      "mission": "n/a (IAU names)",
+      "instrument": "n/a",
+      "projection": "Planetocentric lon/lat, converted to east-positive -180..180",
+      "datum": "Mars 2000",
+      "resolution": "point (feature centre)",
+      "credit": "IAU Working Group for Planetary System Nomenclature / USGS Astrogeology",
+      "raws": [
+        {
+          "rawFile": "data/raw/trek_search_all.json",
+          "url": "https://trek.nasa.gov/mars/TrekServices/ws/index/eq/searchItems?rows=2100&start=0&q=*",
+          "sha256": "5da2a5058aba13778c3638ad594361696bc3410153ac9f72bf28d5392b9a63a6",
+          "bytes": 1504672,
+          "downloadedOn": "2026-11-14T12:58:01.899Z"
+        },
+        {
+          "rawFile": "data/raw/gazetteer_mars_pts.zip",
+          "url": "https://planetarynames.wr.usgs.gov/shapefiles/MARS_nomenclature_center_pts.zip",
+          "sha256": "753f29654d14e3f3e75f8bbe2b8fc36d4a6b43e16d9d74c122150a3797c31910",
+          "bytes": 5421247,
+          "downloadedOn": "2026-11-14T12:58:20.902Z"
+        }
+      ],
+      "processing": [
+        "Mars Trek search (rows=2100, q=*) holds 1783 nomenclature items, only 1 near the DEM, so the USGS Gazetteer centre-point shapefile was used as the main source.",
+        "Kept features with centre inside DEM bbox ±0.2°; type reduced to the singular head word; diameter in km as published; Trek-only names added if missing."
+      ]
+    },
+    "public/data/layers.json": {
+      "output": "public/data/layers.json",
+      "outputBytes": 3573,
+      "outputSha256": "e2a1b783ecd64c3ea3d78da58764538bf53dbfb2e67c772b67a0c7f9eba85c5c",
+      "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
+      "sourceUrls": [],
+      "productLabel": "layer catalogue",
+      "mission": "n/a",
+      "instrument": "n/a",
+      "projection": "n/a",
+      "datum": "n/a",
+      "resolution": "n/a",
+      "credit": "see per-layer credits",
+      "raws": [],
+      "processing": [
+        "Hand-written catalogue assembled by prepare-data.mjs from the generated files."
+      ]
+    }
+  }
+}
