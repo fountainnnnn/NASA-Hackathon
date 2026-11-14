@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { R_MARS } from '@/lib/contracts';
 import type { Dem } from '@/lib/contracts';
-import { bearingDeg, decodeDem, groundDistanceM, lonLatToPixel, pixelCentreLonLat, sampleElevation, toLocal, toLonLat } from '@/lib/geo/frame';
+import { bearingDeg, decodeDem, undoRowDelta, groundDistanceM, lonLatToPixel, pixelCentreLonLat, sampleElevation, toLocal, toLonLat } from '@/lib/geo/frame';
 import { makeMeta, makeSyntheticDem, SYN } from '../fixtures/synthetic';
 
 const DEG = Math.PI / 180;
@@ -80,5 +80,28 @@ describe('frame', () => {
     expect(d.elev[4]).toBe(-102.5);
     expect(d.elev[5]).toBeCloseTo(-100 + 0.5 * 32767, 2);
     expect(() => decodeDem(m, new ArrayBuffer(4))).toThrow();
+  });
+
+  it('row-delta encoding round-trips, including nodata wrap-around', () => {
+    const W = 5, H = 3;
+    const plain = Int16Array.from([10, 12, 9, -32768, 30, -1000, -1000, 32767, -32768, 0, 1, 2, 3, 4, 5]);
+    const delta = new Int16Array(W * H);
+    for (let r = 0; r < H; r++) {
+      delta[r * W] = plain[r * W];
+      for (let c = 1; c < W; c++) delta[r * W + c] = plain[r * W + c] - plain[r * W + c - 1];
+    }
+    const buf = new ArrayBuffer(W * H * 2);
+    const dv = new DataView(buf);
+    delta.forEach((x, i) => dv.setInt16(i * 2, x, true));
+    const out = new Int16Array(undoRowDelta(buf, W, H));
+    expect(Array.from(out)).toEqual(Array.from(plain));
+
+    const m = { ...makeMeta(W, H), encoding: { type: 'int16le' as const, scale: 1, offset: 0, nodata: -32768 as const, delta: 'row' as const } };
+    const d = decodeDem(m, buf);
+    expect(d.elev[0]).toBe(10);
+    expect(d.elev[3]).toBeNaN();
+    expect(d.elev[7]).toBe(32767);
+    expect(d.elev[14]).toBe(5);
+    expect(() => undoRowDelta(new ArrayBuffer(4), W, H)).toThrow();
   });
 });

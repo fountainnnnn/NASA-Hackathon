@@ -5,10 +5,15 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500", "600"], display: "swap" });
 
+const title = "MarsWalk Copilot: plan a Marswalk on real NASA terrain";
+const description =
+  "Point at Jezero Crater, ask a question, and an AI copilot plans your Marswalk on real NASA terrain and data. Made by Ng Yu Hang, team Ecliptical, for NASA Space Apps Challenge 2026 Singapore.";
+
 export const metadata: Metadata = {
-  title: "MarsWalk Copilot — Jezero Marswalk planner",
-  description:
-    "A georeferenced 3D Jezero Crater built from NASA MRO CTX data. Click the ground, ask the copilot, and watch deterministic tools draw routes, pins and hazards on the terrain.",
+  title,
+  description,
+  authors: [{ name: "Ng Yu Hang" }],
+  openGraph: { title, description, type: "website" },
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#120d0e" };

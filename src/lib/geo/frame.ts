@@ -70,10 +70,32 @@ export function sampleElevation(dem: Dem, lon: number, lat: number): number | nu
   return acc;
 }
 
-/** Decode public/data/dem.i16 (Int16 LE) into a Dem. nodata -> NaN. */
-export function decodeDem(meta: DemMeta, buf: ArrayBuffer): Dem {
-  const n = meta.width * meta.height;
+/** Undo row-wise delta encoding (wrap-around Int16 sums). Returns a new buffer. */
+export function undoRowDelta(buf: ArrayBuffer, width: number, height: number): ArrayBuffer {
+  const n = width * height;
   if (buf.byteLength < n * 2) throw new Error(`DEM buffer too small: ${buf.byteLength} < ${n * 2}`);
+  const src = new DataView(buf);
+  const out = new Int16Array(n);
+  for (let r = 0; r < height; r++) {
+    const o = r * width;
+    let acc = src.getInt16(o * 2, true);
+    out[o] = acc;
+    for (let c = 1; c < width; c++) {
+      acc = (acc + src.getInt16((o + c) * 2, true)) << 16 >> 16; // wrap to Int16
+      out[o + c] = acc;
+    }
+  }
+  const le = new ArrayBuffer(n * 2);
+  const dv = new DataView(le);
+  for (let i = 0; i < n; i++) dv.setInt16(i * 2, out[i], true);
+  return le;
+}
+
+/** Decode the (already decompressed) DEM buffer, Int16 LE, optionally row-delta encoded, into a Dem. nodata -> NaN. */
+export function decodeDem(meta: DemMeta, rawBuf: ArrayBuffer): Dem {
+  const n = meta.width * meta.height;
+  if (rawBuf.byteLength < n * 2) throw new Error(`DEM buffer too small: ${rawBuf.byteLength} < ${n * 2}`);
+  const buf = meta.encoding.delta === 'row' ? undoRowDelta(rawBuf, meta.width, meta.height) : rawBuf;
   const view = new DataView(buf);
   const { scale, offset, nodata } = meta.encoding;
   const elev = new Float32Array(n);

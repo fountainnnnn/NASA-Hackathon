@@ -17,6 +17,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import zlib from 'node:zlib';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { fromFile } from 'geotiff';
@@ -196,6 +197,24 @@ async function prepareDem() {
   }
   fs.writeFileSync(path.join(OUT, 'dem.i16'), Buffer.from(i16.buffer, i16.byteOffset, i16.byteLength));
 
+  // Row-wise delta (first value of each row as-is, then differences), Int16 LE, gzip -9. Differences use
+  // wrap-around Int16 arithmetic, so the transform is always lossless (decoder adds with the same wrap).
+  const delta = new Int16Array(W * H);
+  let maxAbsDelta = 0, wrapped = 0;
+  for (let r = 0; r < H; r++) {
+    const o = r * W;
+    delta[o] = i16[o];
+    for (let c = 1; c < W; c++) {
+      const d = i16[o + c] - i16[o + c - 1];
+      if (Math.abs(d) > 32767) wrapped++;
+      else maxAbsDelta = Math.max(maxAbsDelta, Math.abs(d));
+      delta[o + c] = d; // typed-array store wraps modulo 2^16
+    }
+  }
+  const gz = zlib.gzipSync(Buffer.from(delta.buffer, delta.byteOffset, delta.byteLength), { level: 9 });
+  fs.writeFileSync(path.join(OUT, 'dem.i16.gz'), gz);
+  log(`  dem.i16.gz ${gz.length} bytes (plain ${i16.byteLength}); max |delta| ${maxAbsDelta}; ${wrapped} deltas wrapped (nodata edges, still lossless)`);
+
   const meta = {
     productLabel: DEM_LABEL,
     sourceUrl: demUrl,
@@ -203,8 +222,8 @@ async function prepareDem() {
     lonMin, lonMax, latMin, latMax,
     dLon, dLat,
     nominalResM: Math.abs(resX),
-    encoding: { type: 'int16le', scale, offset: mid, nodata: -32768 },
-    file: 'dem.i16',
+    encoding: { type: 'int16le', scale, offset: mid, nodata: -32768, delta: 'row', compression: 'gzip' },
+    file: 'dem.i16.gz',
     elevMin: round(elevMin, 3), elevMax: round(elevMax, 3),
     hRef,
     datum: 'Mars 2000 sphere R=3396190 m; heights above areoid',

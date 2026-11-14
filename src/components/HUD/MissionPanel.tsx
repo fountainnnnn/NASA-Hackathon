@@ -5,7 +5,7 @@ import type { MissionConstraints } from '@/lib/contracts';
 import { fmtElev, fmtLat, fmtLon } from '@/lib/scene/format';
 import { planRoundTripToSelection, showSteepestStretch, whatsHere } from '@/state/services';
 import { useWorld, world } from '@/state/world';
-import { ProvBadge, Section, Slider } from './ui';
+import { Section, Slider } from './ui';
 import s from './hud.module.css';
 
 const set = (c: Partial<MissionConstraints>) => { world.setConstraints(c); };
@@ -15,7 +15,7 @@ function AssumptionField({ k, label, unit, min, max, step }: { k: 'suitPowerW' |
   const v = useWorld((st) => st.constraints[k]);
   return (
     <div className={s.field}>
-      <div className={s.fieldTop}><label htmlFor={id}>{label} ({unit})</label><ProvBadge kind="assumption" /></div>
+      <div className={s.fieldTop}><label htmlFor={id}>{label} ({unit})</label></div>
       <input id={id} className={s.num} type="number" min={min} max={max} step={step} value={v}
         onChange={(e) => { const n = Number(e.target.value); if (Number.isFinite(n)) world.setConstraints({ [k]: n }); }} />
     </div>
@@ -53,7 +53,7 @@ export function MissionPanel() {
       </div>
 
       <details>
-        <summary><ProvBadge kind="assumption" /> Assumptions</summary>
+        <summary>Assumptions</summary>
         <div className={s.sectionBody} style={{ padding: '10px 0 0' }}>
           <p className={s.note}>Model inputs, not NASA values. Change them to see how a route responds.</p>
           <AssumptionField k="suitPowerW" label="Suit power" unit="W" min={20} max={2000} step={10} />

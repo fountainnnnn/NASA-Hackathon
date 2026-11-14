@@ -6,6 +6,7 @@ import { PLACEHOLDER_LABEL } from '@/lib/scene/placeholder';
 import { useRuntime } from '@/state/services';
 import { useHover } from '@/state/ui';
 import { useWorld } from '@/state/world';
+import { useIntro } from './Intro';
 import s from './hud.module.css';
 
 export function Toasts() {
@@ -58,7 +59,8 @@ export function LoadingScreen() {
   const rt = useRuntime((st) => st.rt);
   const error = useRuntime((st) => st.error);
   const ready = useWorld((st) => st.ready);
-  if (rt && ready) return null;
+  const introOpen = useIntro((st) => st.open === true);
+  if ((rt && ready) || (introOpen && !error)) return null;
   return (
     <div className={s.loading} role="status" aria-live="polite">
       <div className={s.loadBox}>

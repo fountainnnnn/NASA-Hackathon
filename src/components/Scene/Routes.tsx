@@ -9,8 +9,9 @@ import { Marker } from './Pins';
 import { lineY, trueHeight, useScene } from './sceneCtx';
 import type { SceneCtxValue } from './sceneCtx';
 
-const OCHRE = '#F2A65A', CYAN = '#5CC8FF', GREY = '#9AA0A6', RED = '#FF4D4D';
+const OCHRE = '#E0884A', CYAN = '#5CC8FF', GREY = '#9AA0A6', RED = '#FF4D4D';
 const noRaycast = () => null;
+const dashed = (style: 'primary' | 'alternate', grey: boolean) => grey || style === 'alternate';
 
 interface LegGeom { x: number[]; z: number[]; h: (number | null)[]; vertexIndex: number[] }
 const cache = new WeakMap<RouteResult, LegGeom[]>();
@@ -57,10 +58,14 @@ function RouteLines({ route, style, geoms, exag }: { route: RouteResult; style: 
     <>
       {pieces.map((p, i) => (
         <group key={i}>
-          <Line points={p.pts} color="#0b0809" lineWidth={7} transparent opacity={0.55} raycast={noRaycast} />
+          {/* both transparent + explicit renderOrder, so the halo is drawn first and never tints the route colour */}
           <Line
-            points={p.pts} color={p.grey ? GREY : color} lineWidth={4} raycast={noRaycast}
-            dashed={style === 'alternate' && !p.grey} dashSize={60} gapSize={40}
+            points={p.pts} color="#1a0d05" lineWidth={8} transparent opacity={0.85} depthWrite={false} renderOrder={10} raycast={noRaycast}
+            dashed={dashed(style, p.grey)} dashSize={60} gapSize={40}
+          />
+          <Line
+            points={p.pts} color={p.grey ? GREY : color} lineWidth={4} transparent depthWrite={false} renderOrder={11} raycast={noRaycast}
+            dashed={dashed(style, p.grey)} dashSize={60} gapSize={40}
           />
         </group>
       ))}
@@ -84,8 +89,8 @@ function Highlight({ ann, n, route, geoms, exag }: { ann: Annotation; n: number;
   const mid = pts[pts.length >> 1];
   return (
     <>
-      <Line points={pts} color="#0b0809" lineWidth={10} transparent opacity={0.6} raycast={noRaycast} />
-      <Line points={pts} color={RED} lineWidth={6} raycast={noRaycast} />
+      <Line points={pts} color="#2a0606" lineWidth={13} transparent opacity={0.85} depthWrite={false} renderOrder={20} raycast={noRaycast} />
+      <Line points={pts} color={RED} lineWidth={8} transparent depthWrite={false} renderOrder={21} raycast={noRaycast} />
       <Marker pos={[mid[0], mid[1] + 6 * exag, mid[2]]} kind="hazard" label={`${n}. ${ann.label}`} tone="num" />
     </>
   );

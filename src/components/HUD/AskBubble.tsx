@@ -19,11 +19,12 @@ const QUICK = [
   'Plan a delta science loop',
 ];
 
-function Message({ role, text, unverified }: { role: string; text: string; unverified?: string[] }) {
+function Message({ role, text, unverified, offline }: { role: string; text: string; unverified?: string[]; offline?: boolean }) {
   if (role === 'user') return <div className={`${s.msg} ${s.msgUser}`}>{text}</div>;
   const parts = splitUnverified(text, unverified ?? []);
   return (
-    <div className={`${s.msg} ${s.msgBot}`}>
+    <div className={`${s.msg} ${s.msgBot} ${offline ? s.offline : ''}`}>
+      {offline && <WifiOff size={15} aria-hidden />}
       {parts.map((p, i) => p.flagged
         ? <span key={i} className={s.unverified} tabIndex={0} title="not found in tool results" aria-label={`${p.text}, not found in tool results`}>{p.text}</span>
         : <span key={i}>{p.text}</span>)}
@@ -54,19 +55,20 @@ export function AskBubble({ embedded = false }: { embedded?: boolean }) {
     const place = (a: Anchor) => {
       const el = box.current;
       if (!el) return;
-      const ok = !!selected && a.visible;
+      // with the route drawer open the bubble docks bottom-centre instead of following the pin
+      const ok = !!selected && a.visible && !drawerOpen;
       setAnchored((p) => (p === ok ? p : ok));
       if (!ok) { el.style.left = ''; el.style.top = ''; el.style.right = ''; el.style.bottom = ''; return; }
       const w = el.offsetWidth, h = el.offsetHeight;
       let left = a.x + 26;
       if (left + w > window.innerWidth - 12) left = a.x - 26 - w;
-      left = Math.max(12, left);
+      left = Math.max(336, left); // never over the left dock (312 px + gutters)
       const top = Math.min(Math.max(a.y - 48, 72), window.innerHeight - h - 12);
       el.style.left = `${left}px`; el.style.top = `${top}px`; el.style.right = 'auto'; el.style.bottom = 'auto';
     };
     place(getAnchor());
     return subscribeAnchor(place);
-  }, [embedded, open, selected]);
+  }, [embedded, open, selected, drawerOpen]);
 
   const send = (t: string) => {
     if (!t.trim()) return;
@@ -92,7 +94,7 @@ export function AskBubble({ embedded = false }: { embedded?: boolean }) {
   return (
     <section
       ref={box} aria-label="Ask the copilot"
-      className={embedded ? undefined : `${s.panel} ${s.ask} ${anchored ? '' : s.askFallback} ${!anchored && drawerOpen ? s.askShift : ''}`}
+      className={embedded ? undefined : `${s.panel} ${s.ask} ${drawerOpen ? s.askDocked : anchored ? '' : s.askFallback}`}
     >
       <div className={s.askHead}>
         <MascotSlot state={mascot} />
@@ -107,11 +109,10 @@ export function AskBubble({ embedded = false }: { embedded?: boolean }) {
 
       <div className={s.msgs} ref={list} aria-live="polite">
         {messages.length === 0 && <p className={s.note}>Ask about the ground you picked, or have the copilot plan and draw a route. Every number comes from deterministic tools.</p>}
-        {messages.map((m) => <Message key={m.id} role={m.role} text={m.text} unverified={m.unverified} />)}
+        {messages.map((m) => <Message key={m.id} role={m.role} text={m.text} unverified={m.unverified} offline={m.offline} />)}
         {busy && trace.length === 0 && <p className={s.note}>Thinking…</p>}
       </div>
       <AgentTrace steps={trace} />
-      {offline && <p className={s.offline}><WifiOff size={15} aria-hidden /> Copilot unavailable right now. The buttons still work.</p>}
 
       <div className={s.quick}>
         {QUICK.map((q) => <button key={q} className={s.chip} disabled={busy} onClick={() => send(q)}>{q}</button>)}

@@ -16,6 +16,7 @@ import type {
   AgentApi, ChatMessage, Dem, DemMeta, GeoApi, GeologyFile, LayerInfo, RoverImage, ScienceApi, ScienceSite, TerrainApi,
   ToolDeps, TraverseFile, WorldPoint,
 } from '@/lib/contracts';
+import { fmtLat, fmtLon } from '@/lib/scene/format';
 import { decodeDem, sampleElevation, toLocal, toLonLat } from '@/lib/geo/frame';
 import { createTerrainClient } from '@/lib/terrain/client';
 import { executeTool as runnerExecuteTool, runAgentTurn } from '@/lib/agent/runner';
@@ -115,14 +116,31 @@ export function startLoading(): Promise<void> {
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+/** Fetch the DEM; gunzip it in the browser, or fall back to the plain dem.i16 when DecompressionStream is missing. */
+async function loadDemBuffer(meta: DemMeta): Promise<{ meta: DemMeta; buf: ArrayBuffer }> {
+  const onProgress = (f: number | null) => step('dem', { progress: f ?? 0 });
+  if (meta.encoding.compression === 'gzip') {
+    if (typeof DecompressionStream !== 'undefined') {
+      const gz = await fetchWithProgress(`/data/${meta.file}`, onProgress);
+      const stream = new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'));
+      return { meta, buf: await new Response(stream).arrayBuffer() };
+    }
+    const { delta: _d, compression: _c, ...enc } = meta.encoding;
+    const plain = { ...meta, file: 'dem.i16', encoding: enc };
+    return { meta: plain, buf: await fetchWithProgress('/data/dem.i16', onProgress) };
+  }
+  return { meta, buf: await fetchWithProgress(`/data/${meta.file}`, onProgress) };
+}
+
 async function loadAll() {
   // 1. DEM
   step('dem', { status: 'active', progress: 0 });
   let meta: DemMeta, dem: Dem, placeholder = false;
+  let demBuf: ArrayBuffer;
   try {
     meta = await getJson<DemMeta>('/data/dem_meta.json');
-    const buf = await fetchWithProgress(`/data/${meta.file}`, (f) => step('dem', { progress: f }));
-    dem = decodeDem(meta, buf);
+    ({ meta, buf: demBuf } = await loadDemBuffer(meta));
+    dem = decodeDem(meta, demBuf);
   } catch (e) {
     if (!isDev) { step('dem', { status: 'error', detail: String(e) }); throw new Error(`Could not load the terrain model: ${e instanceof Error ? e.message : e}`); }
     console.warn(`[services] ${PLACEHOLDER_LABEL}`, e);
@@ -290,9 +308,9 @@ const guard = async (fn: () => Promise<void>) => {
 /** "Plan round trip to selection" — deterministic, same executor the LLM uses; the tool draws the route itself. */
 export const planRoundTripToSelection = () => guard(async () => {
   if (!S().selected) { S().toast('info', 'Click the terrain to select a destination first.'); return; }
-  const r = await callTool<{ id: string; feasible: boolean; reasonText: string[] }>('plan_route', { to: 'selected', roundTrip: true });
+  await callTool<{ id: string; feasible: boolean; reasonText: string[] }>('plan_route', { to: 'selected', roundTrip: true });
   S().patch({ drawerOpen: true, sheetTab: 'route' });
-  if (!r.feasible) S().toast('info', r.reasonText?.[0] ?? 'Route is not feasible under the current limits.');
+  // an infeasible route explains itself in the drawer, so no toast
 });
 
 /** "Show steepest stretch" — hazards of the active route, drawn as numbered red highlights. */
@@ -316,14 +334,14 @@ export const showSteepestStretch = () => guard(async () => {
 function describeContext(ctx: Record<string, unknown>, ana: Record<string, unknown> | null): string {
   const lines: string[] = [];
   const pt = ctx.point as { lon: number; lat: number } | undefined;
-  if (pt) lines.push(`Location ${pt.lat}, ${pt.lon}`);
+  if (pt) lines.push(`Location: ${fmtLat(pt.lat)}, ${fmtLon(pt.lon)}`);
   lines.push(`Elevation: ${ctx.elevationM == null ? 'no data' : `${ctx.elevationM} m above the areoid`}`);
   const g = ctx.geology as { symbol: string; name: string; interpretation: string } | null;
-  lines.push(g ? `Geology (USGS): ${g.name} (${g.symbol}). ${g.interpretation}` : 'Geology: no verified data here.');
+  lines.push(g ? `Geology: ${g.name} (${g.symbol}). ${g.interpretation}` : 'Geology: no verified data here.');
   const n = (ctx.namedFeaturesNear as { name: string; type: string; distanceKm: number }[]) ?? [];
   if (n.length) lines.push(`Nearby: ${n.slice(0, 3).map((x) => `${x.name} (${x.type}, ${x.distanceKm} km)`).join('; ')}`);
   const t = ctx.nearestRoverTraverse as { sol: number; distanceM: number } | null;
-  if (t) lines.push(`Nearest Perseverance traverse point: sol ${t.sol}, ${t.distanceM} m away`);
+  if (t) lines.push(`Rover traverse: nearest Perseverance point is from sol ${t.sol}, ${t.distanceM} m away`);
   if (ana) {
     lines.push(`Terrain within ${ana.radiusM} m: mean slope ${ana.slopeMeanDeg}°, 90th percentile ${ana.slopeP90Deg}°, max ${ana.slopeMaxDeg}°; ${ana.pctAboveLimit}% steeper than the ${ana.limitDeg}° limit; relief ${ana.reliefM} m.`);
   }

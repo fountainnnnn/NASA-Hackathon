@@ -38,6 +38,9 @@ export function SourcesPanel() {
           <button ref={ref} className={`${s.btn} ${s.iconBtn}`} onClick={close} aria-label="Close sources"><X size={16} aria-hidden /></button>
         </div>
         <div className={s.modalBody}>
+          <div className={s.legend} aria-label="Data provenance legend">
+            {(['observed', 'computed', 'assumption', 'unavailable'] as const).map((k) => <ProvBadge key={k} kind={k} long />)}
+          </div>
           {meta && (
             <div className={s.src}>
               <h3>Terrain: {meta.productLabel} <ProvBadge kind="observed" /></h3>
@@ -55,6 +58,7 @@ export function SourcesPanel() {
               <span>{l.mission}, {l.instrument}</span>
               <span className={s.muted}>Credit: {l.credit}</span>
               {l.note && <span className={s.muted}>{l.note}</span>}
+              {l.id === 'ctx' && <span className={s.muted}>Greyscale 6 m imagery. The warm tint is display-only.</span>}
               <a href={l.sourceUrl} target="_blank" rel="noopener noreferrer">{l.sourceUrl} <ExternalLink size={12} aria-hidden /></a>
             </div>
           ))}

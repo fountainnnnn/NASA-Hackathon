@@ -1,19 +1,19 @@
 'use client';
 import { Layers, MapPin, Trash2 } from 'lucide-react';
-import type { LayerId, Provenance } from '@/lib/contracts';
+import type { LayerId } from '@/lib/contracts';
 import { useRuntime } from '@/state/services';
 import { useWorld, world } from '@/state/world';
-import { ProvBadge, Section, Slider, Switch, PROV } from './ui';
+import { Section, Slider, Switch } from './ui';
 import s from './hud.module.css';
 
-const ROWS: { id: LayerId; title: string; prov: Provenance; note?: string }[] = [
-  { id: 'ctx', title: 'CTX imagery', prov: 'observed', note: 'Greyscale 6 m imagery. The warm tint is display-only.' },
-  { id: 'themisDay', title: 'THEMIS day infrared', prov: 'observed' },
-  { id: 'themisNight', title: 'THEMIS night infrared', prov: 'observed' },
-  { id: 'geology', title: 'Geology (USGS)', prov: 'observed' },
-  { id: 'slope', title: 'Slope limit', prov: 'computed', note: 'Red: steeper than your limit. Amber: within 80% of it.' },
-  { id: 'traverse', title: 'Perseverance traverse', prov: 'observed' },
-  { id: 'ellipse', title: 'Landing ellipse', prov: 'observed' },
+const ROWS: { id: LayerId; title: string; note?: string }[] = [
+  { id: 'ctx', title: 'CTX imagery' },
+  { id: 'themisDay', title: 'THEMIS day infrared' },
+  { id: 'themisNight', title: 'THEMIS night infrared' },
+  { id: 'geology', title: 'Geology (USGS)' },
+  { id: 'slope', title: 'Slope limit', note: 'Red: steeper than your limit. Amber: within 80% of it.' },
+  { id: 'traverse', title: 'Perseverance traverse' },
+  { id: 'ellipse', title: 'Landing ellipse' },
 ];
 
 export function LayerDock() {
@@ -38,12 +38,11 @@ export function LayerDock() {
         {ROWS.map((r) => {
           const info = rt?.layers.find((l) => l.id === r.id);
           const ok = available(r.id);
-          const prov: Provenance = ok ? info?.provenance ?? r.prov : 'unavailable';
           return (
             <div key={r.id} className={s.layerRow}>
               <Switch checked={layers[r.id] && ok} disabled={!ok} label={`Show ${r.title}`} onChange={(v) => useWorld.getState().setLayer(r.id, v)} />
               <span className={s.layerTitle}>
-                {r.title} <ProvBadge kind={prov} />
+                {r.title}
                 {info?.simulated && <span className={`${s.badge} ${s.simBadge}`}>Simulated</span>}
               </span>
               {r.note && layers[r.id] && <span className={s.layerNote}>{r.note}</span>}
@@ -66,9 +65,6 @@ export function LayerDock() {
           label={`Vertical exaggeration ${exag.toFixed(1)}×`} text="" value={exag} min={1} max={3} step={0.1}
           onChange={(v) => useWorld.getState().setExaggeration(v)}
         />
-        <div className={s.legend} aria-label="Data provenance legend">
-          {(Object.keys(PROV) as Provenance[]).map((k) => <ProvBadge key={k} kind={k} long />)}
-        </div>
       </Section>
 
       {annotations.length > 0 && (

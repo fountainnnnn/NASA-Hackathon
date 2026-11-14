@@ -4,6 +4,7 @@ import { useWorld } from '@/state/world';
 import type { SheetTab } from '@/state/world';
 import { AskBubble } from './AskBubble';
 import { LayerDock } from './LayerDock';
+import { Intro } from './Intro';
 import { MissionPanel } from './MissionPanel';
 import { CreditStrip, LoadingScreen, HoverReadout, PlaceholderBanner, Toasts } from './Overlays';
 import { DrawerContent, RouteDrawer } from './RouteDrawer';
@@ -66,6 +67,7 @@ export function HudRoot() {
         <Toasts />
       </div>
       <SourcesPanel />
+      <Intro />
     </>
   );
 }

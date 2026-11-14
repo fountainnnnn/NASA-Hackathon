@@ -31,8 +31,8 @@ export interface DemMeta {
   dLon: number; dLat: number;
   nominalResM: number;           // 20
   /** Stored as little-endian Int16 in public/data/dem.i16 ; elevation = offset + scale·v ; v === nodata → NaN */
-  encoding: { type: 'int16le'; scale: number; offset: number; nodata: -32768 };
-  file: string;                  // "dem.i16"
+  encoding: { type: 'int16le'; scale: number; offset: number; nodata: -32768; delta?: 'row'; compression?: 'gzip' };
+  file: string;                  // "dem.i16.gz" (dem.i16 is the plain fallback)
   elevMin: number; elevMax: number; // metres, valid cells only
   hRef: number;                  // scene elevation reference (median of valid cells), metres
   datum: string;                 // "Mars 2000 sphere R=3396190 m; heights above areoid"
