@@ -1,0 +1,39 @@
+{
+  "name": "space-apps-2026",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
+    "lucide-react": "^1.73.0",
+    "next": "15.5.29",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "three": "^0.187.0",
+    "zod": "^4.6.7",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.187.0",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.29",
+    "geotiff": "^3.0.5",
+    "jszip": "^3.10.2",
+    "shapefile": "^0.6.6",
+    "sharp": "^0.35.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.1.0"
+  }
+}
