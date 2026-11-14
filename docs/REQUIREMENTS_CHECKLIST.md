@@ -28,7 +28,7 @@ Boxes are unchecked until someone has verified them. "Where" says which file or 
 - [ ] Demo is a video of 30 s or less, or 7 slides or fewer. We make both. Over the limit means no Global Judging. Where: docs/DEMO_30_SECONDS.md. TODO(link)
 - [ ] Video duration checked with ffprobe, 30.0 s or less. TODO(verify)
 - [ ] Demo is in English (on-screen text in English). Where: DEMO_30_SECONDS.md.
-- [ ] Slides include team name, member name, the challenge, a project image, the user experience and how NASA data enables it. TODO(name) TODO(team)
+- [ ] Slides include team name, member name, the challenge, a project image, the user experience and how NASA data enables it.
 - [ ] Demo link is public, no login. Tested in a private window. TODO(link)
 - [ ] Link to Final Project is public, no login, permission or registration. TODO(link)
 - [ ] Links tested logged out on a different network if possible. TODO(verify)
