@@ -1,0 +1,60 @@
+/* Survey Reticle tokens with fallbacks so the preview page works without globals.css. No pills, no glow, no blur. */
+.tag {
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: var(--t-micro, 11px);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1, #ece7e1);
+  background: rgba(13, 11, 11, 0.92);
+  border: 1px solid var(--line, rgba(236, 231, 225, 0.1));
+  border-radius: var(--r-1, 2px);
+  padding: 4px 6px;
+  white-space: nowrap;
+  display: grid;
+  gap: 1px;
+  pointer-events: auto;
+  user-select: none;
+  transform: translateY(-4px);
+}
+.tag .name { color: var(--text-2, #a39c95); font-family: var(--font-sans, "Instrument Sans", system-ui, sans-serif); }
+.tag .row { display: flex; gap: 8px; justify-content: space-between; }
+.tag .unit { color: var(--text-2, #a39c95); }
+.tag .low { color: var(--nogo, #d9423b); }
+
+.mark {
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: var(--t-micro, 11px);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-1, #ece7e1);
+  background: rgba(13, 11, 11, 0.92);
+  border: 1px solid var(--line-strong, rgba(236, 231, 225, 0.22));
+  border-left: 2px solid var(--nogo, #d9423b);
+  border-radius: var(--r-1, 2px);
+  padding: 4px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  display: grid;
+  gap: 1px;
+}
+.mark .sub { color: var(--text-2, #a39c95); }
+
+.tick {
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 10px;
+  color: var(--text-2, #a39c95);
+  pointer-events: none;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 3px #000, 0 0 3px #000;
+}
+
+.contour {
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-size: 10px;
+  color: var(--text-1, #ece7e1);
+  background: rgba(13, 11, 11, 0.85);
+  padding: 1px 4px;
+  border-radius: var(--r-1, 2px);
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

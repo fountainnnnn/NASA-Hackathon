@@ -1,0 +1,29 @@
+.bar {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: min(680px, 100%); box-sizing: border-box; padding: 6px 16px 10px;
+  background: rgba(6, 5, 5, 0.78);
+  border-top: 1px solid var(--line, rgba(236,231,225,0.1));
+  font-family: var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  font-variant-numeric: tabular-nums; color: var(--text-1, #ece7e1);
+  user-select: none; touch-action: none;
+}
+.arc { display: block; width: 100%; height: 66px; cursor: ew-resize; outline: none; overflow: visible; }
+.arc:focus-visible { outline: 1.5px solid var(--data, #5cc8ff); outline-offset: 2px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.left { display: flex; align-items: center; gap: 10px; }
+.play {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; cursor: pointer; padding: 0;
+  color: var(--text-1, #ece7e1); background: transparent; border: 1px solid var(--line-strong, rgba(236,231,225,0.22)); border-radius: var(--r-1, 2px);
+}
+.play:hover { background: var(--bg-2, #161313); }
+.play:focus-visible, .speed:focus-visible { outline: 1.5px solid var(--data, #5cc8ff); outline-offset: 2px; }
+.clock { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+.sub { font: 400 var(--t-micro, 11px) var(--font-sans, "Instrument Sans", system-ui, sans-serif); color: var(--text-2, #a39c95); }
+.speeds { display: flex; gap: 2px; align-items: flex-end; }
+.speed {
+  position: relative; min-width: 38px; height: 28px; padding: 0 6px; cursor: pointer; background: transparent; border: 0;
+  color: var(--text-2, #a39c95); font: 400 var(--t-small, 12px) var(--font-mono, "IBM Plex Mono", ui-monospace, monospace);
+  border-top: 1px solid var(--line-strong, rgba(236,231,225,0.22));
+}
+.speed:hover { color: var(--text-1, #ece7e1); }
+.speed[aria-pressed="true"] { color: var(--text-1, #ece7e1); border-top: 2px solid var(--accent, #e0884a); }
