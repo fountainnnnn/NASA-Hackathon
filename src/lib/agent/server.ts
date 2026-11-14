@@ -61,17 +61,22 @@ function takeDaily(now: number): boolean {
   return true;
 }
 
-/** Client IP from the hosting proxy, never from client-controlled left-most XFF entries.
- *  Railway's edge sets X-Real-IP; otherwise use the RIGHT-most XFF hop (appended by our own proxy). */
+/** Client IP for rate limiting. Only a header named in CLIENT_IP_HEADER (set it to a header the hosting
+ *  edge overwrites, e.g. "x-real-ip" on Railway) is trusted. Otherwise use the RIGHT-most X-Forwarded-For
+ *  hop, which is appended by the proxy in front of us, never the client-controlled left-most entries.
+ *  With neither, all callers share one bucket (fail closed). The global daily cap is a second backstop. */
 function clientIp(req: Request): string {
-  const real = req.headers.get('x-real-ip')?.trim();
-  if (real) return real;
+  const trusted = process.env.CLIENT_IP_HEADER?.trim().toLowerCase();
+  if (trusted) {
+    const v = req.headers.get(trusted)?.split(',').pop()?.trim();
+    if (v) return v;
+  }
   const xff = req.headers.get('x-forwarded-for');
   if (xff) {
     const hops = xff.split(',').map((h) => h.trim()).filter(Boolean);
     if (hops.length) return hops[hops.length - 1];
   }
-  return 'unknown';
+  return 'shared';
 }
 
 /** Read the body as a stream, aborting as soon as it exceeds `limit` bytes. Returns null when too large. */
