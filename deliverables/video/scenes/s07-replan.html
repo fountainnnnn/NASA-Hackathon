@@ -12,20 +12,16 @@
   </style>
   <div id="s07-root" class="rk-scene on-stage" data-composition-id="s07" data-width="1920" data-height="1080" data-duration="3.8" data-qa-hold="3.8" data-qa-endhold="3.8">
     <div id="s07-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3.8" data-track-index="0"></div>
-    <div id="s07-cam" class="hm-cam" style="transform: translate(132.41px, 0px) scale(1.1494);">
-      <img id="s07-m0" class="hm-media clip" src="footage/pending/map.png" data-start="0" data-duration="3.8" data-track-index="1" alt="">
+    <div id="s07-cam" class="hm-cam" style="transform: translate(0px, 0px) scale(1.5326);">
+      <video id="s07-m0" class="hm-media" src="footage/c07.mp4" data-start="0" data-duration="3.8" data-track-index="1" muted playsinline></video>
     </div>
-    <div id="s07-co0-tag" class="hm-tag" data-qa="box" style="left: 1097.91px; top: 569.53px; opacity: 0;">Radio shadow <span class="hm-mono">2.2</span> km</div>
-    <div id="s07-co1-tag" class="hm-tag" data-qa="box" style="left: 711.59px; top: 143.68px; opacity: 0;">Verdict with its reason</div>
+    <div id="s07-co0-tag" class="hm-tag" data-qa="box" style="left: 647.94px; top: 171.65px; opacity: 0;">The limiting reason</div>
     <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
-      <circle id="s07-co0-ring" cx="1097.91" cy="419.53" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
-      <line id="s07-co0-line" opacity="0" x1="1097.91" y1="569.53" x2="1097.91" y2="435.53" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="134 134"/>
-      <circle id="s07-co1-ring" cx="841.59" cy="143.68" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
-      <line id="s07-co1-line" opacity="0" x1="711.59" y1="143.68" x2="825.59" y2="143.68" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="114 114"/>
+      <circle id="s07-co0-ring" cx="537.94" cy="171.65" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s07-co0-line" opacity="0" x1="647.94" y1="171.65" x2="553.94" y2="171.65" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="94 94"/>
     </svg>
-    <div id="s07-pending" class="hm-pending" data-qa-ignore>CAPTURE PENDING: approved mockup still, real footage replaces it</div>
     <div id="s07-band" class="hm-band"></div>
-    <div id="s07-cap0" class="hm-cap">NO GO: <span class="hm-mono">2.2</span> km of the walk is out of radio contact.</div>
+    <div id="s07-cap0" class="hm-cap">NO GO: <span class="hm-mono">1.0</span> km of the walk is out of radio contact.</div>
     <div id="s07-cap1" class="hm-cap">Raise the mast to <span class="hm-mono">20</span> m. It replans: GO.</div>
     <div id="s07-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
   </div>
@@ -34,20 +30,14 @@
       const $ = (i) => document.getElementById(i);
       const tl = gsap.timeline({ paused: true });
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
-      tl.set($("s07-cam"), { x: 132.41, y: 0, scale: 1.1494, transformOrigin: "0 0" }, 0);
-      gsap.set($("s07-co0-tag"), { xPercent: -50, yPercent: 0 });
-      // callout 0: "Radio shadow 2.2 km" at (1097.91, 419.53)
+      tl.set($("s07-cam"), { x: 0, y: 0, scale: 1.5326, transformOrigin: "0 0" }, 0);
+      gsap.set($("s07-co0-tag"), { xPercent: 0, yPercent: -50 });
+      // callout 0: "The limiting reason" at (537.94, 171.65)
       tl.set([$("s07-co0-ring"), $("s07-co0-line"), $("s07-co0-tag")], { opacity: 0 }, 0);
-      tl.fromTo($("s07-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1097.91px 419.53px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.7);
-      tl.fromTo($("s07-co0-line"), { opacity: 1, strokeDashoffset: 134 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.78);
-      RK.rise(tl, $("s07-co0-tag"), 0.92, { y: 10, dur: 0.45, fade: 0.12 });
-      tl.to([$("s07-co0-ring"), $("s07-co0-line"), $("s07-co0-tag")], { opacity: 0, duration: 0.2, ease: RK.E.in }, 1.9);
-      gsap.set($("s07-co1-tag"), { xPercent: -100, yPercent: -50 });
-      // callout 1: "Verdict with its reason" at (841.59, 143.68)
-      tl.set([$("s07-co1-ring"), $("s07-co1-line"), $("s07-co1-tag")], { opacity: 0 }, 0);
-      tl.fromTo($("s07-co1-ring"), { opacity: 0, scale: 0.6, transformOrigin: "841.59px 143.68px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.4);
-      tl.fromTo($("s07-co1-line"), { opacity: 1, strokeDashoffset: 114 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.48);
-      RK.rise(tl, $("s07-co1-tag"), 2.62, { y: 10, dur: 0.45, fade: 0.12 });
+      tl.fromTo($("s07-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "537.94px 171.65px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.6);
+      tl.fromTo($("s07-co0-line"), { opacity: 1, strokeDashoffset: 94 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.68);
+      RK.rise(tl, $("s07-co0-tag"), 0.82, { y: 10, dur: 0.45, fade: 0.12 });
+      tl.to([$("s07-co0-ring"), $("s07-co0-line"), $("s07-co0-tag")], { opacity: 0, duration: 0.2, ease: RK.E.in }, 1.8);
       RK.words(tl, $("s07-cap0"), 0.3, { stagger: 0.05, dur: 0.45 });
       tl.set($("s07-cap1"), { opacity: 0 }, 0);
       RK.swap(tl, $("s07-cap0"), $("s07-cap1"), 2, { words: true, stagger: 0.05, dur: 0.45 });

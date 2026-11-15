@@ -1,7 +1,7 @@
 {
   "schema": "heymars.report.v1",
-  "id": "HM-2026-11-14-R1",
-  "generated": "2026-11-14T23:46:57.164Z",
+  "id": "HM-2026-11-15-R1",
+  "generated": "2026-11-15T01:10:12.017Z",
   "title": "EVA plan: base to 18.441N 77.415E, Jezero Crater",
   "verdict": {
     "word": "NO GO",
@@ -155,17 +155,17 @@
     "cautions": []
   },
   "earthLink": {
-    "rangeAu": 1.3161310966611575,
-    "minutes": 10.94594149061111
+    "rangeAu": 1.3156381120714467,
+    "minutes": 10.94183873603009
   },
   "landingCheck": {
     "site": {
-      "lon": 71.99999972378467,
-      "lat": 20.006480299953218,
-      "elevationM": -294,
+      "lon": 71.99999972349123,
+      "lat": 20.012694770394585,
+      "elevationM": -4191,
       "kind": "click",
-      "altitudeKm": 9000.861705318488,
-      "at": 1794699953190
+      "altitudeKm": 9003.223539219625,
+      "at": 1794704954535
     },
     "verdict": "insufficient-data",
     "caveat": "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
@@ -183,7 +183,7 @@
       {
         "id": "elevation",
         "label": "Landing-site elevation (MOLA areoid)",
-        "value": -264.43,
+        "value": -263.16,
         "unit": "m",
         "limit": "elevation <= +2000 m above the MOLA areoid",
         "result": "pass",
@@ -254,12 +254,12 @@
   },
   "landingScenario": {
     "site": {
-      "lon": 71.99999972378467,
-      "lat": 20.006480299953218,
-      "elevationM": -294,
+      "lon": 71.99999972349123,
+      "lat": 20.012694770394585,
+      "elevationM": -4191,
       "kind": "click",
-      "altitudeKm": 9000.861705318488,
-      "at": 1794699953190
+      "altitudeKm": 9003.223539219625,
+      "at": 1794704954535
     },
     "samples": 10000,
     "okPercent": 100,
@@ -377,16 +377,16 @@
       "n": "4.6",
       "title": "Earth link (NASA JPL Horizons)",
       "lines": [
-        "one-way light time = range ÷ c = 1.316131 au × 499.005 s/au = 656.8 s = 10.9 min"
+        "one-way light time = range ÷ c = 1.315638 au × 499.005 s/au = 656.5 s = 10.9 min"
       ],
       "mock": false
     },
     {
       "n": "4.7",
-      "title": "Landing criteria at 20.006N 72.000E",
+      "title": "Landing criteria at 20.013N 72.000E",
       "lines": [
         "Latitude band: 20.01° vs limit |latitude| <= 60°  pass",
-        "Landing-site elevation (MOLA areoid): -264.43 m vs limit elevation <= +2000 m above the MOLA areoid  pass",
+        "Landing-site elevation (MOLA areoid): -263.16 m vs limit elevation <= +2000 m above the MOLA areoid  pass",
         "Regional slope (2-5 km length scale): 0.26° vs limit slope <= 3° over a 2-5 km length scale  no data",
         "Thermal inertia (not dust-dominated): 331 J m-2 s-0.5 K-1 vs limit thermal inertia > 100 J m-2 s-0.5 K-1  pass",
         "Slope at 200-500 m length scale: no data vs limit slope <= 5° over a 200-500 m length scale  no data",
@@ -475,7 +475,7 @@
             ],
             [
               "Landing-site elevation (MOLA areoid)",
-              "-264.43 m",
+              "-263.16 m",
               "elevation <= +2000 m above the MOLA areoid",
               "pass"
             ],
@@ -525,7 +525,7 @@
           "rows": [
             [
               "Site",
-              "20.006N 72.000E"
+              "20.013N 72.000E"
             ],
             [
               "Ellipse",
@@ -830,25 +830,25 @@
               "1",
               "Asked on the map: What is here?",
               "input",
-              "23:45:53"
+              "01:09:14"
             ],
             [
               "2",
               "get_site_conditions",
               "tool",
-              "313 ms"
+              "58 ms"
             ],
             [
               "3",
               "Asked on the map: Could we land here?",
               "input",
-              "23:45:54"
+              "01:09:15"
             ],
             [
               "4",
               "check_landing_site",
               "tool",
-              "57 ms"
+              "58 ms"
             ],
             [
               "5",
@@ -860,43 +860,43 @@
               "6",
               "Used a tool: Run landing simulation",
               "input",
-              "23:45:54"
+              "01:09:15"
             ],
             [
               "7",
               "show_edl_timeline",
               "tool",
-              "52 ms"
+              "7 ms"
             ],
             [
               "8",
               "run_landing_scenario",
               "tool",
-              "0.39 s"
+              "0.36 s"
             ],
             [
               "9",
               "Used a tool: Take me to Jezero",
               "input",
-              "23:46:32"
+              "01:09:49"
             ],
             [
               "10",
               "Dragged on the map: Plan a round trip from base to 18.44N 77.41E",
               "input",
-              "23:46:49"
+              "01:10:06"
             ],
             [
               "11",
               "You dragged from base to a point: target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear)",
               "deterministic",
-              "23:46:49"
+              "01:10:06"
             ],
             [
               "12",
               "plan_round_trip",
               "tool",
-              "2 ms"
+              "3 ms"
             ],
             [
               "13",
@@ -944,7 +944,7 @@
               "20",
               "science_at_target",
               "tool",
-              "16 ms"
+              "58 ms"
             ],
             [
               "21",
@@ -965,19 +965,19 @@
       "turn": 1,
       "kind": "tool",
       "name": "get_site_conditions",
-      "meta": "313 ms",
+      "meta": "58 ms",
       "raw": {
         "args": {
-          "lon": 71.99999972378467,
-          "lat": 20.006480299953218
+          "lon": 71.99999972349123,
+          "lat": 20.012694770394585
         },
         "result": {
           "point": {
             "lon": 72,
-            "lat": 20.00648
+            "lat": 20.01269
           },
           "placeName": null,
-          "elevationM": -264,
+          "elevationM": -263,
           "elevationNote": "metres above the Mars areoid (MOLA)",
           "slopeDeg": 0.3,
           "slopeNote": "Regional slope from the coarse global DEM; it says nothing about boulders or rover-scale terrain.",
@@ -1031,7 +1031,7 @@
             {
               "name": "Syrtis Major Planum",
               "kind": "feature",
-              "distanceKm": 699,
+              "distanceKm": 700,
               "bearingDeg": 204
             }
           ],
@@ -1063,16 +1063,16 @@
       "turn": 2,
       "kind": "tool",
       "name": "check_landing_site",
-      "meta": "57 ms",
+      "meta": "58 ms",
       "raw": {
         "args": {
-          "lon": 71.99999972378467,
-          "lat": 20.006480299953218
+          "lon": 71.99999972349123,
+          "lat": 20.012694770394585
         },
         "result": {
           "site": {
             "lon": 72,
-            "lat": 20.00648
+            "lat": 20.01269
           },
           "verdict": "insufficient-data",
           "criteria": [
@@ -1089,7 +1089,7 @@
             {
               "id": "elevation",
               "label": "Landing-site elevation (MOLA areoid)",
-              "value": -264.43,
+              "value": -263.16,
               "unit": "m",
               "limit": "elevation <= +2000 m above the MOLA areoid",
               "result": "pass",
@@ -1187,7 +1187,7 @@
       "turn": 3,
       "kind": "tool",
       "name": "show_edl_timeline",
-      "meta": "52 ms",
+      "meta": "7 ms",
       "raw": [
         {
           "id": "cruise_stage_separation",
@@ -1328,11 +1328,11 @@
       "turn": 3,
       "kind": "tool",
       "name": "run_landing_scenario",
-      "meta": "390 ms",
+      "meta": "364 ms",
       "raw": {
         "args": {
-          "lon": 71.99999972378467,
-          "lat": 20.006480299953218,
+          "lon": 71.99999972349123,
+          "lat": 20.012694770394585,
           "samples": 10000,
           "maxSlopeDeg": 15
         },
@@ -1340,7 +1340,7 @@
           "scenarioId": "S1",
           "center": {
             "lon": 72,
-            "lat": 20.00648
+            "lat": 20.01269
           },
           "samples": 10000,
           "maxSlopeDeg": 15,
@@ -1356,7 +1356,7 @@
           },
           "terrainModel": "global DEM, ~7.4 km posting",
           "engine": "ts",
-          "computeMs": 4,
+          "computeMs": 3,
           "seed": 2026,
           "note": "Coarse global DEM: slopes are averaged over kilometres and miss boulders and small craters, so this is an optimistic regional view. Pick a site inside Jezero for 20 m terrain.",
           "method": "Truncated 2-D Gaussian touchdown dispersion, 3 sigma = ellipse semi-axes; slope limit is the user assumption.",
@@ -1381,7 +1381,7 @@
       "turn": 5,
       "kind": "tool",
       "name": "plan_round_trip",
-      "meta": "2 ms",
+      "meta": "3 ms",
       "raw": {
         "args": {
           "from": {
@@ -1435,7 +1435,7 @@
           },
           "gridResM": 40,
           "demResM": 20,
-          "computeMs": 1.6000000014901161,
+          "computeMs": 2.5999999940395355,
           "legs": [
             {
               "lengthM": 2153.000091114363,
@@ -1461,7 +1461,7 @@
       "turn": 5,
       "kind": "tool",
       "name": "science_at_target",
-      "meta": "16 ms",
+      "meta": "58 ms",
       "raw": {
         "unit": {
           "symbol": "Njf",
@@ -1505,7 +1505,7 @@
       "turn": 5,
       "kind": "tool",
       "name": "issue_scene_commands",
-      "meta": "0 ms",
+      "meta": "1 ms",
       "raw": {
         "commands": [
           {
@@ -1538,12 +1538,12 @@
       "question": "What is here?",
       "origin": "map",
       "engine": "deterministic",
-      "started": "2026-11-14T23:45:53.190Z",
-      "ended": "2026-11-14T23:45:53.503Z",
+      "started": "2026-11-15T01:09:14.536Z",
+      "ended": "2026-11-15T01:09:14.595Z",
       "narration": [
         {
-          "text": "Read the global layers at your cursor: elevation -264 m, regional slope 0.3°",
-          "durationMs": 7.9
+          "text": "Read the global layers at your cursor: elevation -263 m, regional slope 0.3°",
+          "durationMs": 6.4
         },
         {
           "text": "Looked up the geologic unit: Early Hesperian volcanic unit, USGS SIM 3292",
@@ -1558,12 +1558,12 @@
         {
           "kind": "tool",
           "title": "get_site_conditions",
-          "meta": "313 ms",
+          "meta": "58 ms",
           "durationMs": null,
           "text": null,
           "formula": [
-            "// global datasets sampled at 20.0065N 72.0000E",
-            "elevation = -264 m",
+            "// global datasets sampled at 20.0127N 72.0000E",
+            "elevation = -263 m",
             "regional slope = 0.3°",
             "geology = Early Hesperian volcanic unit",
             "Geologic Map of Mars (USGS SIM 3292), unit raster = 27 unit index: value k = k-th unit symbol in sorted order of geology_global.json \"units\" (1-based): AHi,AHtu,AHv,ANa,Aa,Ap,Apu,Av,Ave,HNb,HNhu,HNt,Hp,Hpe,Hpu,Ht,Hto,Htu,Hve,Nhe,Nhu,Nve,eAb,eHb,eHh,eHt,eHv,eNh,eNhm,lAa,lApc,lApd,lAv,lAvf,lHb,lHl,lHt,lHv,lHvf,lNh,lNv,mAl,mNh,mNhm",
@@ -1575,16 +1575,16 @@
           ],
           "raw": {
             "args": {
-              "lon": 71.99999972378467,
-              "lat": 20.006480299953218
+              "lon": 71.99999972349123,
+              "lat": 20.012694770394585
             },
             "result": {
               "point": {
                 "lon": 72,
-                "lat": 20.00648
+                "lat": 20.01269
               },
               "placeName": null,
-              "elevationM": -264,
+              "elevationM": -263,
               "elevationNote": "metres above the Mars areoid (MOLA)",
               "slopeDeg": 0.3,
               "slopeNote": "Regional slope from the coarse global DEM; it says nothing about boulders or rover-scale terrain.",
@@ -1638,7 +1638,7 @@
                 {
                   "name": "Syrtis Major Planum",
                   "kind": "feature",
-                  "distanceKm": 699,
+                  "distanceKm": 700,
                   "bearingDeg": 204
                 }
               ],
@@ -1673,12 +1673,12 @@
       "question": "Could we land here?",
       "origin": "map",
       "engine": "deterministic",
-      "started": "2026-11-14T23:45:54.063Z",
-      "ended": "2026-11-14T23:45:54.120Z",
+      "started": "2026-11-15T01:09:15.179Z",
+      "ended": "2026-11-15T01:09:15.238Z",
       "narration": [
         {
           "text": "Checked 8 landing criteria at 20.01N 72.00E",
-          "durationMs": 2.1
+          "durationMs": 2.3
         },
         {
           "text": "Scored each one against its limit: 3 pass, 0 fail, 5 without data",
@@ -1689,12 +1689,12 @@
         {
           "kind": "tool",
           "title": "check_landing_site",
-          "meta": "57 ms",
-          "durationMs": 56.8,
+          "meta": "58 ms",
+          "durationMs": 58.4,
           "text": null,
           "formula": [
             "Latitude band: 20.01° vs limit |latitude| <= 60° → PASS",
-            "Landing-site elevation (MOLA areoid): -264.43 m vs limit elevation <= +2000 m above the MOLA areoid → PASS",
+            "Landing-site elevation (MOLA areoid): -263.16 m vs limit elevation <= +2000 m above the MOLA areoid → PASS",
             "Regional slope (2-5 km length scale): 0.26° vs limit slope <= 3° over a 2-5 km length scale → NO DATA",
             "Thermal inertia (not dust-dominated): 331 J m-2 s-0.5 K-1 vs limit thermal inertia > 100 J m-2 s-0.5 K-1 → PASS",
             "Slope at 200-500 m length scale: no data vs limit slope <= 5° over a 200-500 m length scale → NO DATA",
@@ -1704,13 +1704,13 @@
           ],
           "raw": {
             "args": {
-              "lon": 71.99999972378467,
-              "lat": 20.006480299953218
+              "lon": 71.99999972349123,
+              "lat": 20.012694770394585
             },
             "result": {
               "site": {
                 "lon": 72,
-                "lat": 20.00648
+                "lat": 20.01269
               },
               "verdict": "insufficient-data",
               "criteria": [
@@ -1727,7 +1727,7 @@
                 {
                   "id": "elevation",
                   "label": "Landing-site elevation (MOLA areoid)",
-                  "value": -264.43,
+                  "value": -263.16,
                   "unit": "m",
                   "limit": "elevation <= +2000 m above the MOLA areoid",
                   "result": "pass",
@@ -1854,8 +1854,8 @@
       "question": "Run landing simulation",
       "origin": "tool",
       "engine": "deterministic",
-      "started": "2026-11-14T23:45:54.315Z",
-      "ended": "2026-11-14T23:45:54.784Z",
+      "started": "2026-11-15T01:09:15.867Z",
+      "ended": "2026-11-15T01:09:16.272Z",
       "narration": [
         {
           "text": "Loaded the Mars 2020 EDL timeline: 11 phases from entry to touchdown",
@@ -1863,19 +1863,19 @@
         },
         {
           "text": "Ran 10,000 touchdowns: 100% land on ground under 15°",
-          "durationMs": 373.1
+          "durationMs": 347.5
         },
         {
           "text": "Started the descent at 60× on the timeline: parachute, heat shield, powered descent, sky crane",
-          "durationMs": 6.6
+          "durationMs": 7.2
         }
       ],
       "steps": [
         {
           "kind": "tool",
           "title": "show_edl_timeline",
-          "meta": "52 ms",
-          "durationMs": 51.7,
+          "meta": "7 ms",
+          "durationMs": 7.4,
           "text": null,
           "formula": [
             "Cruise stage separation: t = -600 s to -600 s",
@@ -2029,8 +2029,8 @@
         {
           "kind": "tool",
           "title": "run_landing_scenario",
-          "meta": "390 ms",
-          "durationMs": 390.2,
+          "meta": "364 ms",
+          "durationMs": 363.7,
           "text": null,
           "formula": [
             "10,000 samples, seed 2026, ok = 10,000 (100 %) at or under 15°, p50 slope 0.3°, p95 slope 0.3°",
@@ -2039,8 +2039,8 @@
           ],
           "raw": {
             "args": {
-              "lon": 71.99999972378467,
-              "lat": 20.006480299953218,
+              "lon": 71.99999972349123,
+              "lat": 20.012694770394585,
               "samples": 10000,
               "maxSlopeDeg": 15
             },
@@ -2048,7 +2048,7 @@
               "scenarioId": "S1",
               "center": {
                 "lon": 72,
-                "lat": 20.00648
+                "lat": 20.01269
               },
               "samples": 10000,
               "maxSlopeDeg": 15,
@@ -2064,7 +2064,7 @@
               },
               "terrainModel": "global DEM, ~7.4 km posting",
               "engine": "ts",
-              "computeMs": 4,
+              "computeMs": 3,
               "seed": 2026,
               "note": "Coarse global DEM: slopes are averaged over kilometres and miss boulders and small craters, so this is an optimistic regional view. Pick a site inside Jezero for 20 m terrain.",
               "method": "Truncated 2-D Gaussian touchdown dispersion, 3 sigma = ellipse semi-axes; slope limit is the user assumption.",
@@ -2092,12 +2092,12 @@
       "question": "Take me to Jezero",
       "origin": "tool",
       "engine": "deterministic",
-      "started": "2026-11-14T23:46:32.418Z",
-      "ended": "2026-11-14T23:46:37.107Z",
+      "started": "2026-11-15T01:09:49.218Z",
+      "ended": "2026-11-15T01:09:54.024Z",
       "narration": [
         {
           "text": "Fell from orbit to Jezero Crater with the crosshair locked on the delta",
-          "durationMs": 4681.7
+          "durationMs": 4800.8
         },
         {
           "text": "Loaded the 20 m MRO CTX terrain; base at the Octavia E. Butler site",
@@ -2111,8 +2111,8 @@
       "question": "Plan a round trip from base to 18.44N 77.41E",
       "origin": "drag",
       "engine": "deterministic",
-      "started": "2026-11-14T23:46:49.541Z",
-      "ended": "2026-11-14T23:46:49.576Z",
+      "started": "2026-11-15T01:10:06.578Z",
+      "ended": "2026-11-15T01:10:06.669Z",
       "narration": [
         {
           "text": "Read the ground at the target: CTX 20 m terrain, elevation -2,551 m",
@@ -2120,7 +2120,7 @@
         },
         {
           "text": "Planned a round trip from base with A*, slope limit 15°: 2.15 km out, 2.15 km back",
-          "durationMs": 1.9
+          "durationMs": 3
         },
         {
           "text": "Computed walking time with a suited Tobler model: 1 h 56 min including 30 min at the target",
@@ -2132,7 +2132,7 @@
         },
         {
           "text": "Checked line of sight to the 10 m base mast at every vertex: 2.64 km in shadow",
-          "durationMs": 2.5
+          "durationMs": 3
         },
         {
           "text": "Read the sun from the same check: daylight lasts the whole EVA, 7 h 32 min margin",
@@ -2140,7 +2140,7 @@
         },
         {
           "text": "Looked up the science at the target: Jezero floor unit (Njf); nearest Perseverance view is sol 652, 795 m away",
-          "durationMs": 4.7
+          "durationMs": 6
         },
         {
           "text": "Drew the route and the shadow stretch on the map",
@@ -2151,7 +2151,7 @@
         {
           "kind": "input",
           "title": "You dragged from base to a point",
-          "meta": "23:46:49",
+          "meta": "01:10:06",
           "durationMs": null,
           "text": "target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear)",
           "formula": null,
@@ -2160,8 +2160,8 @@
         {
           "kind": "tool",
           "title": "plan_round_trip",
-          "meta": "2 ms",
-          "durationMs": 1.6,
+          "meta": "3 ms",
+          "durationMs": 2.6,
           "text": null,
           "formula": [
             "// A* on a 40 m grid from the 20 m CTX DEM, objective fastest",
@@ -2222,7 +2222,7 @@
               },
               "gridResM": 40,
               "demResM": 20,
-              "computeMs": 1.6000000014901161,
+              "computeMs": 2.5999999940395355,
               "legs": [
                 {
                   "lengthM": 2153.000091114363,
@@ -2312,7 +2312,7 @@
           "kind": "calculation",
           "title": "Comms line of sight from base",
           "meta": "110 rays",
-          "durationMs": 2.5,
+          "durationMs": 3,
           "text": null,
           "formula": [
             "mast 10 m (assumption), suit antenna 1.8 m, ray sampled every 10 m",
@@ -2338,7 +2338,7 @@
           "kind": "calculation",
           "title": "Sun along the route",
           "meta": null,
-          "durationMs": 0.7,
+          "durationMs": 0.4,
           "text": null,
           "formula": [
             "Mars24: MSD 54,344.2, Ls 22.4°, LTST 09:00 at the start",
@@ -2348,9 +2348,9 @@
           "raw": {
             "ok": true,
             "thresholdDeg": 0,
-            "minElevationDeg": 45.51991281381183,
+            "minElevationDeg": 45.51991296890621,
             "minElevationAtMin": 0,
-            "startElevationDeg": 45.51991281381183,
+            "startElevationDeg": 45.51991296890621,
             "endElevationDeg": 71.41412822309597,
             "firstViolationMin": null
           }
@@ -2362,11 +2362,11 @@
           "durationMs": 0.1,
           "text": null,
           "formula": [
-            "one-way light time = range ÷ c = 1.316132 au × 499.005 s/au = 656.8 s = 10.9 min"
+            "one-way light time = range ÷ c = 1.315639 au × 499.005 s/au = 656.5 s = 10.9 min"
           ],
           "raw": {
-            "rangeAu": 1.3161318458273956,
-            "minutes": 10.945947724124999
+            "rangeAu": 1.3156386462463312,
+            "minutes": 10.941843181747686
           }
         },
         {
@@ -2455,8 +2455,8 @@
         {
           "kind": "tool",
           "title": "science_at_target",
-          "meta": "16 ms",
-          "durationMs": 16.2,
+          "meta": "58 ms",
+          "durationMs": 58.4,
           "text": null,
           "formula": [
             "geology = Jezero floor unit (Njf)  (USGS SIM 3464)",
@@ -2505,8 +2505,8 @@
         {
           "kind": "tool",
           "title": "issue_scene_commands",
-          "meta": "0 ms",
-          "durationMs": 0.2,
+          "meta": "1 ms",
+          "durationMs": 0.7,
           "text": "clear_annotations, draw_route R1, highlight_segment 21 to 54",
           "formula": null,
           "raw": {

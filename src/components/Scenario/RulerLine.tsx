@@ -71,9 +71,7 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
   };
   const labelEls = useRef<(HTMLSpanElement | null)[]>([]);
   const proj = useMemo(() => new THREE.Vector3(), []);
-  useFrame(({ size, gl }) => {
-    // tick positions are canvas pixels; the obstacles are viewport rects, so shift by the canvas's place on the page
-    const cv = gl.domElement.getBoundingClientRect();
+  useFrame(({ size }) => {
     // screen-space declutter: at most one minute label per LABEL_GAP_PX on screen, nearest the start wins
     let kept: { x: number; y: number }[] = [];
     const blocks = Array.from(document.querySelectorAll('[data-avoid], [data-companion]')).filter((n) => !(n as HTMLElement).className.toString().includes('tick') && getComputedStyle(n).visibility !== 'hidden').map((n) => n.getBoundingClientRect());
@@ -83,9 +81,10 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
       proj.set(k.x + k.nx, ys[i], k.z + k.nz).project(camera);
       const sx = (proj.x * 0.5 + 0.5) * size.width, sy = (-proj.y * 0.5 + 0.5) * size.height;
       const inside = proj.z < 1 && proj.z > -1 && sx > 24 && sx < size.width - 90 && sy > 56 && sy < size.height - 24;
-      // where the label really sits: drei centres it on the point, then the span moves 18 px right and 8 px up
-      const w = el.offsetWidth || 70, h = el.offsetHeight || 14;
-      const box = { l: cv.left + sx - w / 2 + 18, r: cv.left + sx + w / 2 + 18, t: cv.top + sy - h / 2 - 8, b: cv.top + sy + h / 2 - 8 };
+      // where the label really sits on the page (laid out even while hidden), measured rather than predicted: a prediction
+      // from the canvas size drifts from the Base tag and the other labels while the canvas is being resized
+      const r = el.getBoundingClientRect();
+      const box = { l: r.left, r: r.right, t: r.top, b: r.bottom };
       const free = !blocks.some((b) => box.l < b.right + 3 && box.r > b.left - 3 && box.t < b.bottom + 3 && box.b > b.top - 3);
       const clear = inside && free && kept.every((q) => Math.hypot(q.x - sx, q.y - sy) >= LABEL_GAP_PX);
       if (clear) kept = [...kept, { x: sx, y: sy }];

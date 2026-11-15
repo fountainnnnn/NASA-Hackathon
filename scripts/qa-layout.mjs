@@ -334,6 +334,19 @@ async function waitTurn(page, before, timeout = 90_000) {
   await park(page);
   await sleep(page, 600);
 }
+/**
+ * Wait (up to 4 s) until an element has kept the same box for 400 ms. The streaming card grows as lines land; measuring
+ * text while it moves samples the contrast against the wrong pixels.
+ */
+async function settled(page, css) {
+  let last = '', same = 0;
+  for (let i = 0; i < 20 && same < 2; i++) {
+    const b = await page.locator(css).first().boundingBox().catch(() => null);
+    const k = b ? [b.x, b.y, b.width, b.height].map(Math.round).join(',') : '';
+    same = k && k === last ? same + 1 : 0; last = k;
+    await sleep(page, 200);
+  }
+}
 const turnCount = (page) => page.evaluate(() => window.__mw.thread.getState().turns.length);
 const pauseAt = (page, f) => page.evaluate((fr) => { const p = window.__mw.playback; p.getState().pause(); p.getState().seek(p.getState().durationS * fr); }, f);
 /** Pause the playback at an absolute time (s), clamped to its length. */
@@ -342,6 +355,8 @@ const seekAt = (page, s) => page.evaluate((t) => { const p = window.__mw.playbac
  * The landing waits behind a veil for its terrain, captioned "Loading terrain" (centred status while loading; the phase
  * caption sits top left once it plays). A seek cancels that wait, so never seek before the caption has gone.
  */
+/** After a seek the camera jumps: wait (up to `ms`) until the globe reports its tiles loaded, so the shot shows the real imagery. */
+const tilesSettled = (page, ms = 25_000) => page.waitForFunction(() => window.__planet?.stats?.().tilesLoaded, null, { timeout: ms, polling: 250 }).catch(() => {});
 const terrainLoaded = (page, timeout = 120_000) => page.waitForFunction(() => ![...document.querySelectorAll('[data-stage] [role="status"], [role="status"]')].some((e) => /Loading terrain/.test(e.textContent ?? '') && e.checkVisibility()), null, { timeout });
 async function stageBox(page) { const b = await page.locator('[data-stage]').boundingBox(); if (!b) throw new Error('no stage'); return b; }
 const baseScreen = (page) => page.evaluate("(() => { const w = window.__mw, b = w.world.getState().base; return w.projectJezero({ lon: b.lon, lat: b.lat }); })()");
@@ -401,6 +416,7 @@ const STATES = [
     await sleep(page, 400);
     await ask(page, 'Landing check', 'map');
     await sleep(page, 1800);
+    await settled(page, 'section[data-companion]');
   } },
   { name: 'landing-check-card', run: async ({ page }) => {
     await page.evaluate(() => window.__mw.thread.getState().setPace(260));
@@ -414,12 +430,14 @@ const STATES = [
     await terrainLoaded(page);
     await sleep(page, 1000);
     await pauseAt(page, 0.55);
-    await sleep(page, 3500);
+    await sleep(page, 1500);
+    await tilesSettled(page);
+    await sleep(page, 1500);
   } },
   // sky crane (20 m and below, stage, bridles and rover in one frame) and the close hold on the rover just after touchdown
-  { name: 'landing-sky-crane', run: async ({ page }) => { await seekAt(page, 412); await sleep(page, 4500); } },
-  { name: 'landing-touchdown-close', run: async ({ page }) => { await seekAt(page, 425); await sleep(page, 4500); } },
-  { name: 'landing-sim-touchdown', run: async ({ page }) => { await pauseAt(page, 1); await sleep(page, 4000); } },
+  { name: 'landing-sky-crane', run: async ({ page }) => { await seekAt(page, 412); await sleep(page, 1500); await tilesSettled(page); await sleep(page, 1500); } },
+  { name: 'landing-touchdown-close', run: async ({ page }) => { await seekAt(page, 425); await sleep(page, 1500); await tilesSettled(page); await sleep(page, 1500); } },
+  { name: 'landing-sim-touchdown', run: async ({ page }) => { await pauseAt(page, 1); await sleep(page, 1500); await tilesSettled(page); await sleep(page, 1500); } },
   { name: 'jezero-after-fall', run: async ({ page }) => { await closeAll(page); await enterJezero(page); } },
   // a target on a 24° cell west of the base (QA round 1, P0): no route, two rows, Replan and Nearest point
   { name: 'route-nopath-card', run: async ({ page }) => {

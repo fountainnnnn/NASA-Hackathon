@@ -190,6 +190,15 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     return { lon: C.Math.toDegrees(scratch.cart.longitude), lat: C.Math.toDegrees(scratch.cart.latitude), height: scratch.cart.height, world: C.Cartesian3.clone(p) };
   };
 
+  /** The point under the pointer on the bare Mars ellipsoid (height unknown): the fallback while terrain tiles load. */
+  const pickEllipsoid = (x: number, y: number): { lon: number; lat: number; height: number; world: CesiumNS.Cartesian3 } | null => {
+    scratch.c2.x = x; scratch.c2.y = y;
+    const p = camera.pickEllipsoid(scratch.c2, MARS, scratch.c3);
+    if (!p) return null;
+    MARS.cartesianToCartographic(p, scratch.cart);
+    return { lon: C.Math.toDegrees(scratch.cart.longitude), lat: C.Math.toDegrees(scratch.cart.latitude), height: NaN, world: C.Cartesian3.clone(p) };
+  };
+
   const frameFrags = new Set<() => void>();
   const preFrags = new Set<() => void>();
   const ctx: PlanetCtx = {
@@ -373,9 +382,10 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
   canvas.addEventListener('wheel', stopFlightOnInput, { passive: true });
 
   const emitPick = async (kind: 'click' | 'dblclick', x: number, y: number) => {
-    // right after load the terrain under the pointer may not be pickable yet: retry each frame for up to 2 s so the
-    // first click is never dropped (QA round 2, item 21)
-    const p = await retryEachFrame(() => pickGround(x, y), ctx.onFrame, PICK_RETRY_MS);
+    // right after load the terrain under the pointer may not be pickable yet: retry each frame for up to 2 s, then take
+    // the point on the Mars ellipsoid (elevation still comes from the terrain sample below), so the first click after
+    // load is never dropped (QA round 2, item 21)
+    const p = (await retryEachFrame(() => pickGround(x, y), ctx.onFrame, PICK_RETRY_MS)) ?? pickEllipsoid(x, y);
     if (!p) return null;
     const sampled = await sampleOne(p);
     const h = sampled ?? p.height;

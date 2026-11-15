@@ -12,15 +12,14 @@
   </style>
   <div id="s06-root" class="rk-scene on-stage" data-composition-id="s06" data-width="1920" data-height="1080" data-duration="3.2" data-qa-hold="3.2" data-qa-endhold="3.2">
     <div id="s06-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3.2" data-track-index="0"></div>
-    <div id="s06-cam" class="hm-cam" style="transform: translate(-417.66px, -72.99px) scale(1.6234);">
-      <img id="s06-m0" class="hm-media clip" src="footage/pending/steps.png" data-start="0" data-duration="3.2" data-track-index="1" alt="">
+    <div id="s06-cam" class="hm-cam" style="transform: translate(-1536px, -324.4px) scale(2.4);">
+      <video id="s06-m0" class="hm-media" src="footage/c06.mp4" data-start="0" data-duration="3.2" data-track-index="1" muted playsinline></video>
     </div>
-    <div id="s06-co0-tag" class="hm-tag" data-qa="box" style="left: 1129.29px; top: 440px; opacity: 0;">Formula with real numbers</div>
+    <div id="s06-co0-tag" class="hm-tag" data-qa="box" style="left: 1104px; top: 440px; opacity: 0;">Formula with real numbers</div>
     <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
-      <circle id="s06-co0-ring" cx="1249.29" cy="440" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
-      <line id="s06-co0-line" opacity="0" x1="1129.29" y1="440" x2="1233.29" y2="440" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
+      <circle id="s06-co0-ring" cx="1224" cy="440" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s06-co0-line" opacity="0" x1="1104" y1="440" x2="1208" y2="440" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
     </svg>
-    <div id="s06-pending" class="hm-pending" data-qa-ignore>CAPTURE PENDING: approved mockup still, real footage replaces it</div>
     <div id="s06-band" class="hm-band"></div>
     <div id="s06-cap0" class="hm-cap">Every answer is computed, and every step is shown.</div>
     <div id="s06-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
@@ -30,12 +29,12 @@
       const $ = (i) => document.getElementById(i);
       const tl = gsap.timeline({ paused: true });
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
-      tl.set($("s06-cam"), { x: -417.66, y: -72.99, scale: 1.6234, transformOrigin: "0 0" }, 0);
-      tl.fromTo($("s06-cam"), { x: -417.66, y: -72.99, scale: 1.6234 }, { x: -989.09, y: -499.39, scale: 2.0202, duration: 0.8, ease: RK.E.io, immediateRender: false }, 1.5);
+      tl.set($("s06-cam"), { x: -1536, y: -324.4, scale: 2.4, transformOrigin: "0 0" }, 0);
+      tl.fromTo($("s06-cam"), { x: -1536, y: -324.4, scale: 2.4 }, { x: -1536, y: -263.2, scale: 2.4, duration: 0.8, ease: RK.E.io, immediateRender: false }, 1.5);
       gsap.set($("s06-co0-tag"), { xPercent: -100, yPercent: -50 });
-      // callout 0: "Formula with real numbers" at (1249.29, 440)
+      // callout 0: "Formula with real numbers" at (1224, 440)
       tl.set([$("s06-co0-ring"), $("s06-co0-line"), $("s06-co0-tag")], { opacity: 0 }, 0);
-      tl.fromTo($("s06-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1249.29px 440px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.35);
+      tl.fromTo($("s06-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1224px 440px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.35);
       tl.fromTo($("s06-co0-line"), { opacity: 1, strokeDashoffset: 104 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.43);
       RK.rise(tl, $("s06-co0-tag"), 2.57, { y: 10, dur: 0.45, fade: 0.12 });
       RK.words(tl, $("s06-cap0"), 0.3, { stagger: 0.05, dur: 0.45 });

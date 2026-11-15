@@ -11,6 +11,7 @@ import type * as CesiumNS from 'cesium';
 import { cropWithMargin, fuseTile, vikingSource } from './imageryBlend';
 import type { FuseJob, FuseReply } from './imagery.worker';
 import { CTX, VIKING } from './planetMath';
+import { salvageGrayPng } from './pngSalvage';
 
 type C = typeof CesiumNS;
 type Img = ImageBitmap | HTMLImageElement;
@@ -127,33 +128,71 @@ class VikingProvider extends MarsProvider {
   }
 }
 
-/** Wait before the one retry of a failed CTX tile, ms. */
+/** Wait before the one retry of a CTX tile that failed on the network, ms. */
 const CTX_RETRY_MS = 900;
 /** Ancestor levels tried for a CTX tile the service cannot send. */
 const CTX_PARENT_LEVELS = 2;
+/** The browser could not decode the bytes (a truncated PNG), as opposed to a network or HTTP failure. */
+const isDecodeError = (e: unknown) => typeof DOMException !== 'undefined' && e instanceof DOMException && /decod/i.test(e.message);
 
 /**
- * CTX detail on Viking colour. The CTX service has holes in its tile cache (HTTP 500 for some tiles, for example around
- * 14N 72E at level 11) and its error responses carry no CORS header, so the browser reports a network error and the
- * pixels are unreadable. Such a tile is retried once; if it fails again it takes the matching quarter of its parent CTX
- * tile (up to two levels up, the parent is usually in the HTTP cache already), so the detail continues at half
- * resolution instead of dropping to Viking's 232 m. With no ancestor either it is no data: Viking colour alone, graded
- * exactly like the base layer, so the Viking layer shows through. It never rejects, so Cesium logs nothing. Known holes
- * are remembered and not fetched again this session.
+ * CTX detail on Viking colour. The CTX tile service fails some tiles in two ways, and both used to leave a Viking-only
+ * patch (232 m) beside 5 m neighbours, a hard seam in the landing shots:
+ *  - HTTP 500 for holes in its cache (for example around 14N 72E at level 11). Error responses carry no CORS header, so
+ *    the browser logs a network error and the pixels are unreadable. Retried once after CTX_RETRY_MS.
+ *  - HTTP 200 with a truncated grayscale PNG (no IEND), which the browser refuses to decode. Its bytes are fetched again
+ *    (from the HTTP cache), every row that arrived is kept (pngSalvage.ts) and the missing rows come from the ancestor.
+ * A tile that still has nothing takes the matching part of its nearest ancestor CTX tile (up to two levels up), and with
+ * no ancestor it is no data: Viking colour alone, graded exactly like the base layer, so the Viking layer shows through.
+ * It never rejects for these, so Cesium logs nothing. Known holes are remembered and not fetched again this session.
  */
 class FusedProvider extends MarsProvider {
   readonly tileWidth = CTX.tileSize; readonly tileHeight = CTX.tileSize; readonly maximumLevel = CTX.maxLevel;
   private viking = new Map<string, Promise<Img | null>>();
   private noData = new Set<string>();
-  /** CTX tiles drawn as Viking only, after a failed retry (debug stats). */
+  /** CTX tiles with no usable pixels of their own after the retry or salvage (debug stats). */
   ctxNoData = 0;
+  /** CTX tiles rebuilt from a truncated PNG (debug stats). */
+  ctxSalvaged = 0;
+  /**
+   * A truncated tile: the rows that arrived, as a bitmap. Given the tile's address, the rows that never arrived are filled
+   * from the nearest ancestor CTX tile (so the strip keeps CTX detail at lower resolution instead of showing Viking alone);
+   * without it they stay transparent (no data). Null when nothing can be decoded.
+   */
+  private async salvage(url: string, at?: { l: number; y: number; x: number }): Promise<Img | null> {
+    try {
+      const buf = await new this.C.Resource({ url }).fetchArrayBuffer();
+      const t = buf ? await salvageGrayPng(buf) : null;
+      if (!t) return null;
+      const own = await createImageBitmap(new ImageData(t.rgba as Uint8ClampedArray<ArrayBuffer>, t.width, t.height));
+      this.ctxSalvaged++;
+      if (!at || t.rows >= t.height || typeof OffscreenCanvas === 'undefined') return own;
+      const under = await this.ancestorCtx(at.l, at.y, at.x);
+      if (!under) return own;
+      const cv = new OffscreenCanvas(t.width, t.height), g = cv.getContext('2d')!;
+      g.drawImage(under, 0, 0, t.width, t.height);
+      g.drawImage(own, 0, 0);
+      own.close();
+      if (under instanceof ImageBitmap) under.close();
+      return await createImageBitmap(cv);
+    } catch { return null; }
+  }
+  /** One CTX tile, salvaging a truncated PNG; null when it cannot be had. */
+  private async load(url: string): Promise<Img | null> {
+    try { return (await this.fetch(url)) ?? null; } catch (e) { return isDecodeError(e) ? this.salvage(url) : null; }
+  }
   private async ctxOrNoData(first: Promise<Img>, l: number, y: number, x: number, request?: CesiumNS.Request): Promise<Img | null> {
+    const url = ctxUrl(l, y, x);
     try { return await first; } catch (e) {
       // cancelled by Cesium (tile no longer wanted): let it reschedule the tile instead of drawing it without CTX
       if (request?.state === this.C.RequestState.CANCELLED) throw e;
+      if (isDecodeError(e)) { const s = await this.salvage(url, { l, y, x }); if (s) return s; }
+      else {
+        await new Promise((r) => setTimeout(r, CTX_RETRY_MS));
+        const again = await this.load(url);
+        if (again) return again;
+      }
     }
-    await new Promise((r) => setTimeout(r, CTX_RETRY_MS));
-    try { const again = this.fetch(ctxUrl(l, y, x)); if (again) return await again; } catch { /* hole: try an ancestor */ }
     this.noData.add(`${l}/${y}/${x}`);
     this.ctxNoData++;
     return this.ancestorCtx(l, y, x);
@@ -163,12 +202,12 @@ class FusedProvider extends MarsProvider {
     for (let k = 1; k <= CTX_PARENT_LEVELS && l - k >= FUSE_MIN_LEVEL; k++) {
       const pl = l - k, py = y >> k, px = x >> k;
       if (this.noData.has(`${pl}/${py}/${px}`)) continue;
+      const img = await this.load(ctxUrl(pl, py, px));
+      if (!img) { this.noData.add(`${pl}/${py}/${px}`); continue; }
       try {
-        const img = await this.fetch(ctxUrl(pl, py, px));
-        if (!img) continue;
         const n = 1 << k, w = img.width / n, h = img.height / n;
         return await createImageBitmap(img, (x - px * n) * w, (y - py * n) * h, w, h);
-      } catch { this.noData.add(`${pl}/${py}/${px}`); }
+      } catch { /* try the next level up */ }
     }
     return null;
   }

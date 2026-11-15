@@ -13,7 +13,7 @@
       }
     },
     "src": "assets/bgm/bed.wav",
-    "volume": 0.5,
+    "volume": 0.3,
     "fadeIn": 0.3,
     "fadeOut": 1.6
   },

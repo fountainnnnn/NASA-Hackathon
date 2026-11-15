@@ -2,7 +2,7 @@
 
 Round trip from the Octavia E. Butler landing site, prepared for surface operations review.
 
-Report HM-2026-11-14-R1, generated 2026-11-14 23:46 UTC.
+Report HM-2026-11-15-R1, generated 2026-11-15 01:10 UTC.
 
 **Verdict: NO GO.** Radio shadow of 2.6 km with no line of sight to base from a 10 m mast.
 
@@ -22,7 +22,7 @@ Report HM-2026-11-14-R1, generated 2026-11-14 23:46 UTC.
 | Landing criterion | Value | Limit | Status |
 | --- | ---: | --- | --- |
 | Latitude band | 20.01° | \|latitude\| <= 60° | pass |
-| Landing-site elevation (MOLA areoid) | -264.43 m | elevation <= +2000 m above the MOLA areoid | pass |
+| Landing-site elevation (MOLA areoid) | -263.16 m | elevation <= +2000 m above the MOLA areoid | pass |
 | Regional slope (2-5 km length scale) | 0.26° | slope <= 3° over a 2-5 km length scale | not scored at this scale |
 | Thermal inertia (not dust-dominated) | 331 J m-2 s-0.5 K-1 | thermal inertia > 100 J m-2 s-0.5 K-1 | pass |
 | Slope at 200-500 m length scale | no data at this scale | slope <= 5° over a 200-500 m length scale | no data |
@@ -32,7 +32,7 @@ Report HM-2026-11-14-R1, generated 2026-11-14 23:46 UTC.
 
 | Landing simulation | Value |
 | --- | ---: |
-| Site | 20.006N 72.000E |
+| Site | 20.013N 72.000E |
 | Ellipse | 7.7 by 6.6 km (semi-axes 3.85 and 3.3 km) |
 | Simulated touchdowns | 10,000 |
 | Touchdowns on ground at or under 15° (assumption) | 100 % |
@@ -116,14 +116,14 @@ sunset 18:12 LTST, daylight margin at return 7 h 32 min  pass
 **4.6 Earth link (NASA JPL Horizons)**
 
 ```
-one-way light time = range ÷ c = 1.316131 au × 499.005 s/au = 656.8 s = 10.9 min
+one-way light time = range ÷ c = 1.315638 au × 499.005 s/au = 656.5 s = 10.9 min
 ```
 
-**4.7 Landing criteria at 20.006N 72.000E**
+**4.7 Landing criteria at 20.013N 72.000E**
 
 ```
 Latitude band: 20.01° vs limit |latitude| <= 60°  pass
-Landing-site elevation (MOLA areoid): -264.43 m vs limit elevation <= +2000 m above the MOLA areoid  pass
+Landing-site elevation (MOLA areoid): -263.16 m vs limit elevation <= +2000 m above the MOLA areoid  pass
 Regional slope (2-5 km length scale): 0.26° vs limit slope <= 3° over a 2-5 km length scale  no data
 Thermal inertia (not dust-dominated): 331 J m-2 s-0.5 K-1 vs limit thermal inertia > 100 J m-2 s-0.5 K-1  pass
 Slope at 200-500 m length scale: no data vs limit slope <= 5° over a 200-500 m length scale  no data
@@ -178,18 +178,18 @@ Validation: DEM heights agree with 708 Perseverance waypoints, median offset 1.1
 
 | # | Step | Kind | Time |
 | --- | --- | --- | ---: |
-| 1 | Asked on the map: What is here? | input | 23:45:53 |
-| 2 | get_site_conditions | tool | 313 ms |
-| 3 | Asked on the map: Could we land here? | input | 23:45:54 |
-| 4 | check_landing_site | tool | 57 ms |
+| 1 | Asked on the map: What is here? | input | 01:09:14 |
+| 2 | get_site_conditions | tool | 58 ms |
+| 3 | Asked on the map: Could we land here? | input | 01:09:15 |
+| 4 | check_landing_site | tool | 58 ms |
 | 5 | Not enough data to judge: latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km length scale) no data, therm | deterministic | under 1 ms |
-| 6 | Used a tool: Run landing simulation | input | 23:45:54 |
-| 7 | show_edl_timeline | tool | 52 ms |
-| 8 | run_landing_scenario | tool | 0.39 s |
-| 9 | Used a tool: Take me to Jezero | input | 23:46:32 |
-| 10 | Dragged on the map: Plan a round trip from base to 18.44N 77.41E | input | 23:46:49 |
-| 11 | You dragged from base to a point: target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear) | deterministic | 23:46:49 |
-| 12 | plan_round_trip | tool | 2 ms |
+| 6 | Used a tool: Run landing simulation | input | 01:09:15 |
+| 7 | show_edl_timeline | tool | 7 ms |
+| 8 | run_landing_scenario | tool | 0.36 s |
+| 9 | Used a tool: Take me to Jezero | input | 01:09:49 |
+| 10 | Dragged on the map: Plan a round trip from base to 18.44N 77.41E | input | 01:10:06 |
+| 11 | You dragged from base to a point: target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear) | deterministic | 01:10:06 |
+| 12 | plan_round_trip | tool | 3 ms |
 | 13 | Walking time | deterministic | under 1 ms |
 | 14 | Suit battery | deterministic | under 1 ms |
 | 15 | Climbing work | deterministic | under 1 ms |
@@ -197,7 +197,7 @@ Validation: DEM heights agree with 708 Perseverance waypoints, median offset 1.1
 | 17 | Sun along the route | deterministic | under 1 ms |
 | 18 | Earth link delay | deterministic | under 1 ms |
 | 19 | Verdict NO GO: slope pass, battery pass, EVA time pass, daylight pass, comms fail, data pass | deterministic | under 1 ms |
-| 20 | science_at_target | tool | 16 ms |
+| 20 | science_at_target | tool | 58 ms |
 | 21 | issue_scene_commands: clear_annotations, draw_route R1, highlight_segment 21 to 54 | tool | under 1 ms |
 
 Arguments and results of every step are in the JSON export.

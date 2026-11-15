@@ -1,4 +1,4 @@
-# HeyMars demo video, storyboard v2 (matched to the real app, 15 Nov)
+# HeyMars demo video, storyboard v3 (as captured from the live app, 15 Nov)
 
 29.0 s, 1920x1080, 60 fps final (30 fps draft), 10 scenes, 0.4 s zoom joins, original music bed (synthesised in code,
 `tools/music.py`), no voice. Team: Ng Yu Hang, team Ecliptical. Challenge: Interplanetary Survival Guide: Martian Map.
@@ -53,10 +53,12 @@ Credit: "NASA imagery and terrain via JPL Mars Trek" (verify the exact layers at
 ### s04 Click and ask (7.2, 4.4 s), footage c04
 Footage: in the 20 m Jezero scene the MarsAgent reticle trails the cursor to the fan target 18.47162N 77.49357E
 (2.9 km ENE of the base), dwells (readout: lat, lon, elevation, slope), clicks; the compact MarsAgent card opens at the
-cursor. On the card's ask line: "Walk here and back" (a fixed verb, no model call) or, with `--live`, "Can I walk here and
+cursor ("Partly too steep to walk", 18.4714N 77.4937E). On the card's ask line: "Walk here and back" (a fixed verb, no model call) or, with `--live`, "Can I walk here and
 back from base?" (one MarsAgent call). EVA starts 09:00 local solar time (app default). The card turns NO GO:
 "Radio shadow of 2.2 km with no line of sight to base from a 10 m mast"; round trip 6.16 km, 2 h 32 min incl. 30 min at
-target, battery 68.3 % / 20 %, max slope 2° / 15°.
+target, battery 68.3 % / 20 %, max slope 2° / 15° (QA path). AS CAPTURED (live site, the clicked point lands a few
+metres from the QA target): "Radio shadow of 1.0 km with no line of sight to base from a 10 m mast", round trip 6.12 km,
+2 h 32 min, battery 68.4 % / 20 %, max slope 3.5° / 15°, map label "Radio shadow 1.03 km". Captions follow the capture.
 Camera: whole app, then at 1.2 s a 1.0 s push onto the card.
 Caption: "Click any spot on Mars and ask."
 Callout at 2.4 s on the card: "Answer at your cursor".
@@ -77,16 +79,20 @@ Callout at 2.35 s on the formula: "Formula with real numbers".
 Footage: the planned route on the terrain with the radio-shadow stretch, the NO GO card; a click on the card's
 "Raise mast to 20 m"; the route is re-evaluated and the card turns GO, "Every limit holds" (panel: "GO. Every limit holds.
 6.16 km round trip in 2 h 32 min, back with 68.3 % battery.").
-Captions: "NO GO: 2.2 km of the walk is out of radio contact." then at 2.0 s "Raise the mast to 20 m. It replans: GO."
-Callouts: 0.7 to 1.9 s on the shadow stretch, "Radio shadow 2.2 km" (position read off the footage, it is drawn on the
-canvas); at 2.4 s on the GO word, "Verdict with its reason".
+Captions (as captured): "NO GO: 1.0 km of the walk is out of radio contact." then at 2.0 s "Raise the mast to 20 m.
+It replans: GO." The app shows GO "Every limit holds", 6.12 km, 68.4 % at return.
+Callout 0.6 to 1.3 s on the card headline: "The limiting reason". (The map already labels the shadow "Radio shadow
+1.03 km", so the film does not repeat it.)
 
 ### s08 Real simulations (19.6, 4.4 s), footage c08a then c08b
 0.0 to 2.2 s, c08a: the landing simulation on the real terrain (Cesium). Played at 60x until the back shell separates,
 then 10x: the ground-level tracking camera watches the sky crane lower the lander on 7.6 m cords (app captions by
 altitude, "Sky crane"). Over it, the film's EDL rail (NASA/JPL Mars 2020 landing press kit,
 `public/data/global/edl_mars2020.json`): Entry 0 s, Parachute 240 s, Heat shield off 260 s, Powered descent 350 s,
-Sky crane 420 s; it fills across the clip's own stretch of the landing clock (345 to 420 s, updated from the capture).
+Sky crane 420 s; it fills across the clip's own stretch of the landing clock (334 to 420 s). The clip is two pieces of the 10x
+playback: the parachute (334 to 350 s) and, after a jump cut, the sky crane lowering the rover to touchdown (408 to 420 s).
+The landing site is on the plains east of the crater rim (78.0E 18.4N): inside the 20 m Jezero patch the app draws the
+landing result in the 20 m scene instead of flying its own cameras.
 2.2 to 4.4 s, c08b: "Walk it", playback at 600x; the chase camera follows the two astronauts on the route (HiRISE 1.3 m
 imagery near the base). The helmet view (ground ribbon path) is recorded too, as a spare.
 Captions: "Perseverance's landing steps, down to the sky crane." then at 2.3 s "Two crew walk the route at 600× speed."
@@ -103,7 +109,7 @@ Callout at 2.3 s: an ochre underline under the validation sentence.
 
 ### s10 Future and end card (26.6, 2.4 s)
 "Built for the first walks on Mars." (72 px), then the "HEYMARS" wordmark (120 px), the link (Martian Mono, 48 px,
-from `film.config.json` "link", now the placeholder "[link]") and "Ng Yu Hang, team Ecliptical". The bed's last chord
+from `film.config.json` "link": the live app, web-production-9b58e394.up.railway.app) and "Ng Yu Hang, team Ecliptical". The bed's last chord
 rings out from 27.8 s.
 
 ## Lines (measured in Schibsted Grotesk 500, all fit inside 1728 px)
@@ -116,7 +122,7 @@ rings out from 27.8 s.
 | Click any spot on Mars and ask. (56) | 805 |
 | MarsAgent runs real tools. The tools do the maths. (64) | 1448 |
 | Every answer is computed, and every step is shown. (56) | 1333 |
-| NO GO: 2.2 km of the walk is out of radio contact. (56) | 1247 |
+| NO GO: 1.0 km of the walk is out of radio contact. (56) | about 1240 |
 | Raise the mast to 20 m. It replans: GO. (56) | 970 |
 | Perseverance's landing steps, down to the sky crane. (56) | 1341 |
 | Two crew walk the route at 600× speed. (56) | 1025 |
@@ -125,6 +131,6 @@ rings out from 27.8 s.
 | Built for the first walks on Mars. (72) | about 1020 |
 
 ## Music
-`tools/music.py`, 120 BPM: soft pad and shaker from s02, the groove eases in at 5.0 s (HEYMARS), the last chord rings
+Kept subtle (bed at -13.5 dBFS RMS, mixed at volume 0.3). Not listened to by the builder. `tools/music.py`, 120 BPM: soft pad and shaker from s02, the groove eases in at 5.0 s (HEYMARS), the last chord rings
 from 27.8 s (end card). Original, generated by code in this folder; nothing to license. To ship silent instead, delete
 `music` from `scenes.json` and rebuild.

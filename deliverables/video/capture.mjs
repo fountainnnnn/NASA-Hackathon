@@ -41,6 +41,9 @@ const want = (s) => !only || only.includes(s);
 // "Raise mast to 20 m" replans to GO, "Every limit holds" (6.16 km, 2 h 32 min, 68.3 % battery at return).
 const TARGET = { lon: 77.49357, lat: 18.47162 };
 const JEZERO = { lon: 77.45, lat: 18.44 };
+// The landing simulation follows the lander with its own cameras only outside the 20 m Jezero patch (inside it the result
+// is drawn in the 20 m scene), so the landing shot uses a site on the plains just east of the crater rim.
+const LAND = { lon: 78.0, lat: 18.4 };
 const Q_LIVE = "Can I walk here and back from base?";
 const Q_VERB = "Walk here and back";
 
@@ -210,8 +213,10 @@ if (want("orbit")) {
   await start("orbit");
   await pause(0.4);
   mark("fly");
-  await page.evaluate(([lon, lat]) => window.__planet.view(lon, lat, 25, { pitchDeg: -28, headingDeg: 20 }), [JEZERO.lon, JEZERO.lat]);
+  await page.evaluate(([lon, lat]) => window.__planet.view(lon, lat, 160, { pitchDeg: -38, headingDeg: 15 }), [JEZERO.lon, JEZERO.lat]);
   mark("landed");
+  await page.waitForFunction(() => window.__planet.stats().tilesLoaded, null, { timeout: 30000 }).catch(() => {});
+  mark("sharp");
   await pause(1.2);
   await stop();
 }
@@ -219,7 +224,7 @@ if (want("orbit")) {
 // c08a landing: click the planet, "Landing check", "Run landing simulation". At 60x until the back shell separates
 // (340 s after entry), then 10x so the sky crane is seen from the ground-level tracking camera.
 if (want("landing")) {
-  await page.evaluate(([lon, lat]) => window.__planet.view(lon, lat, 400, { pitchDeg: -60, instant: true }), [JEZERO.lon, JEZERO.lat]);
+  await page.evaluate(([lon, lat]) => window.__planet.view(lon, lat, 400, { pitchDeg: -60, instant: true }), [LAND.lon, LAND.lat]);
   await page.waitForFunction(() => window.__planet.stats().tilesLoaded, null, { timeout: 60000 }).catch(() => {});
   await pause(1);
   const st = await stageBox();
@@ -245,6 +250,12 @@ if (want("landing")) {
   await closeAll();
 }
 
+// a fresh session for the Jezero part, so the panel thread holds only the walk's turns
+if (want("orbit") || want("landing")) {
+  await page.goto(`${base}/?qa=1`, { waitUntil: "load", timeout: 120000 });
+  await page.waitForFunction("window.__mw && window.__mw.ready() && !!window.__planet", null, { timeout: 150000 });
+  await pause(2.5);
+}
 // into the 20 m Jezero scene (the app's own verb), then wait for the base to be on screen
 await askWait("Take me to Jezero", "tool", 150000);
 await page.waitForFunction("window.__mw.globe.getState().mode === 'jezero' && window.__mw.projectJezero({lon: window.__mw.world.getState().base.lon, lat: window.__mw.world.getState().base.lat}).visible", null, { timeout: 150000 });
@@ -290,20 +301,24 @@ if (want("click")) {
 
 // c06 steps: the panel's narration of that turn, then "How I worked it out" open on a formula with real numbers
 if (want("steps")) {
+  await page.evaluate(() => { const log = document.querySelector("#marsagent-panel [role=log]"); const art = [...log.querySelectorAll("article")].pop(); log.scrollTop += art.getBoundingClientRect().top - log.getBoundingClientRect().top - 8; });
+  await pause(0.4);
   await start("steps");
-  await boxes("steps", { narration: [["#marsagent-panel ol[aria-label='What MarsAgent is doing']", null]], panel: [["#marsagent-panel"]] });
+  await boxes("steps", { narration: [["#marsagent-panel [role=log] article:last-of-type ol[aria-label='What MarsAgent is doing']"]], panel: [["#marsagent-panel"]] });
   await pause(0.9);
   mark("expand");
-  const sum = page.locator("#marsagent-panel details summary").last();
+  const sum = page.locator("#marsagent-panel [role=log] article").last().locator("details summary");
   await clickLoc(sum, "How I worked it out");
-  await pause(0.6);
+  await pause(0.5);
   await page.evaluate(() => {
     const log = document.querySelector("#marsagent-panel [role=log]");
-    const pre = [...log.querySelectorAll("details[open] pre")].find((e) => /=\s*[\d(−-]/.test(e.textContent)) ?? log.querySelector("details[open]");
-    if (pre) log.scrollTo({ top: pre.offsetTop - log.offsetTop - 120, behavior: "smooth" });
+    const art = [...log.querySelectorAll("article")].pop();
+    const pres = [...art.querySelectorAll("details[open] pre")];
+    const pre = pres.find((e) => /battery|%/i.test(e.getAttribute("aria-label") + e.textContent) && /=/.test(e.textContent)) ?? pres.find((e) => /=/.test(e.textContent)) ?? pres[0];
+    if (pre) { pre.setAttribute("data-film-formula", "1"); log.scrollTo({ top: log.scrollTop + pre.getBoundingClientRect().top - log.getBoundingClientRect().top - log.clientHeight * 0.3, behavior: "smooth" }); }
   });
-  await pause(1.0);
-  await boxes("steps", { formula: [["#marsagent-panel details[open] pre", /=\s*[\d(−-][\s\S]*=/], ["#marsagent-panel details[open] pre"]] });
+  await pause(1.4);
+  await boxes("steps", { formula: [["[data-film-formula]"]] });
   mark("formula");
   await pause(1.6);
   await stop();

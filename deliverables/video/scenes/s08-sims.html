@@ -13,13 +13,13 @@
   <div id="s08-root" class="rk-scene on-stage" data-composition-id="s08" data-width="1920" data-height="1080" data-duration="4.4" data-qa-hold="4.4" data-qa-endhold="4.4">
     <div id="s08-ground" class="rk-ground is-stage clip" data-start="0" data-duration="4.4" data-track-index="0"></div>
     <div id="s08-cam" class="hm-cam" style="transform: translate(0px, 0px) scale(1.3333);">
-      <div id="s08-m0" class="hm-media hm-slate clip" data-start="0" data-duration="2.2" data-track-index="1" data-qa-ignore><b>CAPTURE PENDING</b><span>Sky crane lowers the lander onto the real terrain, seen from the ground-level tracking camera (Cesium)</span></div>
-      <div id="s08-m1" class="hm-media hm-slate clip" data-start="2.2" data-duration="2.2" data-track-index="2" data-qa-ignore><b>CAPTURE PENDING</b><span>Chase camera behind the two astronauts walking the planned route at 600x</span></div>
+      <video id="s08-m0" class="hm-media" src="footage/c08a.mp4" data-start="0" data-duration="2.2" data-track-index="1" muted playsinline></video>
+      <video id="s08-m1" class="hm-media" src="footage/c08b.mp4" data-start="2.2" data-duration="2.2" data-track-index="2" muted playsinline></video>
     </div>
-    <div id="s08-co0-tag" class="hm-tag" data-qa="box" style="left: 1281.56px; top: 723.05px; opacity: 0;"><span class="hm-mono">600</span>× playback</div>
+    <div id="s08-co0-tag" class="hm-tag" data-qa="box" style="left: 1415.7px; top: 713.41px; opacity: 0;"><span class="hm-mono">600</span>× playback</div>
     <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
-      <circle id="s08-co0-ring" cx="1281.56" cy="843.05" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
-      <line id="s08-co0-line" opacity="0" x1="1281.56" y1="723.05" x2="1281.56" y2="827.05" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
+      <circle id="s08-co0-ring" cx="1415.7" cy="833.41" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s08-co0-line" opacity="0" x1="1415.7" y1="713.41" x2="1415.7" y2="817.41" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
     </svg>
     <div id="s08-edl" class="hm-edl" style="top: 96px; opacity: 0;" data-qa="box">
       <div class="hm-edl-rail"></div>
@@ -35,7 +35,6 @@
       <div id="s08-e4" class="hm-edl-mark" style="left: 1608px; top: 0px; transform: translate(-100%,0); text-align: right;"><b>Sky crane</b> <span class="hm-mono">420</span> s</div>
       <div id="s08-et4" class="hm-edl-tick" style="left: 1607px;"></div>
     </div>
-    <div id="s08-pending" class="hm-pending" data-qa-ignore>CAPTURE PENDING</div>
     <div id="s08-band" class="hm-band"></div>
     <div id="s08-cap0" class="hm-cap">Perseverance's landing steps, down to the sky crane.</div>
     <div id="s08-cap1" class="hm-cap">Two crew walk the route at <span class="hm-mono">600</span>× speed.</div>
@@ -47,17 +46,17 @@
       const tl = gsap.timeline({ paused: true });
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
       tl.set($("s08-cam"), { x: 0, y: 0, scale: 1.3333, transformOrigin: "0 0" }, 0);
-      tl.fromTo($("s08-cam"), { x: 0, y: 0, scale: 1.3333 }, { x: 177.78, y: 0, scale: 1.0864, duration: 0.01, ease: RK.E.io, immediateRender: false }, 2.2);
+      tl.fromTo($("s08-cam"), { x: 0, y: 0, scale: 1.3333 }, { x: -84.09, y: -262.86, scale: 1.4109, duration: 0.01, ease: RK.E.io, immediateRender: false }, 2.2);
       gsap.set($("s08-co0-tag"), { xPercent: -50, yPercent: -100 });
-      // callout 0: "600× playback" at (1281.56, 843.05)
+      // callout 0: "600× playback" at (1415.7, 833.41)
       tl.set([$("s08-co0-ring"), $("s08-co0-line"), $("s08-co0-tag")], { opacity: 0 }, 0);
-      tl.fromTo($("s08-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1281.56px 843.05px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.7);
+      tl.fromTo($("s08-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1415.7px 833.41px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.7);
       tl.fromTo($("s08-co0-line"), { opacity: 1, strokeDashoffset: 104 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.78);
       RK.rise(tl, $("s08-co0-tag"), 2.92, { y: 10, dur: 0.45, fade: 0.12 });
       tl.set($("s08-edl"), { opacity: 0 }, 0);
       RK.rise(tl, $("s08-edl"), 0.15, { y: -8, dur: 0.45, fade: 0.15 });
-      tl.fromTo($("s08-edl-fill"), { scaleX: 0.82 }, { scaleX: 1, duration: 1.8, ease: "none", transformOrigin: "0 50%" }, 0.15);
-      tl.fromTo($("s08-e3"), { opacity: 0.4 }, { opacity: 1, duration: 0.15 }, 0.27);
+      tl.fromTo($("s08-edl-fill"), { scaleX: 0.8 }, { scaleX: 1, duration: 1.8, ease: "none", transformOrigin: "0 50%" }, 0.15);
+      tl.fromTo($("s08-e3"), { opacity: 0.4 }, { opacity: 1, duration: 0.15 }, 0.48);
       tl.fromTo($("s08-e4"), { opacity: 0.4 }, { opacity: 1, duration: 0.15 }, 1.9);
       tl.to($("s08-edl"), { opacity: 0, duration: 0.2, ease: RK.E.in }, 2.05);
       RK.words(tl, $("s08-cap0"), 0.3, { stagger: 0.05, dur: 0.45 });

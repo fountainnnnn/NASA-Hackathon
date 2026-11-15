@@ -13,14 +13,13 @@
   <div id="s04-root" class="rk-scene on-stage" data-composition-id="s04" data-width="1920" data-height="1080" data-duration="4.4" data-qa-hold="4.4" data-qa-endhold="4.4">
     <div id="s04-ground" class="rk-ground is-stage clip" data-start="0" data-duration="4.4" data-track-index="0"></div>
     <div id="s04-cam" class="hm-cam" style="transform: translate(177.78px, 0px) scale(1.0864);">
-      <img id="s04-m0" class="hm-media clip" src="footage/pending/map.png" data-start="0" data-duration="4.4" data-track-index="1" alt="">
+      <video id="s04-m0" class="hm-media" src="footage/c04.mp4" data-start="0" data-duration="4.4" data-track-index="1" muted playsinline></video>
     </div>
-    <div id="s04-co0-tag" class="hm-tag" data-qa="box" style="left: 515.32px; top: 608.22px; opacity: 0;">Answer at your cursor</div>
+    <div id="s04-co0-tag" class="hm-tag" data-qa="box" style="left: 686.34px; top: 526.37px; opacity: 0;">Answer at your cursor</div>
     <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
-      <circle id="s04-co0-ring" cx="635.32" cy="608.22" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
-      <line id="s04-co0-line" opacity="0" x1="515.32" y1="608.22" x2="619.32" y2="608.22" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
+      <circle id="s04-co0-ring" cx="796.34" cy="526.37" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s04-co0-line" opacity="0" x1="686.34" y1="526.37" x2="780.34" y2="526.37" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="94 94"/>
     </svg>
-    <div id="s04-pending" class="hm-pending" data-qa-ignore>CAPTURE PENDING: approved mockup still, real footage replaces it</div>
     <div id="s04-band" class="hm-band"></div>
     <div id="s04-cap0" class="hm-cap">Click any spot on Mars and ask.</div>
     <div id="s04-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
@@ -31,13 +30,15 @@
       const tl = gsap.timeline({ paused: true });
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
       tl.set($("s04-cam"), { x: 177.78, y: 0, scale: 1.0864, transformOrigin: "0 0" }, 0);
-      tl.fromTo($("s04-cam"), { x: 177.78, y: 0, scale: 1.0864 }, { x: -698.01, y: 0, scale: 2.1645, duration: 1, ease: RK.E.io, immediateRender: false }, 1.2);
+      tl.fromTo($("s04-cam"), { x: 177.78, y: 0, scale: 1.0864 }, { x: -588.71, y: -531.15, scale: 1.7422, duration: 0.9, ease: RK.E.io, immediateRender: false }, 1);
+      tl.fromTo($("s04-cam"), { x: -588.71, y: -531.15, scale: 1.7422 }, { x: 0, y: -34.12, scale: 2.0749, duration: 0.8, ease: RK.E.io, immediateRender: false }, 3);
       gsap.set($("s04-co0-tag"), { xPercent: -100, yPercent: -50 });
-      // callout 0: "Answer at your cursor" at (635.32, 608.22)
+      // callout 0: "Answer at your cursor" at (796.34, 526.37)
       tl.set([$("s04-co0-ring"), $("s04-co0-line"), $("s04-co0-tag")], { opacity: 0 }, 0);
-      tl.fromTo($("s04-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "635.32px 608.22px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.4);
-      tl.fromTo($("s04-co0-line"), { opacity: 1, strokeDashoffset: 104 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.48);
-      RK.rise(tl, $("s04-co0-tag"), 2.62, { y: 10, dur: 0.45, fade: 0.12 });
+      tl.fromTo($("s04-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "796.34px 526.37px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2);
+      tl.fromTo($("s04-co0-line"), { opacity: 1, strokeDashoffset: 94 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 2.08);
+      RK.rise(tl, $("s04-co0-tag"), 2.22, { y: 10, dur: 0.45, fade: 0.12 });
+      tl.to([$("s04-co0-ring"), $("s04-co0-line"), $("s04-co0-tag")], { opacity: 0, duration: 0.2, ease: RK.E.in }, 2.9);
       RK.words(tl, $("s04-cap0"), 0.35, { stagger: 0.05, dur: 0.45 });
       window.__timelines["s04"] = tl;
     })();

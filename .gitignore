@@ -59,3 +59,4 @@ deliverables/video/assets/bgm/*.wav
 deliverables/screens/
 test-results/
 deliverables/video/.film/
+deliverables/video/.hyperframes/video-state.json

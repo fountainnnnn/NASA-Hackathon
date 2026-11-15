@@ -1,7 +1,7 @@
 {
  "title": "HeyMars",
  "byline": "Ng Yu Hang, team Ecliptical",
- "link": "[link]",
+ "link": "web-production-9b58e394.up.railway.app",
  "transition": 0.4,
  "credit": "NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons",
  "capture": {
@@ -89,15 +89,26 @@
      ]
     },
     {
-     "at": 1.2,
-     "dur": 1.0,
+     "at": 1.0,
+     "dur": 0.9,
+     "box": [
+      690,
+      370,
+      540,
+      410
+     ],
+     "pad": 0.06
+    },
+    {
+     "at": 3.0,
+     "dur": 0.8,
      "box": "card@click",
-     "pad": 0.2,
+     "pad": 0.04,
      "grow": [
-      40,
-      20,
-      40,
-      -170
+      0,
+      0,
+      260,
+      -190
      ]
     }
    ],
@@ -109,11 +120,12 @@
    ],
    "callouts": [
     {
-     "at": 2.4,
-     "box": "card@click",
+     "at": 2.0,
+     "until": 2.9,
+     "box": "card@clicked",
      "anchor": "l",
      "side": "left",
-     "len": 140,
+     "len": 110,
      "text": "Answer at your cursor"
     }
    ]
@@ -189,17 +201,17 @@
     {
      "at": 0,
      "box": [
-      150,
-      60,
-      860,
-      600
+      40,
+      40,
+      960,
+      450
      ]
     }
    ],
    "captions": [
     {
      "at": 0.3,
-     "text": "NO GO: 2.2 km of the walk is out of radio contact."
+     "text": "NO GO: 1.0 km of the walk is out of radio contact."
     },
     {
      "at": 2.0,
@@ -208,21 +220,13 @@
    ],
    "callouts": [
     {
-     "at": 0.7,
-     "until": 1.9,
-     "box": "shadow@route",
-     "anchor": "c",
-     "side": "below",
-     "len": 150,
-     "text": "Radio shadow 2.2 km"
-    },
-    {
-     "at": 2.4,
-     "box": "verdict@replan",
-     "anchor": "l",
-     "side": "left",
-     "len": 130,
-     "text": "Verdict with its reason"
+     "at": 0.6,
+     "until": 1.8,
+     "box": "headline@route",
+     "anchor": "r",
+     "side": "right",
+     "len": 110,
+     "text": "The limiting reason"
     }
    ]
   },
@@ -259,11 +263,12 @@
      "at": 2.2,
      "dur": 0.01,
      "box": [
-      0,
-      0,
-      1440,
-      810
-     ]
+      360,
+      280,
+      760,
+      525
+     ],
+     "pad": 0.04
     }
    ],
    "captions": [
@@ -287,7 +292,7 @@
     }
    ],
    "edl": {
-    "from": 345,
+    "from": 334,
     "to": 420
    }
   },
@@ -316,8 +321,13 @@
    "cam": [
     {
      "at": 0,
-     "box": "paper@report",
-     "pad": 0.02
+     "box": [
+      426,
+      52,
+      820,
+      430
+     ],
+     "pad": 0.03
     },
     {
      "at": 1.5,
@@ -389,13 +399,34 @@
    ]
   }
  },
- "boxes": {},
+ "boxes": {
+  "clicked": {
+   "card": [
+    795,
+    458,
+    300,
+    298
+   ],
+   "selected": [
+    836,
+    396,
+    24,
+    24
+   ]
+  }
+ },
  "cuts": {
   "c03": {
    "shot": "orbit",
    "from": "fly-0.3",
-   "to": "landed+0.8",
-   "maxSpeed": 2.5
+   "to": "sharp+0.9",
+   "skip": [
+    [
+     "fly+2.55",
+     "sharp-0.4"
+    ]
+   ],
+   "maxSpeed": 1.6
   },
   "c04": {
    "shot": "click",
@@ -427,9 +458,15 @@
   },
   "c08a": {
    "shot": "landing",
-   "from": "slow+0.3",
-   "to": "touchdown+1.5",
-   "maxSpeed": 3.5
+   "from": "slow",
+   "to": "slow+9.2",
+   "skip": [
+    [
+     "slow+1.6",
+     "slow+7.4"
+    ]
+   ],
+   "maxSpeed": 1.7
   },
   "c08b": {
    "shot": "walk",
