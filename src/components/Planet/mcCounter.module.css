@@ -13,8 +13,8 @@
 .word { font: 400 12px/1.4 var(--font-display, "Michroma", sans-serif); letter-spacing: 0.04em; }
 .word:empty { display: none; }
 @media (max-width: 640px) {
-  /* phone: a full-width strip under the phase caption, clear of the credit line and the bottom card sheet */
-  .counter { top: 64px; right: 8px; left: 8px; bottom: auto; justify-content: flex-start; max-width: none; column-gap: 12px; font-size: 11px; }
+  /* phone: a full-width strip just above the two-line data credit (the caption and legend own the top) */
+  .counter { top: auto; right: 8px; left: 8px; bottom: calc(var(--inset, 0px) + 66px); justify-content: flex-start; max-width: none; column-gap: 12px; font-size: 11px; }
   /* once testing ends the completion card carries the result, so the strip steps aside */
   .counter[data-done="1"] { display: none; }
 }
