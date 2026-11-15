@@ -91,7 +91,7 @@ HeyMars is a mission planning map for the first crews on Mars. It covers the who
 
 **Validation.** The scripts sample the 20 m DEM at 708 Perseverance waypoints and compare it with each waypoint's recorded elevation: median offset -1.06 m, mean -0.89 m, standard deviation 3.25 m, 95th percentile of the absolute offset 6.44 m, largest 11.72 m on a steep slope. The global MOLA grid differs from the 20 m model by 11.3 m at the landing site. These show agreement between NASA products, not ground truth.
 
-**Testing.** 519 unit tests in 49 files pass (Vitest). They cover A* symmetry and limits, a brute-force Dijkstra cross-check, Horn slope on known planes, line of sight with curvature, Mars24 against NASA GISS, Horizons light time, go/no-go rules, the EDL timeline and Rust against TypeScript Monte Carlo. Playwright end-to-end tests drive the real app in a browser: 16 of 16 pass. A layout QA script checks overlap, clipping, contrast and keyboard reach in 29 app states.
+**Testing.** 519 unit tests in 49 files pass (Vitest). They cover A* symmetry and limits, a brute-force Dijkstra cross-check, Horn slope on known planes, line of sight with curvature, Mars24 against NASA GISS, Horizons light time, go/no-go rules, the EDL timeline and Rust against TypeScript Monte Carlo. 16 Playwright end-to-end tests drive the real app in a browser. A layout QA script checks overlap, clipping, contrast and keyboard reach in 29 app states.
 
 ### Tools and languages
 
@@ -143,7 +143,7 @@ Full detail: docs/AI_USE.md.
 
 | Dataset | Mission and instrument | Exact source | What it lets the astronaut decide | Resources tab |
 | --- | --- | --- | --- | --- |
-| Mars Trek global 3D terrain | Terrain tiles used by Mars Trek's own 3D viewer; heights match MOLA after a fixed 8,201 m offset (tested) | https://marshub.s3.amazonaws.com/mars_v14/ | The shape of the ground anywhere on Mars, from orbit to an oblique ground view | Yes, Mars Trek |
+| Mars Trek global 3D terrain | Terrain tiles used by Mars Trek's own 3D viewer; heights match MOLA after a fixed 8,201 m offset (tested) | https://marshub.s3.amazonaws.com/mars_v14/layer.json | The shape of the ground anywhere on Mars, from orbit to an oblique ground view | Yes, Mars Trek |
 | Viking MDIM 2.1 colour mosaic, 232 m | Viking Orbiters (USGS Astrogeology) | https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/WMTSCapabilities.xml | Where a region is, and its broad colour and terrain | Yes, Mars Trek |
 | CTX global mosaic, about 5 m (beta01, uncontrolled) | MRO Context Camera (Caltech Murray Lab) | https://trek.nasa.gov/tiles/Mars/EQ/CTX_beta01_uncontrolled_5m_Caltech/1.0.0/WMTSCapabilities.xml (tiles served from astro.arcgis.com) | Craters, ridges and dunes near a candidate site | Yes, Mars Trek |
 | MOLA MEGDR 1/8 degree | MGS Mars Orbiter Laser Altimeter | https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img | Elevation and regional slope anywhere, for the landing elevation check | No, PDS |
