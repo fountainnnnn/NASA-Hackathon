@@ -60,7 +60,7 @@ HeyMars is a mission planning map for the first crews on Mars. It covers the who
 
 ### How it works
 
-**Data pipeline.** Node scripts download the NASA and USGS products once, crop and convert them, and write small static files to `public/data`. They record the source URL, download date, checksum, processing and credit of each file in `data/source_manifest.json`. At runtime the app reads JPL Mars Trek terrain and imagery tiles directly, and Perseverance raw-image metadata through a small server proxy with a cache. Everything else is static.
+**Data pipeline.** Node scripts download the NASA and USGS products once, crop and convert them, and write small static files to `public/data`. They record the source URL, download date, checksum, processing and credit of each file in `data/source_manifest.json`. At runtime the app reads JPL Mars Trek terrain directly, and imagery tiles and Perseverance raw-image metadata through its own server proxy with a cache. Everything else is static.
 
 **Frame.** Mars 2000 sphere, R = 3,396,190 m, planetocentric latitude, east-positive longitude, heights above the MOLA areoid.
 
