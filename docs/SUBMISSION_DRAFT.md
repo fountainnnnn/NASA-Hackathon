@@ -165,7 +165,7 @@ Full detail: docs/AI_USE.md.
 | Mars24 algorithm | NASA GISS | https://www.giss.nasa.gov/tools/mars24/ | Local solar time, sun elevation and daylight left at return | No |
 | Mars 2020 EDL timeline | NASA/JPL landing press kit | https://www.jpl.nasa.gov/news/press_kits/mars_2020/landing/mission/ | The phases and altitudes of the landing simulation | No |
 | Perseverance landing ellipse size | NASA Science | https://science.nasa.gov/resource/perseverance-rover-landing-ellipse-in-jezero-crater/ | The 7.7 by 6.6 km ellipse for the Monte Carlo | No |
-| MSL landing-site engineering constraints | NASA/JPL | https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf | Which landing criteria a site passes, and which cannot be judged from global data | No |
+| MSL landing-site engineering constraints | NASA/JPL | https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf | Which landing criteria a site passes, with labelled estimates where global data is too coarse | No |
 | Mars Fact Sheet | NASA NSSDC | https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html | Surface gravity 3.721 m/s^2 for climb work | No |
 
 The Resources tab also lists the Curiosity proposed path example and NASA Worldview. Neither is used as data.
