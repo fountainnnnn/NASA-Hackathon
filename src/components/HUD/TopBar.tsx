@@ -54,7 +54,8 @@ export function TopBar() {
   // mission instant: EVA start plus scenario time while a walk plays, otherwise now
   // landing: the descent is timed to touch down at 10:00 local solar time at the site (daylight), entry + scenario time
   const landStart = useHud((h) => h.landing?.startUtcMs);
-  const when = simOn && walkOn && kind !== 'landing' ? start + t * 1000 : simOn && kind === 'landing' && landStart ? landStart + t * 1000 : now;
+  // in Jezero (planning) the clock shows the planned EVA start, so a daylight verdict never sits beside a night clock
+  const when = simOn && walkOn && kind !== 'landing' ? start + t * 1000 : simOn && kind === 'landing' && landStart ? landStart + t * 1000 : mode === 'jezero' && start ? start : now;
   let ltst = '', sun = '';
   if (now && site) try {
     ltst = formatHms(ltstHours(marsState(when), site.lon)).slice(0, 5);

@@ -50,7 +50,7 @@ HeyMars is a mission planning map for the first crews on Mars. It covers the who
 
 - **Whole planet.** A 3D globe with JPL Mars Trek terrain, the Viking MDIM 2.1 colour mosaic and the CTX global mosaic. You can turn on MOLA elevation and slope, the USGS geologic map of Mars, Mars Odyssey water-equivalent hydrogen, TES thermal inertia and TES dust cover.
 - **Click and ask.** A small reticle follows the cursor. Click a point and MarsAgent opens a card there: elevation, regional slope, geologic unit, orbital layers, nearby landing sites and named places. The same turn appears in the MarsAgent panel, which shows the full working.
-- **Could we land here?** MarsAgent checks 8 criteria from NASA's MSL landing-site engineering guide. Latitude, elevation and thermal inertia are scored from global data. The other 5 need finer terrain or rock data and are shown as "no data", not guessed.
+- **Could we land here?** MarsAgent checks 8 criteria from NASA's MSL landing-site engineering guide. Latitude, elevation and thermal inertia are scored from global data. The other 5 need finer terrain or rock data than exists globally, so MarsAgent fills them with a derived estimate (marked est.) or a fixed placeholder (marked mock) and always says so in the card, the reasoning and the report.
 - **Landing simulation.** 10,000 seeded Monte Carlo touchdowns in a 7.7 by 6.6 km ellipse, the size NASA gives for Perseverance. Then a 3D lander flies the Mars 2020 timeline on real terrain: parachute, heat shield separation, radar, Terrain-Relative Navigation, powered descent and sky crane.
 - **Plan a walk at Jezero.** Drag from the base to a target. MarsAgent plans a round trip on the 20 m terrain model and checks slope, suit battery, EVA time, daylight, radio line of sight to the base mast and terrain coverage. The verdict is GO, HOLD or NO GO with the one limiting reason.
 - **Replan.** If there is no path, the card says why and offers the smallest slope limit that works or the nearest reachable point. If a radio shadow blocks the plan, it offers a taller mast. Each change replans with the same tools.
@@ -87,11 +87,11 @@ HeyMars is a mission planning map for the first crews on Mars. It covers the who
 - Verdict: each check is go, caution or no-go; the worst one sets GO, HOLD or NO GO.
 - Landing Monte Carlo: truncated 2-D Gaussian with 3 sigma at the ellipse semi-axes, 10,000 seeded draws, slope sampled at each touchdown. Rust compiled to WebAssembly, with a TypeScript fallback. The two agree within histogram resolution (tested).
 
-**Simulations.** The lander, parachute, heat shield, back shell and rover are original simple 3D models built in code at true scale, with matte materials and no insignia. The astronauts are built from three.js primitives with jointed legs, so the planted boot stays on the ground. Phase times and altitudes come from the NASA/JPL Mars 2020 landing press kit.
+**Simulations.** The lander, parachute, heat shield, back shell and rover are original simple 3D models built in code, with matte materials and no insignia. They are drawn 3x to 4x true size so they are visible from the camera, and the legend states the factor. The astronauts are built from three.js primitives with jointed legs, so the planted boot stays on the ground. Phase times and altitudes come from the NASA/JPL Mars 2020 landing press kit.
 
 **Validation.** The scripts sample the 20 m DEM at 708 Perseverance waypoints and compare it with each waypoint's recorded elevation: median offset -1.06 m, mean -0.89 m, standard deviation 3.25 m, 95th percentile of the absolute offset 6.44 m, largest 11.72 m on a steep slope. The global MOLA grid differs from the 20 m model by 11.3 m at the landing site. These show agreement between NASA products, not ground truth.
 
-**Testing.** 435 unit tests in 40 files pass (Vitest). They cover A* symmetry and limits, a brute-force Dijkstra cross-check, Horn slope on known planes, line of sight with curvature, Mars24 against NASA GISS, Horizons light time, go/no-go rules, the EDL timeline and Rust against TypeScript Monte Carlo. Playwright end-to-end tests drive the real app in a browser: 14 of 14 passed on the last recorded run. A layout QA script checks overlap, clipping, contrast and keyboard reach at 1440x810, 1280x720, 1024x768 and 390x844.
+**Testing.** 519 unit tests in 49 files pass (Vitest). They cover A* symmetry and limits, a brute-force Dijkstra cross-check, Horn slope on known planes, line of sight with curvature, Mars24 against NASA GISS, Horizons light time, go/no-go rules, the EDL timeline and Rust against TypeScript Monte Carlo. Playwright end-to-end tests drive the real app in a browser: 15 of 15 passed on the last recorded run. A layout QA script checks overlap, clipping, contrast and keyboard reach at 1440x810, 1280x720, 1024x768 and 390x844.
 
 ### Tools and languages
 
@@ -116,6 +116,8 @@ Show that an agent can plan inside a real map with tools a reviewer can check, a
 - Suit power, battery, speed factor, crew mass, mast height and the comms rule are assumptions, not a NASA EVA or life-support model.
 - No live weather, dust, radiation or orbiter relay passes.
 - Landing criteria are the MSL (Curiosity) constraints, used as a reference, not the Mars 2020 requirements.
+- Values marked mock are placeholders, not measurements; values marked est. are derived from coarser data. Both are labelled wherever they appear.
+- Scenario objects are drawn larger than true size for visibility (factor shown in the legend); distances, times and verdicts use true dimensions.
 - The agent's prose can be wrong. The number guard checks numbers, not reasoning.
 
 ---

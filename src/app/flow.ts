@@ -253,7 +253,7 @@ async function runScenario(meta: AskMeta) {
     if (r.verdict) n.step({ kind: 'verdict', title: `Landing verdict: ${r.verdict.label}`, durMs: 0, text: r.verdict.reason, code: [r.verdict.rule, ...(r.verdict.calc ?? [])], tone: okTone, raw: r.verdict });
     const why: Answer['why'] = r.verdict ? { word: r.verdict.word, tone: okTone, lines: [
       { text: r.verdict.reason, step: 'Landing verdict' },
-      { text: `Median slope ${r.slopeP50Deg ?? 0}°, 95th percentile ${r.slopeP95Deg ?? 0}°, against a ${r.maxSlopeDeg}° limit.`, step: 'run_landing_scenario' },
+      { text: `Median slope ${fmt(r.slopeP50Deg ?? 0, 1)}°, 95th percentile ${fmt(r.slopeP95Deg ?? 0, 1)}°, against a ${r.maxSlopeDeg}° limit.`, step: 'run_landing_scenario' },
       { text: r.verdict.word === 'GO' ? 'A steeper site or a tighter slope limit would change it.' : 'A site with gentler ground, or a site inside Jezero on the 20 m terrain, would change it.' },
       ...(r.verdict.estimated ? [{ text: '(includes estimates: the terrain cell is wider than the ellipse)' }] : []),
     ] } : null;
@@ -385,7 +385,7 @@ const val = (v: number | null, unit: string) => (v == null ? '' : `${fmt(v, Math
 function whyRoute(ops: RouteOps): Answer['why'] {
   const items = ops.goNoGo.items;
   const lim = items.find((x) => x.status === 'no-go') ?? items.find((x) => x.status === 'caution');
-  const passed = items.filter((x) => x.status === 'go').map((x) => x.label.toLowerCase());
+  const passed = items.filter((x) => x.status === 'go').map((x) => x.label.toLowerCase().replace(/\beva\b/g, 'EVA'));
   const lines: NonNullable<Answer['why']>['lines'] = [];
   if (lim) lines.push({ text: `${lim.label}: ${val(lim.value, lim.unit)}${lim.limit != null ? ` against a limit of ${val(lim.limit, lim.unit)}` : ''}${lim.status === 'caution' ? ' (close to the limit)' : ''}.`, step: STEP_OF[lim.id] });
   if (passed.length) lines.push({ text: `Passed: ${passed.join(', ')}.` });
@@ -1231,7 +1231,7 @@ function showScenarioEnd(o: ScenarioOutcome) {
     const rows: Row[] = [
       { label: 'Touchdowns simulated', value: nf(st?.samples ?? sc?.samples ?? 0), tone: 'info' },
       { label: `Within ${st?.maxSlopeDeg ?? landing.maxSlopeDeg}° slope`, value: `${fmt(st?.okPercent ?? sc?.okPercent ?? 0, 1)} %`, tone },
-      { label: 'Median / 95th pct slope', value: `${sc?.slopeP50Deg ?? 0}° / ${st?.slopeP95Deg ?? sc?.slopeP95Deg ?? 0}°`, tone: 'info' },
+      { label: 'Median / 95th pct slope', value: `${fmt(sc?.slopeP50Deg ?? 0, 1)}° / ${fmt(st?.slopeP95Deg ?? sc?.slopeP95Deg ?? 0, 1)}°`, tone: 'info' },
       { label: 'Rover at touchdown point', value: ll2(landing.site), tone: 'info' },
     ];
     end(n, {
