@@ -29,7 +29,7 @@ References
 
 ## Link to Project Demo
 
-Video, 30 s or less: https://youtu.be/JLg3vAqIZdo
+Video, 30 s or less: https://youtu.be/UpM-vKv996A
 
 ## Link to Final Project
 
