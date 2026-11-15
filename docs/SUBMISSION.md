@@ -7,7 +7,7 @@ Deadline: Sun 15 Nov 2026, 23:59 SGT. Target: submit at 18:00 SGT.
 ## Before pasting
 
 - [ ] Push the latest commits to https://github.com/fountainnnnn/NASA-Hackathon.
-- [ ] Redeploy the live app and check that it shows HeyMars: https://web-production-9b58e394.up.railway.app
+- [ ] Redeploy the live app and check that it shows HeyMars: https://heymars.up.railway.app
 - [ ] Render the final 30 s video, check its length with ffprobe, upload it publicly and replace every `TODO(link)` with its URL.
 - [ ] Resolve every `TODO(verify)` in SUBMISSION_DRAFT.md.
 

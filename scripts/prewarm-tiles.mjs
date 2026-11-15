@@ -3,7 +3,7 @@
  * Warm the CTX tile proxy (and the edge CDN in front of it) for the Jezero region: every CTX tile within ±1 degree of the
  * crater centre at levels 8 to 12 (about 2,900 tiles), requested through the app's own /api/tiles/ctx route.
  *
- *   node scripts/prewarm-tiles.mjs https://web-production-9b58e394.up.railway.app
+ *   node scripts/prewarm-tiles.mjs https://heymars.up.railway.app
  *   PREWARM_LEVELS=8-11 PREWARM_SPAN=0.5 PREWARM_CONCURRENCY=8 node scripts/prewarm-tiles.mjs http://localhost:5200
  *
  * Run it after each deploy, from the region the users are in (the edge cache is per point of presence). Cold upstream

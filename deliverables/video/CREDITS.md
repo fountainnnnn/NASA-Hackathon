@@ -1,6 +1,6 @@
 # Credits (demo video)
 
-Footage: real screen capture of the live HeyMars app (https://web-production-9b58e394.up.railway.app, 15 Nov 2026),
+Footage: real screen capture of the live HeyMars app (https://heymars.up.railway.app, 15 Nov 2026),
 recorded with Playwright and the Chrome DevTools screencast at 2880x1620. Idle waits are cut out (jump cuts) and some
 clips play up to 1.7x faster; nothing is staged or composited into the app's picture. The film adds captions, callouts,
 the EDL rail and the camera framing on top.

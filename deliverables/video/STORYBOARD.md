@@ -109,7 +109,7 @@ Callout at 2.3 s: an ochre underline under the validation sentence.
 
 ### s10 Future and end card (26.6, 2.4 s)
 "Built for the first walks on Mars." (72 px), then the "HEYMARS" wordmark (120 px), the link (Martian Mono, 48 px,
-from `film.config.json` "link": the live app, web-production-9b58e394.up.railway.app) and "Ng Yu Hang, team Ecliptical". The bed's last chord
+from `film.config.json` "link": the live app, heymars.up.railway.app) and "Ng Yu Hang, team Ecliptical". The bed's last chord
 rings out from 27.8 s.
 
 ## Lines (measured in Schibsted Grotesk 500, all fit inside 1728 px)

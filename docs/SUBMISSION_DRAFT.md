@@ -33,7 +33,7 @@ Video, 30 s or less: TODO(link)
 
 ## Link to Final Project
 
-Live app: https://web-production-9b58e394.up.railway.app
+Live app: https://heymars.up.railway.app
 Repository: https://github.com/fountainnnnn/NASA-Hackathon
 
 Both must open in a private window with no login.
@@ -42,7 +42,7 @@ Both must open in a private window with no login.
 
 ## Detailed Project Description
 
-Live app: https://web-production-9b58e394.up.railway.app. Code: https://github.com/fountainnnnn/NASA-Hackathon
+Live app: https://heymars.up.railway.app. Code: https://github.com/fountainnnnn/NASA-Hackathon
 
 ### What it does
 
