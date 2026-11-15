@@ -183,8 +183,11 @@
 }
 
 /* GPS-style Recenter: bottom-right of the stage, above the data credit and the timeline (QA round 3) */
-.recenter {
+.viewCtl {
   position: absolute; z-index: 6; right: calc(var(--stage-right, var(--log-w, 0px)) + 12px); bottom: calc(var(--inset, 0px) + 36px);
+  display: flex; gap: 8px;
+}
+.recenter {
   display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 11px; border-radius: 15px;
   background: var(--chip, rgba(6, 5, 5, 0.88)); border: 1px solid var(--line-2); color: var(--text-1); font-size: 12px; white-space: nowrap;
 }

@@ -84,11 +84,18 @@ export const reliefShading = (altKm: number) => 1 - smoothstep(2000, 5000, altKm
 /** 0 = local sun (near the ground), 1 = camera-relative light (whole-disc views), blended between 600 and 3000 km. */
 export const globeLightBlend = (altKm: number) => smoothstep(600, 3000, altKm);
 
-/** The old globe's relief slider defaulted to 20x for a 7 km sphere. Real terrain is shown true below 300 km; the global view gets mild relief. */
+/**
+ * Relief near the ground, constant below 300 km so heights sampled for marks and the landing objects stay valid while
+ * the camera moves. Mars plains read as flat at true scale in an oblique view; the legend states the factor.
+ */
+export const GROUND_EXAGGERATION = 2.5;
+/** The old globe's relief slider defaulted to 20x for a 7 km sphere: the global view blends from the ground factor to that. */
 export function effectiveExaggeration(slider: number, altKm: number): number {
   const global = 1 + (clamp(slider, 1, 50) - 1) * 0.05;
-  return 1 + (global - 1) * smoothstep(300, 2500, altKm);
+  return GROUND_EXAGGERATION + (global - GROUND_EXAGGERATION) * smoothstep(300, 2500, altKm);
 }
+/** A true terrain height (m above the Mars ellipsoid) moved to where the exaggerated ground is drawn near the surface. */
+export const renderHeight = (h: number) => TERRAIN_DATUM_OFFSET_M + (h - TERRAIN_DATUM_OFFSET_M) * GROUND_EXAGGERATION;
 
 /** Vertical lift above sampled terrain so marks do not z-fight with a coarser rendered tile. Grows with distance. */
 export function liftForRangeM(rangeM: number): number {

@@ -155,6 +155,7 @@ export function Legend() {
         {rows.dots && <div className={sh.row}><span className={sh.dotSw} style={{ background: '#d9423b' }} />Touchdown over the limit</div>}
         <div className={sh.src}>Terrain: Mars Trek, EDL: Mars 2020</div>
         <div className={sh.src}>Imagery: CTX 5 m on Viking 232 m per pixel</div>
+        <div className={sh.src}>Relief drawn 2.5 times true height</div>
         {scaleNote && <div className={sh.src}>{scaleNote}</div>}
       </div>
     );

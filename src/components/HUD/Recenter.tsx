@@ -5,7 +5,7 @@
  * Click (or press C) flies back: the walk re-engages the chase camera, the landing calls the simulation's recenterLanding()
  * export when it exists, and Jezero frames the active route (or the base). Hidden in the helmet view.
  */
-import { LocateFixed } from 'lucide-react';
+import { LocateFixed, Rotate3d } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import * as LandingMod from '@/components/Planet/landing';
 import { useWalkUi } from '@/components/Scenario/walkStore';
@@ -64,20 +64,35 @@ export function Recenter() {
     setDrift(false);
   };
 
+  // the planet view can tilt between top-down and a low side view; the Jezero planner frames its own oblique camera
+  const tiltOn = mode === 'globe' && !helmet;
+  const tilt = () => window.dispatchEvent(new Event('heymars:tilt'));
+
   useEffect(() => {
-    if (!show) return;
+    if (!show && !tiltOn) return;
     const k = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
-      if ((e.key === 'c' || e.key === 'C') && !e.metaKey && !e.ctrlKey && !e.altKey && !(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))) { e.preventDefault(); recenter(); }
+      if (e.metaKey || e.ctrlKey || e.altKey || (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))) return;
+      if (show && (e.key === 'c' || e.key === 'C')) { e.preventDefault(); recenter(); }
+      else if (tiltOn && (e.key === 't' || e.key === 'T')) { e.preventDefault(); tilt(); }
     };
     window.addEventListener('keydown', k);
     return () => window.removeEventListener('keydown', k);
   });
 
-  if (!show) return null;
+  if (!show && !tiltOn) return null;
   return (
-    <button type="button" className={s.recenter} onClick={recenter} data-avoid title="Fly back to the framed view (C)" aria-keyshortcuts="C">
-      <LocateFixed size={14} strokeWidth={1.75} aria-hidden />Recenter
-    </button>
+    <div className={s.viewCtl} data-avoid>
+      {tiltOn && (
+        <button type="button" className={s.recenter} onClick={tilt} title="Switch between top-down and side view (T). Right-drag also tilts. Relief is drawn 2.5 times true height near the ground." aria-keyshortcuts="T">
+          <Rotate3d size={14} strokeWidth={1.75} aria-hidden />Tilt
+        </button>
+      )}
+      {show && (
+        <button type="button" className={s.recenter} onClick={recenter} title="Fly back to the framed view (C)" aria-keyshortcuts="C">
+          <LocateFixed size={14} strokeWidth={1.75} aria-hidden />Recenter
+        </button>
+      )}
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  TERRAIN_DATUM_OFFSET_M, ctxAlpha, globeLightBlend, effectiveExaggeration, elevationFromHeight, flightDurationS, heightFromElevation, inJezero,
+  TERRAIN_DATUM_OFFSET_M, ctxAlpha, globeLightBlend, effectiveExaggeration, elevationFromHeight, renderHeight, flightDurationS, heightFromElevation, inJezero,
   landingViewpoint, liftBucket, liftForRangeM, pitchForAltitudeKm, rangeForAltitudeM, roundAltKm, retryEachFrame,
 } from '../../src/components/Planet/planetMath';
 
@@ -62,11 +62,13 @@ describe('imagery and relief by altitude', () => {
     expect(globeLightBlend(300)).toBe(0);
     expect(globeLightBlend(9000)).toBe(1);
   });
-  it('real terrain is shown true near the ground', () => {
-    expect(effectiveExaggeration(20, 50)).toBe(1);
+  it('relief is a constant 2.5x near the ground and blends to the global factor', () => {
+    expect(effectiveExaggeration(20, 50)).toBe(2.5);
+    expect(effectiveExaggeration(20, 299)).toBe(2.5);
     expect(effectiveExaggeration(20, 9000)).toBeGreaterThan(1);
     expect(effectiveExaggeration(20, 9000)).toBeLessThan(3);
     expect(effectiveExaggeration(1, 9000)).toBe(1);
+    expect(renderHeight(TERRAIN_DATUM_OFFSET_M + 100)).toBeCloseTo(TERRAIN_DATUM_OFFSET_M + 250);
   });
 });
 

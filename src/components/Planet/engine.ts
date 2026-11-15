@@ -14,7 +14,7 @@ import { VIKING_TEXEL_M, ctxLevelFor, ctxTexelM, floorRangeM, groundPxM, marsIma
 import { withTerrainNormals } from './terrainNormals';
 import {
   CTX, DATA_CREDIT, JEZERO_HANDOFF_ALT_KM, MARS_RADII_M, MIN_CAMERA_HEIGHT_M, SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG, TERRAIN_DATUM_OFFSET_M, TERRAIN_URL,
-  ctxAlpha, effectiveExaggeration, reliefShading, elevationFromHeight, flightDurationS, globeLightBlend, inJezero, pitchForAltitudeKm,
+  ctxAlpha, effectiveExaggeration, renderHeight, reliefShading, elevationFromHeight, flightDurationS, globeLightBlend, inJezero, pitchForAltitudeKm,
   rangeForAltitudeM, roundAltKm,
   PICK_RETRY_MS, retryEachFrame,
 } from './planetMath';
@@ -147,8 +147,11 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
   globe.lightingFadeOutDistance = 6e7; globe.lightingFadeInDistance = 9e7;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = 1.33;
-  globe.tileCacheSize = 400;
+  // oblique views: keep far tiles sharp (fog would otherwise coarsen them 2x) and load more of them at once
+  globe.tileCacheSize = 1000;
   globe.preloadSiblings = true;
+  globe.loadingDescendantLimit = 40;
+  scene.fog.screenSpaceErrorFactor = 0.5;
   scene.light = new C.DirectionalLight({ direction: new C.Cartesian3(1, 0, 0) });
   scene.verticalExaggerationRelativeHeight = TERRAIN_DATUM_OFFSET_M;
 
@@ -176,10 +179,16 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     carto.longitude = lonRad; carto.latitude = latRad; carto.height = 0;
     return globe.getHeight(carto);
   };
-  const sample: PlanetCtx['sample'] = async (pts) => {
+  /** True terrain heights (for numbers shown to the user). NaN where the terrain could not be sampled. */
+  const sampleTrue = async (pts: LonLat[]): Promise<number[]> => {
     const cs = pts.map((p) => new C.Cartographic(C.Math.toRadians(p.lon), C.Math.toRadians(p.lat), NaN));
     if (terrainOk) { try { await C.sampleTerrainMostDetailed(scene.terrainProvider, cs); } catch { /* use the rendered height */ } }
-    return cs.map((c) => (Number.isFinite(c.height) ? c.height : groundHeight(c.longitude, c.latitude) ?? datum));
+    return cs.map((c) => c.height);
+  };
+  /** Heights where the (exaggerated) ground is drawn, for placing marks and objects on it. */
+  const sample: PlanetCtx['sample'] = async (pts) => {
+    const hs = await sampleTrue(pts);
+    return hs.map((h, i) => (Number.isFinite(h) ? renderHeight(h) : groundHeight(C.Math.toRadians(pts[i].lon), C.Math.toRadians(pts[i].lat)) ?? datum));
   };
   const sampleOne = async (p: LonLat, ms = 700): Promise<number | null> => {
     const r = await Promise.race([sample([p]), new Promise<null>((res) => setTimeout(() => res(null), ms))]);
@@ -449,6 +458,25 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
   canvas.addEventListener('pointerleave', onLeave);
   const stopFlightOnInput = () => { if (st.flying) cancelFlight(); landing.releaseFollow(); };
   canvas.addEventListener('pointerdown', stopFlightOnInput);
+
+  /** Tilt button (or T): orbit the point at the screen centre between top-down and a low side view, keeping the distance. */
+  const onTilt = () => {
+    if (!globeMode()) return;
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const c = pickGround(w / 2, h / 2) ?? pickEllipsoid(w / 2, h / 2);
+    if (!c) return;
+    cancelFlight(); landing.releaseFollow();
+    const token = flightToken;
+    const range = C.Cartesian3.distance(camera.positionWC, c.world);
+    const pitch = C.Math.toRadians(camera.pitch < C.Math.toRadians(-50) ? -16 : -89);
+    st.flying = true;
+    camera.flyToBoundingSphere(new C.BoundingSphere(c.world, 0), {
+      offset: new C.HeadingPitchRange(camera.heading, pitch, range), duration: 1.1, easingFunction: C.EasingFunction.CUBIC_IN_OUT,
+      complete: () => { if (token === flightToken) st.flying = false; },
+      cancel: () => { if (token === flightToken) st.flying = false; },
+    });
+  };
+  window.addEventListener('heymars:tilt', onTilt);
   canvas.addEventListener('wheel', stopFlightOnInput, { passive: true });
 
   const emitPick = async (kind: 'click' | 'dblclick', x: number, y: number) => {
@@ -457,8 +485,8 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     // load is never dropped (QA round 2, item 21)
     const p = (await retryEachFrame(() => pickGround(x, y), ctx.onFrame, PICK_RETRY_MS)) ?? pickEllipsoid(x, y);
     if (!p) return null;
-    const sampled = await sampleOne(p);
-    const h = sampled ?? p.height;
+    const [sampled] = await Promise.race([sampleTrue([p]), new Promise<number[]>((res) => setTimeout(() => res([NaN]), 700))]);
+    const h = Number.isFinite(sampled) ? sampled : NaN;
     store.getState().pick({ lon: p.lon, lat: p.lat, elevationM: Number.isFinite(h) ? Math.round(elevationFromHeight(h)) : null, kind, altitudeKm: st.altKm, at: Date.now() });
     return p;
   };
@@ -504,7 +532,7 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     unsubFlight(); unsubLayers();
     scene.preRender.removeEventListener(preRender); scene.postRender.removeEventListener(postRender);
     canvas.removeEventListener('pointermove', onMove); canvas.removeEventListener('pointerleave', onLeave);
-    canvas.removeEventListener('pointerdown', stopFlightOnInput); canvas.removeEventListener('wheel', stopFlightOnInput);
+    canvas.removeEventListener('pointerdown', stopFlightOnInput); window.removeEventListener('heymars:tilt', onTilt); canvas.removeEventListener('wheel', stopFlightOnInput);
     handler.destroy(); landing.dispose(); overlays.dispose(); ctx.labels.destroy();
     widget.destroy(); imagery.destroy(); ctxStatus.remove();
   };

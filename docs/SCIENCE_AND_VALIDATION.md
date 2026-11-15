@@ -12,7 +12,7 @@ Mars 2000 sphere, R = 3,396,190 m, planetocentric latitude, east-positive longit
     z = -R (phi - phi_c) pi/180                        (south is +z)
     y = (h - h_ref) * exaggeration                     (up)
 
-Ground distances use per-row spacing: dx = R cos(phi) d_lambda, dy = R d_phi (radians). Picking inverts the transform and then samples the true DEM, not the exaggerated mesh.
+Ground distances use per-row spacing: dx = R cos(phi) d_lambda, dy = R d_phi (radians). Picking inverts the transform and then samples the true DEM, not the exaggerated mesh. The Cesium planet view draws relief 2.5 times true height below 300 km (blending to the global factor above); clicked elevations come from the true terrain sample, and marks and the landing objects are placed at the drawn height.
 
 ## Slope
 
