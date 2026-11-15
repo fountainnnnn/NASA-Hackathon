@@ -159,7 +159,7 @@ The waypoint check compares two NASA products, so it shows agreement, not ground
 | Planet (`tests/planet`) | 32 | CesiumJS version and SRI hash, terrain datum offset, EDL descent (TRN only between 4.2 and 2.2 km, every phase cited), imagery fusion |
 | Scene, science, globe, companion, report | 114 | Command reducer, context terrain, geology and site lookups, rover image selection, globe reducer, companion state, report model and exports |
 
-Browser tests (Playwright, `npm run e2e`): 16 tests. They cover the intro, shell layout, panel toggle, globe click with the synced card and panel turn, landing check narration, a Jezero drag with formulas and a maths follow-up, report scroll lock and real file exports, walk and helmet view, the Sources sheet, the Limits popover, the steep-target no-path card, and that every red card row really fails its limit. The last recorded run passed 15 of 15.
+Browser tests (Playwright, `npm run e2e`): 16 tests. They cover the intro, shell layout, panel toggle, globe click with the synced card and panel turn, landing check narration, a Jezero drag with formulas and a maths follow-up, report scroll lock and real file exports, walk and helmet view, the Sources sheet, the Limits popover, the steep-target no-path card, and that every red card row really fails its limit. The last recorded run passed 16 of 16.
 
 Layout QA (`scripts/qa-layout.mjs`): overlap, clipping, contrast of at least 4.5:1 and keyboard reach for every state at 1440x810, 1280x720, 1024x768 and 390x844. The e2e suite runs it at 1440x810 and it passed. TODO(verify): result of the last full four-viewport run.
 
