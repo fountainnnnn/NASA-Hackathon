@@ -129,6 +129,8 @@ export class LandingLayer {
     const add = (n: ModelName) => {
       void C.Model.fromGltfAsync({
         url: `/models/${n}.glb`, modelMatrix: C.Matrix4.IDENTITY, show: false, allowPicking: false, shadows: C.ShadowMode.DISABLED,
+        // placed at the drawn (exaggerated) ground height already: Cesium must not stretch the model again
+        enableVerticalExaggeration: false,
         minimumPixelSize: n === 'parachute' || n === 'dust' ? 0 : MIN_PX,
       }).then((m) => {
         if (dead) { m.destroy(); return; }

@@ -468,7 +468,9 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     cancelFlight(); landing.releaseFollow();
     const token = flightToken;
     const range = C.Cartesian3.distance(camera.positionWC, c.world);
-    const pitch = C.Math.toRadians(camera.pitch < C.Math.toRadians(-50) ? -16 : -89);
+    // steepness at the target, not at the camera: from far out the camera's own pitch stays steep after tilting
+    const down = C.Cartesian3.dot(camera.directionWC, MARS.geodeticSurfaceNormal(c.world, new C.Cartesian3()));
+    const pitch = C.Math.toRadians(down < -Math.sin(C.Math.toRadians(50)) ? -16 : -89);
     st.flying = true;
     camera.flyToBoundingSphere(new C.BoundingSphere(c.world, 0), {
       offset: new C.HeadingPitchRange(camera.heading, pitch, range), duration: 1.1, easingFunction: C.EasingFunction.CUBIC_IN_OUT,

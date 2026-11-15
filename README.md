@@ -8,7 +8,7 @@ Challenge: **Interplanetary Survival Guide: Martian Map**, https://www.spaceapps
 Earth is about 11 light-minutes from Mars, so a crew there has to plan its own walks. HeyMars is a 3D map of the whole planet built from NASA terrain and imagery, with a 20 m terrain model of Jezero Crater for walking-scale plans. You click a point and ask. MarsAgent, the app's agent, runs deterministic tools for terrain, routes, suit battery, sun position, radio line of sight and landing criteria. It answers on the map with a GO, HOLD or NO GO verdict and the one reason that limits it, shows each formula with the real numbers, and builds a report you can export. Every number comes from a tool and a named NASA or USGS source. It is a planning aid, not a safety certification.
 
 - Demo video (30 s): TODO(link)
-- Live app: https://heymars.up.railway.app
+- Live app: https://heymars.ngyuhang.com
 - Repository: https://github.com/fountainnnnn/NASA-Hackathon
 
 ## Screenshots
