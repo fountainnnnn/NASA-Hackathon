@@ -109,6 +109,8 @@ TypeScript, Next.js 15, React 19, CesiumJS 1.147.0 (planet view), three.js with 
 
 Show that an agent can plan inside a real map with tools a reviewer can check, as a companion for the first walks on Mars. Next steps: HiRISE terrain and rock abundance for metre-scale hazards, a validated suit model from a mission team, and more 20 m regions beyond Jezero.
 
+**Running on Mars.** Every check, route and report already runs in the browser, with no server, and the Jezero terrain, imagery, geology and Perseverance data ship with the app. For a habitat with no link to Earth, the global map tiles and rover images would be preloaded onto local storage (the app's tile proxy already caches tiles), and the free-text agent would point at a language model running on the habitat's own computer. Clicking, planning and every button already work without a model.
+
 ### Limitations
 
 - The 20 m Jezero model cannot see boulders or small scarps. The CTX imagery is 6 m per pixel.

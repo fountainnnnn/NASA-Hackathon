@@ -118,6 +118,10 @@ This project is not affiliated with or endorsed by NASA or USGS and uses no NASA
 - Landing criteria are the MSL (Curiosity) constraints used as a reference, not the Mars 2020 requirements.
 - The agent's prose can be wrong. The number guard checks numbers, not reasoning.
 
+## Running on Mars
+
+Every check, route and report already runs in the browser, with no server, and the Jezero terrain, imagery, geology and Perseverance data ship with the app. For a habitat with no link to Earth, the global map tiles and rover images would be preloaded onto local storage (the app's tile proxy already caches tiles), and the free-text agent would point at a language model running on the habitat's own computer. Clicking, planning and every button already work without a model.
+
 ## AI disclosure
 
 Built with AI assistance: the code, data scripts, docs and the demo video edit were written with Claude Code (Anthropic), and the app contains a runtime language-model agent. The video carries a visible "Made with AI assistance" mark. No AI-generated images are shown in the app. Details: [docs/AI_USE.md](docs/AI_USE.md).
