@@ -257,6 +257,7 @@ export class LandingLayer {
         cOk.style.color = cWord.style.color = runs > 0 ? TONE_CSS[v.tone] : '';
       }
       counter.style.visibility = a >= MC_START_S ? 'visible' : 'hidden';
+      counter.dataset.done = a >= MC_END_S ? '1' : '0';
       // end state: the rover ring and label, and the verdict for the shell's completion card (once per pass)
       const done = a >= MC_END_S;
       { roverRing.show = done; if (done) roverRing.position = cart(site, groundAt(endS) + lift); }
