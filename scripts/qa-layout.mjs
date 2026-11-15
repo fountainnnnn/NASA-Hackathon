@@ -242,6 +242,7 @@ function collectInPage({ scopeCss, overlapPx, allow }) {
     const fg = parse(svgText ? cs.fill : cs.color);
     let op = 1; for (let a = el; a && a !== document.body; a = a.parentElement) op *= parseFloat(getComputedStyle(a).opacity || '1');
     fg[3] *= op * (svgText ? parseFloat(cs.fillOpacity || '1') : 1);
+    if (fg[3] < 0.05) continue; // fully faded out: not on screen, nothing to read
     const layers = []; let opaque = null;
     for (let a = el; a && a.tagName !== 'MAIN' && a !== document.body; a = a.parentElement) {
       const bg = parse(getComputedStyle(a).backgroundColor);

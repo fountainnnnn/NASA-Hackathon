@@ -21,7 +21,7 @@
 .leaderSvg { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 59; pointer-events: none; }
 .leader { stroke: var(--c-line2); stroke-width: 1; opacity: 0; }
 
-.readout { position: fixed; left: 0; top: 0; z-index: 58; pointer-events: none; opacity: 0; white-space: pre; font: 400 11px/1.35 var(--c-mono); font-variant-numeric: tabular-nums; color: var(--c-t1); background: var(--chip, rgba(6, 5, 5, 0.88)); padding: 2px 6px; border-radius: 2px; }
+.readout { position: fixed; left: 0; top: 0; z-index: 58; pointer-events: none; opacity: 0; white-space: pre-wrap; max-width: 240px; font: 400 11px/1.35 var(--c-mono); font-variant-numeric: tabular-nums; color: var(--c-t1); background: var(--chip, rgba(6, 5, 5, 0.88)); padding: 2px 6px; border-radius: 2px; }
 
 /* ---------------------------------------------------------------- bubble */
 .bubble {
