@@ -9,7 +9,7 @@
       },
       "outro": {
         "scene": "s10",
-        "at": 1.2
+        "at": 2.2
       }
     },
     "src": "assets/bgm/bed.wav",
@@ -77,7 +77,7 @@
     {
       "id": "s09",
       "file": "scenes/s09-report.html",
-      "duration": 3.2,
+      "duration": 2.4,
       "sfx": [],
       "in": {
         "type": "zoom-out",
@@ -87,7 +87,7 @@
     {
       "id": "s10",
       "file": "scenes/s10-close.html",
-      "duration": 3.4,
+      "duration": 4.2,
       "sfx": [],
       "in": {
         "type": "zoom-out",

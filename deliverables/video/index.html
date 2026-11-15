@@ -440,8 +440,8 @@
       <div id="el-s06" class="scene" data-composition-id="s06" data-composition-src="scenes/s06-steps.html" data-start="10.800" data-duration="3" data-track-index="1" data-width="1920" data-height="1080"></div>
       <div id="el-s07" class="scene" data-composition-id="s07" data-composition-src="scenes/s07-replan.html" data-start="13.400" data-duration="5.6" data-track-index="0" data-width="1920" data-height="1080"></div>
       <div id="el-s08" class="scene" data-composition-id="s08" data-composition-src="scenes/s08-sims.html" data-start="18.600" data-duration="5.2" data-track-index="1" data-width="1920" data-height="1080"></div>
-      <div id="el-s09" class="scene" data-composition-id="s09" data-composition-src="scenes/s09-report.html" data-start="23.400" data-duration="3.2" data-track-index="0" data-width="1920" data-height="1080"></div>
-      <div id="el-s10" class="scene" data-composition-id="s10" data-composition-src="scenes/s10-close.html" data-start="26.200" data-duration="3.4" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s09" class="scene" data-composition-id="s09" data-composition-src="scenes/s09-report.html" data-start="23.400" data-duration="2.4" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="el-s10" class="scene" data-composition-id="s10" data-composition-src="scenes/s10-close.html" data-start="25.400" data-duration="4.2" data-track-index="1" data-width="1920" data-height="1080"></div>
       <!-- SI disclosure required by the Space Apps rules: small, constant, bottom right, clear of the caption band and credit -->
       <div id="ai-mark" style="position: absolute; right: 28px; bottom: 22px; z-index: 50; padding: 5px 10px; border-radius: 4px; background: rgba(6, 5, 5, 0.5); color: rgba(236, 231, 225, 0.7); font: 500 17px/1.2 'Schibsted Grotesk', system-ui, sans-serif; letter-spacing: 0.01em; white-space: nowrap; pointer-events: none;">Made with AI assistance</div>
       <audio id="el-bgm" src="assets/bgm/bed-cut.wav" data-start="0" data-duration="29.6" data-track-index="10" data-volume="0.3"></audio>
@@ -485,20 +485,20 @@
       main.set("#el-s08", { opacity: 0, scale: 0.92 }, 18.6);
       main.fromTo("#el-s08", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 18.78);
       main.fromTo("#el-s08", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 18.78);
-      main.fromTo("#s09-root", { scale: 1 }, { scale: 1.012, duration: 3.2, ease: "none", immediateRender: false }, 23.4);
+      main.fromTo("#s09-root", { scale: 1 }, { scale: 1.012, duration: 2.4, ease: "none", immediateRender: false }, 23.4);
       main.set("#stage-ground", { opacity: 1 }, 23.4);
       main.fromTo("#el-s08", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 23.4);
       main.fromTo("#el-s08", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 23.4);
       main.set("#el-s09", { opacity: 0, scale: 1.08 }, 23.4);
       main.fromTo("#el-s09", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 23.58);
       main.fromTo("#el-s09", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 23.58);
-      main.fromTo("#s10-root", { scale: 1 }, { scale: 1.012, duration: 3.4, ease: "none", immediateRender: false }, 26.2);
-      main.set("#stage-ground", { opacity: 1 }, 26.2);
-      main.fromTo("#el-s09", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 26.2);
-      main.fromTo("#el-s09", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 26.2);
-      main.set("#el-s10", { opacity: 0, scale: 1.08 }, 26.2);
-      main.fromTo("#el-s10", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 26.38);
-      main.fromTo("#el-s10", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 26.38);
+      main.fromTo("#s10-root", { scale: 1 }, { scale: 1.012, duration: 4.2, ease: "none", immediateRender: false }, 25.4);
+      main.set("#stage-ground", { opacity: 1 }, 25.4);
+      main.fromTo("#el-s09", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 25.4);
+      main.fromTo("#el-s09", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 25.4);
+      main.set("#el-s10", { opacity: 0, scale: 1.08 }, 25.4);
+      main.fromTo("#el-s10", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 25.58);
+      main.fromTo("#el-s10", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 25.58);
       window.__timelines["main"] = main;
     </script>
   </body>

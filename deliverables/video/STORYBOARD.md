@@ -19,8 +19,8 @@ in so card text is readable.
 | s06 | Every step shown | 10.8 | 3.0 | narration, then a formula with real numbers |
 | s07 | NO GO, GO, walk | 13.4 | 5.6 | NO GO card (radio shadow), raise the mast, GO; two crew walk at 600x |
 | s08 | Landing | 18.6 | 5.2 | EDL steps to the sky crane on real terrain; 10,000 test landings, 100 % within the slope limit |
-| s09 | Report | 23.4 | 3.2 | the report, then section 6 and the 708-waypoint check |
-| s10 | End card | 26.2 | 3.4 | "Built for the first walks on Mars.", HEYMARS, heymars.ngyuhang.com, byline |
+| s09 | Report | 23.4 | 2.4 | the report, then section 6 and the 708-waypoint check |
+| s10 | End card | 25.4 | 4.2 | "So the first crews on Mars can plan their own walks." held 2 s (answers the hook), then HEYMARS, heymars.ngyuhang.com, byline |
 
 The scene notes below are from v3; s01 and s05 are no longer in the film.
 
