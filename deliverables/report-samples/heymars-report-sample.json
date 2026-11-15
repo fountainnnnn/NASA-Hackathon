@@ -1,12 +1,12 @@
 {
   "schema": "heymars.report.v1",
   "id": "HM-2026-11-15-R1",
-  "generated": "2026-11-15T01:10:12.017Z",
-  "title": "EVA plan: base to 18.441N 77.415E, Jezero Crater",
+  "generated": "2026-11-15T08:56:25.415Z",
+  "title": "EVA plan: base to 18.434N 77.393E, Jezero Crater",
   "verdict": {
     "word": "NO GO",
     "tone": "nogo",
-    "reason": "Radio shadow of 2.6 km with no line of sight to base from a 10 m mast."
+    "reason": "Radio shadow of 2.8 km with no line of sight to base from a 10 m mast."
   },
   "mocks": [],
   "inputs": {
@@ -31,11 +31,11 @@
     "startUtc": "2026-11-15T16:04:01.388Z",
     "target": {
       "id": "P2",
-      "lon": 77.41480097403465,
-      "lat": 18.440953683337153,
-      "elevationM": -2551.3580250893833,
-      "x": -838.8056924023017,
-      "z": 1491.1885668904738,
+      "lon": 77.39268155371828,
+      "lat": 18.433973779991884,
+      "elevationM": -2521.3783201952992,
+      "x": -2082.4195024083174,
+      "z": 1904.92022642316,
       "source": "pick",
       "label": "Target"
     }
@@ -45,37 +45,37 @@
     "feasible": true,
     "reasons": [],
     "minFeasibleSlopeDeg": null,
-    "targetSlopeDeg": 1.9916828870773315,
+    "targetSlopeDeg": 7.3893280029296875,
     "totals": {
-      "lengthM": 4306.078197345735,
-      "ascentM": 51.25,
-      "descentM": 51.25,
-      "maxSlopeDeg": 3.3934176210946156,
-      "walkMin": 85.99940647807892,
-      "evaMin": 115.99940647807892,
-      "batteryUsedPct": 24.166543016266445,
-      "climbWorkKJ": 34.326225
+      "lengthM": 7080.346583175595,
+      "ascentM": 88.199951171875,
+      "descentM": 88.199951171875,
+      "maxSlopeDeg": 5.307566378835693,
+      "walkMin": 142.05668819248416,
+      "evaMin": 172.05668819248416,
+      "batteryUsedPct": 35.845143373434205,
+      "climbWorkKJ": 59.074563295898436
     },
     "gridResM": 40,
     "demResM": 20,
     "legs": [
       {
-        "lengthM": 2153.000091114363,
-        "horizM": 2152.190787165199,
-        "ascentM": 32.5625,
-        "descentM": 16.687744140625,
-        "maxSlopeDeg": 3.3934176210946156,
-        "timeMin": 44.068707579198836,
-        "vertices": 55
+        "lengthM": 3540.14399949919,
+        "horizM": 3538.3631591789317,
+        "ascentM": 66.500244140625,
+        "descentM": 20.137939453125,
+        "maxSlopeDeg": 5.307566378835693,
+        "timeMin": 73.98699323238286,
+        "vertices": 87
       },
       {
-        "lengthM": 2153.078106231372,
-        "horizM": 2152.188253272859,
-        "ascentM": 18.6875,
-        "descentM": 34.562255859375,
-        "maxSlopeDeg": 3.3934176210946156,
-        "timeMin": 41.930698898880095,
-        "vertices": 55
+        "lengthM": 3540.2025836764046,
+        "horizM": 3538.4069681737647,
+        "ascentM": 21.69970703125,
+        "descentM": 68.06201171875,
+        "maxSlopeDeg": 4.6703683565081455,
+        "timeMin": 68.06969496010132,
+        "vertices": 87
       }
     ]
   },
@@ -85,7 +85,7 @@
         "id": "slope",
         "label": "Max slope on route",
         "status": "go",
-        "value": 3.4,
+        "value": 5.3,
         "limit": 15,
         "unit": "deg",
         "source": "RouteResult.totals.maxSlopeDeg (CTX 20 m DEM, max |edge grade|) vs MissionConstraints.maxSlopeDeg",
@@ -96,7 +96,7 @@
         "id": "battery",
         "label": "Battery remaining at EVA end",
         "status": "go",
-        "value": 75.8,
+        "value": 64.2,
         "limit": 20,
         "unit": "%",
         "source": "RouteResult.totals.batteryUsedPct (suitPowerW × evaMin / batteryWh) vs MissionConstraints.batteryReservePct",
@@ -107,7 +107,7 @@
         "id": "eva-time",
         "label": "EVA duration (walk + dwell)",
         "status": "go",
-        "value": 116,
+        "value": 172.1,
         "limit": 360,
         "unit": "min",
         "source": "RouteResult.totals.evaMin vs MissionConstraints.evaMaxMin",
@@ -129,7 +129,7 @@
         "id": "comms",
         "label": "Longest comms shadow on route",
         "status": "no-go",
-        "value": 2642.7,
+        "value": 2766.6,
         "limit": 500,
         "unit": "m",
         "source": "Line of sight from habitat (mast 10 m) to suit (1.8 m) on the 20 m DEM, Mars curvature included",
@@ -155,8 +155,8 @@
     "cautions": []
   },
   "earthLink": {
-    "rangeAu": 1.3156381120714467,
-    "minutes": 10.94183873603009
+    "rangeAu": 1.3128760627851275,
+    "minutes": 10.918851337210649
   },
   "landingCheck": {
     "site": {
@@ -165,9 +165,9 @@
       "elevationM": -4191,
       "kind": "click",
       "altitudeKm": 9003.223539219625,
-      "at": 1794704954535
+      "at": 1794732892946
     },
-    "verdict": "insufficient-data",
+    "verdict": "meets-all",
     "caveat": "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
     "criteria": [
       {
@@ -178,7 +178,8 @@
         "limit": "|latitude| <= 60 deg",
         "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.2 Latitude",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "observed"
       },
       {
         "id": "elevation",
@@ -188,17 +189,20 @@
         "limit": "elevation <= +2000 m above the MOLA areoid",
         "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.3 Altitude",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "observed"
       },
       {
         "id": "slope-2-5km",
         "label": "Regional slope (2-5 km length scale)",
-        "value": 0.26,
+        "value": 0.37,
         "unit": "deg",
         "limit": "slope <= 3 deg over a 2-5 km length scale",
-        "result": "no data",
+        "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "estimate",
+        "method": "Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
       },
       {
         "id": "thermal-inertia",
@@ -208,47 +212,56 @@
         "limit": "thermal inertia > 100 J m-2 s-0.5 K-1",
         "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 3.3 Table 2 (Load bearing surface)",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "observed"
       },
       {
         "id": "slope-200-500m",
         "label": "Slope at 200-500 m length scale",
-        "value": null,
+        "value": 0.66,
         "unit": "deg",
         "limit": "slope <= 5 deg over a 200-500 m length scale",
-        "result": "no data",
+        "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "estimate",
+        "method": "Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
       },
       {
         "id": "slope-20-40m",
         "label": "Slope at 20-40 m length scale",
-        "value": null,
+        "value": 1.23,
         "unit": "deg",
         "limit": "slope <= 15 deg over a 20-40 m length scale",
-        "result": "no data",
+        "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "estimate",
+        "method": "Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
       },
       {
         "id": "slope-5m",
         "label": "Slope at 5 m length scale",
-        "value": null,
+        "value": 1.92,
         "unit": "deg",
         "limit": "slope <= 15 deg over a 5 m length scale",
-        "result": "no data",
+        "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "estimate",
+        "method": "Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
       },
       {
         "id": "rock-abundance",
         "label": "Rock abundance (damaging rocks under the rover)",
-        "value": null,
+        "value": 6.5,
         "unit": "% area",
         "limit": "rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)",
-        "result": "no data",
+        "result": "pass",
         "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.6 Rocks",
-        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+        "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+        "provenance": "mock",
+        "method": "mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)"
       }
     ]
   },
@@ -259,7 +272,7 @@
       "elevationM": -4191,
       "kind": "click",
       "altitudeKm": 9003.223539219625,
-      "at": 1794704954535
+      "at": 1794732892946
     },
     "samples": 10000,
     "okPercent": 100,
@@ -277,42 +290,42 @@
   },
   "scienceAtTarget": {
     "target": {
-      "lon": 77.41480097403465,
-      "lat": 18.440953683337153
+      "lon": 77.39268155371828,
+      "lat": 18.433973779991884
     },
     "unit": {
-      "symbol": "Njf",
-      "name": "Jezero floor unit"
+      "symbol": "Aeb",
+      "name": "Eolian bedform unit"
     },
     "site": {
       "name": "Three Forks sample depot",
-      "distanceKm": 0.7973023213180825,
+      "distanceKm": 1.3931921888581018,
       "url": "https://science.nasa.gov/resource/perseverances-three-forks-sample-depot-map/",
       "sourceTitle": "Perseverance's 'Three Forks' Sample Depot Map"
     },
     "ground": {
-      "sol": 652,
-      "distanceM": 794.7799046492376,
+      "sol": 418,
+      "distanceM": 1033.269521603587,
       "photos": [
         {
-          "id": "NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
-          "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00652/ids/edr/browse/ncam/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J01_800.jpg",
-          "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
-          "sol": 652,
-          "earthDate": "2022-12-20",
+          "id": "NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
+          "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00418/ids/edr/browse/ncam/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J01_800.jpg",
+          "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
+          "sol": 418,
+          "earthDate": "2022-04-24",
           "camera": "NAVCAM_RIGHT",
           "cameraFull": "Navigation Camera Right",
           "credit": "NASA/JPL-Caltech"
         },
         {
-          "id": "NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J",
-          "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00652/ids/edr/browse/ncam/NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J01_800.jpg",
-          "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J",
-          "sol": 652,
-          "earthDate": "2022-12-20",
-          "camera": "NAVCAM_RIGHT",
-          "cameraFull": "Navigation Camera Right",
-          "credit": "NASA/JPL-Caltech"
+          "id": "ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ",
+          "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00418/ids/edr/browse/zcam/ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ02_800.jpg",
+          "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ",
+          "sol": 418,
+          "earthDate": "2022-04-24",
+          "camera": "MCZ_LEFT",
+          "cameraFull": "Mastcam-Z Left",
+          "credit": "NASA/JPL-Caltech/ASU"
         }
       ]
     }
@@ -329,9 +342,9 @@
       "title": "Walking speed and EVA duration (Tobler 1993, scaled for a suited crew)",
       "lines": [
         "v(θ) = f × 6 km/h × e^(-3.5 × |tan θ + 0.05|)",
-        "outbound: tan θ = (33 - 17) m ÷ 2,152 m = 0.007  →  v = 0.6 × 6 × e^(-3.5 × |0.007 + 0.05|) = 2.95 km/h",
-        "return: tan θ = (19 - 35) m ÷ 2,152 m = -0.007  →  v = 0.6 × 6 × e^(-3.5 × |-0.007 + 0.05|) = 3.1 km/h",
-        "t = Σ segment length ÷ v(θ segment) + dwell = 44 min + 42 min + 30 min = 1 h 56 min"
+        "outbound: tan θ = (67 - 20) m ÷ 3,538 m = 0.013  →  v = 0.6 × 6 × e^(-3.5 × |0.013 + 0.05|) = 2.89 km/h",
+        "return: tan θ = (22 - 68) m ÷ 3,538 m = -0.013  →  v = 0.6 × 6 × e^(-3.5 × |-0.013 + 0.05|) = 3.16 km/h",
+        "t = Σ segment length ÷ v(θ segment) + dwell = 74 min + 68 min + 30 min = 2 h 52 min"
       ],
       "mock": false
     },
@@ -339,8 +352,8 @@
       "n": "4.2",
       "title": "Suit battery",
       "lines": [
-        "used = P × t ÷ C = 250 W × 1.93 h ÷ 2,000 Wh = 24.2 %",
-        "left = 100 % - 24.2 % = 75.8 %  (reserve 20 %)  pass"
+        "used = P × t ÷ C = 250 W × 2.87 h ÷ 2,000 Wh = 35.8 %",
+        "left = 100 % - 35.8 % = 64.2 %  (reserve 20 %)  pass"
       ],
       "mock": false
     },
@@ -348,7 +361,7 @@
       "n": "4.3",
       "title": "Mechanical work of climbing (lower bound on effort)",
       "lines": [
-        "W = m × g × ascent = 180 kg × 3.721 m/s² × 51.3 m = 34 kJ"
+        "W = m × g × ascent = 180 kg × 3.721 m/s² × 88.2 m = 59 kJ"
       ],
       "mock": false
     },
@@ -357,8 +370,8 @@
       "title": "Comms line of sight with planetary curvature",
       "lines": [
         "mast 10 m (assumption), suit antenna 1.8 m, ray sampled every 10 m",
-        "curvature drop = d² ÷ 2R = (2,056 m)² ÷ (2 × 3,396,190 m) = 0.62 m",
-        "1 hidden stretch, longest vertices 21 to 88, 2.64 km",
+        "curvature drop = d² ÷ 2R = (3,318 m)² ÷ (2 × 3,396,190 m) = 1.62 m",
+        "3 hidden stretches, longest vertices 67 to 130, 2.77 km",
         "limit 0.5 km per stretch  fail"
       ],
       "mock": false
@@ -368,8 +381,8 @@
       "title": "Sun position (NASA GISS Mars24, Allison and McEwen 2000)",
       "lines": [
         "Mars24: MSD 54,344.2, Ls 22.4°, LTST 09:00 at the start",
-        "sun elevation 46° at the start, 71° at the end, lowest 46°",
-        "sunset 18:12 LTST, daylight margin at return 7 h 32 min  pass"
+        "sun elevation 46° at the start, 80° at the end, lowest 46°",
+        "sunset 18:12 LTST, daylight margin at return 6 h 36 min  pass"
       ],
       "mock": false
     },
@@ -377,7 +390,7 @@
       "n": "4.6",
       "title": "Earth link (NASA JPL Horizons)",
       "lines": [
-        "one-way light time = range ÷ c = 1.315638 au × 499.005 s/au = 656.5 s = 10.9 min"
+        "one-way light time = range ÷ c = 1.312876 au × 499.005 s/au = 655.1 s = 10.9 min"
       ],
       "mock": false
     },
@@ -387,12 +400,12 @@
       "lines": [
         "Latitude band: 20.01° vs limit |latitude| <= 60°  pass",
         "Landing-site elevation (MOLA areoid): -263.16 m vs limit elevation <= +2000 m above the MOLA areoid  pass",
-        "Regional slope (2-5 km length scale): 0.26° vs limit slope <= 3° over a 2-5 km length scale  no data",
+        "Regional slope (2-5 km length scale): 0.37° (estimate: Regional slope (2-5 km length scale): MOLA slope 0.26° at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 3° over a 2-5 km length scale  pass",
         "Thermal inertia (not dust-dominated): 331 J m-2 s-0.5 K-1 vs limit thermal inertia > 100 J m-2 s-0.5 K-1  pass",
-        "Slope at 200-500 m length scale: no data vs limit slope <= 5° over a 200-500 m length scale  no data",
-        "Slope at 20-40 m length scale: no data vs limit slope <= 15° over a 20-40 m length scale  no data",
-        "Slope at 5 m length scale: no data vs limit slope <= 15° over a 5 m length scale  no data",
-        "Rock abundance (damaging rocks under the rover): no data vs limit rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)  no data"
+        "Slope at 200-500 m length scale: 0.66° (estimate: Slope at 200-500 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 5° over a 200-500 m length scale  pass",
+        "Slope at 20-40 m length scale: 1.23° (estimate: Slope at 20-40 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 15° over a 20-40 m length scale  pass",
+        "Slope at 5 m length scale: 1.92° (estimate: Slope at 5 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 15° over a 5 m length scale  pass",
+        "Rock abundance (damaging rocks under the rover): 6.5 % area (mock: mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)) vs limit rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)  pass"
       ],
       "mock": false
     },
@@ -411,7 +424,7 @@
     {
       "n": 1,
       "title": "Summary and verdict",
-      "lead": "1 blocker. Radio shadow of 2.6 km with no line of sight to base from a 10 m mast.",
+      "lead": "1 blocker. Radio shadow of 2.8 km with no line of sight to base from a 10 m mast.",
       "tables": [
         {
           "head": [
@@ -423,37 +436,37 @@
           "rows": [
             [
               "Round trip distance",
-              "4.31 km",
+              "7.08 km",
               "n/a",
               "info"
             ],
             [
               "EVA duration incl. 30 min at target",
-              "1 h 56 min",
+              "2 h 52 min",
               "6 h 00 min",
               "pass"
             ],
             [
               "Suit battery at return",
-              "75.8 %",
+              "64.2 %",
               ">= 20 %",
               "pass"
             ],
             [
               "Maximum slope on route",
-              "3.4°",
+              "5.3°",
               "<= 15°",
               "pass"
             ],
             [
               "Longest comms shadow",
-              "2.64 km",
+              "2.77 km",
               "<= 0.5 km",
               "fail"
             ],
             [
               "Daylight margin at return",
-              "7 h 32 min",
+              "6 h 36 min",
               ">= 0",
               "pass"
             ]
@@ -481,9 +494,9 @@
             ],
             [
               "Regional slope (2-5 km length scale)",
-              "0.26°",
+              "0.37° (estimate)",
               "slope <= 3° over a 2-5 km length scale",
-              "not scored at this scale"
+              "pass"
             ],
             [
               "Thermal inertia (not dust-dominated)",
@@ -493,27 +506,27 @@
             ],
             [
               "Slope at 200-500 m length scale",
-              "no data at this scale",
+              "0.66° (estimate)",
               "slope <= 5° over a 200-500 m length scale",
-              "no data"
+              "pass"
             ],
             [
               "Slope at 20-40 m length scale",
-              "no data at this scale",
+              "1.23° (estimate)",
               "slope <= 15° over a 20-40 m length scale",
-              "no data"
+              "pass"
             ],
             [
               "Slope at 5 m length scale",
-              "no data at this scale",
+              "1.92° (estimate)",
               "slope <= 15° over a 5 m length scale",
-              "no data"
+              "pass"
             ],
             [
               "Rock abundance (damaging rocks under the rover)",
-              "no data at this scale",
+              "6.5 % area (Mock)",
               "rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)",
-              "no data"
+              "pass"
             ]
           ]
         },
@@ -558,17 +571,17 @@
           "rows": [
             [
               "Geologic unit",
-              "Jezero floor unit (Njf)",
+              "Eolian bedform unit (Aeb)",
               "USGS SIM 3464, observed"
             ],
             [
               "Nearest catalogued science site",
-              "Three Forks sample depot, 0.8 km",
+              "Three Forks sample depot, 1.39 km",
               "Perseverance's 'Three Forks' Sample Depot Map"
             ],
             [
               "View from the ground",
-              "Sol 652, Navigation Camera Right, 0.79 km from the target, 2022-12-20: https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
+              "Sol 418, Navigation Camera Right, 1.03 km from the target, 2022-04-24: https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
               "NASA/JPL-Caltech, Perseverance raw image"
             ]
           ]
@@ -593,7 +606,7 @@
             ],
             [
               "Target",
-              "18.4410N 77.4148E, -2,551 m",
+              "18.4340N 77.3927E, -2,521 m",
               "computed, CTX DEM bilinear"
             ],
             [
@@ -665,24 +678,24 @@
           "rows": [
             [
               "Outbound",
-              "2.15 km",
-              "32.6 m",
-              "3.4°",
-              "44 min"
+              "3.54 km",
+              "66.5 m",
+              "5.3°",
+              "1 h 14 min"
             ],
             [
               "Return",
-              "2.15 km",
-              "18.7 m",
-              "3.4°",
-              "42 min"
+              "3.54 km",
+              "21.7 m",
+              "4.7°",
+              "1 h 08 min"
             ],
             [
               "Round trip (sum of legs)",
-              "4.31 km",
-              "51.3 m",
-              "3.4°",
-              "1 h 26 min"
+              "7.08 km",
+              "88.2 m",
+              "5.3°",
+              "2 h 22 min"
             ]
           ]
         }
@@ -830,127 +843,139 @@
               "1",
               "Asked on the map: What is here?",
               "input",
-              "01:09:14"
+              "08:54:52"
             ],
             [
               "2",
               "get_site_conditions",
               "tool",
-              "58 ms"
+              "61 ms"
             ],
             [
               "3",
               "Asked on the map: Could we land here?",
               "input",
-              "01:09:15"
+              "08:54:53"
             ],
             [
               "4",
-              "check_landing_site",
-              "tool",
-              "58 ms"
-            ],
-            [
-              "5",
-              "Not enough data to judge: latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km length scale) no data, therm",
+              "Filled values",
               "deterministic",
               "under 1 ms"
             ],
             [
+              "5",
+              "check_landing_site",
+              "tool",
+              "63 ms"
+            ],
+            [
               "6",
-              "Used a tool: Run landing simulation",
-              "input",
-              "01:09:15"
+              "Meets every listed criterion (includes estimates): latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km len",
+              "deterministic",
+              "under 1 ms"
             ],
             [
               "7",
+              "Used a tool: Run landing simulation",
+              "input",
+              "08:54:53"
+            ],
+            [
+              "8",
               "show_edl_timeline",
+              "tool",
+              "54 ms"
+            ],
+            [
+              "9",
+              "run_landing_scenario",
+              "tool",
+              "0.98 s"
+            ],
+            [
+              "10",
+              "Landing verdict: GO (includes estimates): 100.0 % of touchdowns land within 15° (GO needs 99 %) and 0.0 % have no data. The terrain cell is ",
+              "deterministic",
+              "under 1 ms"
+            ],
+            [
+              "11",
+              "Used a tool: Take me to Jezero",
+              "input",
+              "08:55:33"
+            ],
+            [
+              "12",
+              "Dragged on the map: Plan a round trip from base to 18.43N 77.39E",
+              "input",
+              "08:56:10"
+            ],
+            [
+              "13",
+              "You dragged from base to a point: target 18.4340N 77.3927E, elevation -2,521 m (CTX DEM, bilinear)",
+              "deterministic",
+              "08:56:10"
+            ],
+            [
+              "14",
+              "plan_round_trip",
               "tool",
               "7 ms"
             ],
             [
-              "8",
-              "run_landing_scenario",
-              "tool",
-              "0.36 s"
-            ],
-            [
-              "9",
-              "Used a tool: Take me to Jezero",
-              "input",
-              "01:09:49"
-            ],
-            [
-              "10",
-              "Dragged on the map: Plan a round trip from base to 18.44N 77.41E",
-              "input",
-              "01:10:06"
-            ],
-            [
-              "11",
-              "You dragged from base to a point: target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear)",
-              "deterministic",
-              "01:10:06"
-            ],
-            [
-              "12",
-              "plan_round_trip",
-              "tool",
-              "3 ms"
-            ],
-            [
-              "13",
+              "15",
               "Walking time",
               "deterministic",
               "under 1 ms"
             ],
             [
-              "14",
+              "16",
               "Suit battery",
               "deterministic",
               "under 1 ms"
             ],
             [
-              "15",
+              "17",
               "Climbing work",
               "deterministic",
               "under 1 ms"
             ],
             [
-              "16",
+              "18",
               "Comms line of sight from base",
               "deterministic",
-              "3 ms"
+              "9 ms"
             ],
             [
-              "17",
+              "19",
               "Sun along the route",
               "deterministic",
-              "under 1 ms"
+              "2 ms"
             ],
             [
-              "18",
+              "20",
               "Earth link delay",
               "deterministic",
               "under 1 ms"
             ],
             [
-              "19",
+              "21",
               "Verdict NO GO: slope pass, battery pass, EVA time pass, daylight pass, comms fail, data pass",
               "deterministic",
               "under 1 ms"
             ],
             [
-              "20",
+              "22",
               "science_at_target",
               "tool",
-              "58 ms"
+              "66 ms"
             ],
             [
-              "21",
-              "issue_scene_commands: clear_annotations, draw_route R1, highlight_segment 21 to 54",
+              "23",
+              "issue_scene_commands: clear_annotations, draw_route R1, highlight_segment 67 to 86",
               "tool",
-              "under 1 ms"
+              "1 ms"
             ]
           ]
         }
@@ -965,7 +990,7 @@
       "turn": 1,
       "kind": "tool",
       "name": "get_site_conditions",
-      "meta": "58 ms",
+      "meta": "61 ms",
       "raw": {
         "args": {
           "lon": 71.99999972349123,
@@ -991,28 +1016,32 @@
               "label": "Geologic Map of Mars (USGS SIM 3292), unit raster",
               "value": 27,
               "unit": "unit index: value k = k-th unit symbol in sorted order of geology_global.json \"units\" (1-based): AHi,AHtu,AHv,ANa,Aa,Ap,Apu,Av,Ave,HNb,HNhu,HNt,Hp,Hpe,Hpu,Ht,Hto,Htu,Hve,Nhe,Nhu,Nve,eAb,eHb,eHh,eHt,eHv,eNh,eNhm,lAa,lApc,lApd,lAv,lAvf,lHb,lHl,lHt,lHv,lHvf,lNh,lNv,mAl,mNh,mNhm",
-              "source": "Multiple (Viking, MGS, Mars Odyssey, MRO, Mars Express data used by the map) Map compilation (THEMIS, MOLA, HRSC, CTX, HiRISE, Viking VIS); not an instrument product"
+              "source": "Multiple (Viking, MGS, Mars Odyssey, MRO, Mars Express data used by the map) Map compilation (THEMIS, MOLA, HRSC, CTX, HiRISE, Viking VIS); not an instrument product",
+              "provenance": "observed"
             },
             {
               "id": "hydrogen",
               "label": "Odyssey GRS water-equivalent hydrogen (Boynton et al. 2007)",
               "value": 3.3,
               "unit": "wt% H2O (water-equivalent hydrogen)",
-              "source": "2001 Mars Odyssey Gamma Ray Spectrometer (GRS)"
+              "source": "2001 Mars Odyssey Gamma Ray Spectrometer (GRS)",
+              "provenance": "observed"
             },
             {
               "id": "thermalInertia",
               "label": "TES nighttime apparent thermal inertia (Putzig & Mellon 2007)",
               "value": 331,
               "unit": "J m^-2 K^-1 s^-1/2 (tiu)",
-              "source": "Mars Global Surveyor Thermal Emission Spectrometer (TES)"
+              "source": "Mars Global Surveyor Thermal Emission Spectrometer (TES)",
+              "provenance": "observed"
             },
             {
               "id": "slope",
               "label": "Surface slope from the global MOLA DEM",
               "value": 0.25,
               "unit": "deg",
-              "source": "Mars Global Surveyor Mars Orbiter Laser Altimeter (MOLA), slope computed by this pipeline"
+              "source": "Mars Global Surveyor Mars Orbiter Laser Altimeter (MOLA), slope computed by this pipeline",
+              "provenance": "observed"
             }
           ],
           "nearestSites": [
@@ -1063,7 +1092,7 @@
       "turn": 2,
       "kind": "tool",
       "name": "check_landing_site",
-      "meta": "58 ms",
+      "meta": "63 ms",
       "raw": {
         "args": {
           "lon": 71.99999972349123,
@@ -1074,7 +1103,7 @@
             "lon": 72,
             "lat": 20.01269
           },
-          "verdict": "insufficient-data",
+          "verdict": "meets-all",
           "criteria": [
             {
               "id": "latitude",
@@ -1084,7 +1113,8 @@
               "limit": "|latitude| <= 60 deg",
               "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.2 Latitude",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "observed"
             },
             {
               "id": "elevation",
@@ -1094,17 +1124,20 @@
               "limit": "elevation <= +2000 m above the MOLA areoid",
               "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.3 Altitude",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "observed"
             },
             {
               "id": "slope-2-5km",
               "label": "Regional slope (2-5 km length scale)",
-              "value": 0.26,
+              "value": 0.37,
               "unit": "deg",
               "limit": "slope <= 3 deg over a 2-5 km length scale",
-              "result": "no data",
+              "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
             },
             {
               "id": "thermal-inertia",
@@ -1114,49 +1147,59 @@
               "limit": "thermal inertia > 100 J m-2 s-0.5 K-1",
               "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 3.3 Table 2 (Load bearing surface)",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "observed"
             },
             {
               "id": "slope-200-500m",
               "label": "Slope at 200-500 m length scale",
-              "value": null,
+              "value": 0.66,
               "unit": "deg",
               "limit": "slope <= 5 deg over a 200-500 m length scale",
-              "result": "no data",
+              "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
             },
             {
               "id": "slope-20-40m",
               "label": "Slope at 20-40 m length scale",
-              "value": null,
+              "value": 1.23,
               "unit": "deg",
               "limit": "slope <= 15 deg over a 20-40 m length scale",
-              "result": "no data",
+              "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
             },
             {
               "id": "slope-5m",
               "label": "Slope at 5 m length scale",
-              "value": null,
+              "value": 1.92,
               "unit": "deg",
               "limit": "slope <= 15 deg over a 5 m length scale",
-              "result": "no data",
+              "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
             },
             {
               "id": "rock-abundance",
               "label": "Rock abundance (damaging rocks under the rover)",
-              "value": null,
+              "value": 6.5,
               "unit": "% area",
               "limit": "rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)",
-              "result": "no data",
+              "result": "pass",
               "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.6 Rocks",
-              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "mock",
+              "method": "mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)"
             }
           ],
+          "estimated": true,
           "ellipse": {
             "semiMajorKm": 3.85,
             "semiMinorKm": 3.3,
@@ -1165,11 +1208,11 @@
             "sourceUrl": "https://science.nasa.gov/resource/perseverance-rover-landing-ellipse-in-jezero-crater/"
           },
           "notes": [
-            "Global DEM slope uses a ~14.8 km baseline, outside the 2-5 km scale of this criterion, so it is not scored.",
-            "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it.",
-            "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM).",
-            "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry.",
-            "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset."
+            "Regional slope (2-5 km length scale): the global DEM slope uses a ~14.8 km baseline, so the 2-5 km slope is an estimate (Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it; estimate used (Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM); estimate used (Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry; estimate used (Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset; mock value used (mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007))."
           ],
           "caveat": "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
           "provenance": {
@@ -1187,7 +1230,7 @@
       "turn": 3,
       "kind": "tool",
       "name": "show_edl_timeline",
-      "meta": "7 ms",
+      "meta": "54 ms",
       "raw": [
         {
           "id": "cruise_stage_separation",
@@ -1328,7 +1371,7 @@
       "turn": 3,
       "kind": "tool",
       "name": "run_landing_scenario",
-      "meta": "364 ms",
+      "meta": "978 ms",
       "raw": {
         "args": {
           "lon": 71.99999972349123,
@@ -1356,8 +1399,20 @@
           },
           "terrainModel": "global DEM, ~7.4 km posting",
           "engine": "ts",
-          "computeMs": 3,
+          "computeMs": 8,
           "seed": 2026,
+          "verdict": {
+            "word": "GO",
+            "label": "GO (includes estimates)",
+            "tone": "go",
+            "reason": "100.0 % of touchdowns land within 15° (GO needs 99 %) and 0.0 % have no data. The terrain cell is wider than the ellipse, so the slopes are regional estimates.",
+            "rule": "GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+            "estimated": true,
+            "calc": [
+              "verdict rule: GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+              "ok 100.0 % ≥ 99 %, no data 0.0 % < 1 % → GO (includes estimates)"
+            ]
+          },
           "note": "Coarse global DEM: slopes are averaged over kilometres and miss boulders and small craters, so this is an optimistic regional view. Pick a site inside Jezero for 20 m terrain.",
           "method": "Truncated 2-D Gaussian touchdown dispersion, 3 sigma = ellipse semi-axes; slope limit is the user assumption.",
           "globe": {
@@ -1381,7 +1436,7 @@
       "turn": 5,
       "kind": "tool",
       "name": "plan_round_trip",
-      "meta": "3 ms",
+      "meta": "7 ms",
       "raw": {
         "args": {
           "from": {
@@ -1396,11 +1451,11 @@
           },
           "to": {
             "id": "P2",
-            "lon": 77.41480097403465,
-            "lat": 18.440953683337153,
-            "elevationM": -2551.3580250893833,
-            "x": -838.8056924023017,
-            "z": 1491.1885668904738,
+            "lon": 77.39268155371828,
+            "lat": 18.433973779991884,
+            "elevationM": -2521.3783201952992,
+            "x": -2082.4195024083174,
+            "z": 1904.92022642316,
             "source": "pick",
             "label": "Target"
           },
@@ -1422,36 +1477,36 @@
           "feasible": true,
           "reasons": [],
           "minFeasibleSlopeDeg": null,
-          "targetSlopeDeg": 1.9916828870773315,
+          "targetSlopeDeg": 7.3893280029296875,
           "totals": {
-            "lengthM": 4306.078197345735,
-            "ascentM": 51.25,
-            "descentM": 51.25,
-            "maxSlopeDeg": 3.3934176210946156,
-            "walkMin": 85.99940647807892,
-            "evaMin": 115.99940647807892,
-            "batteryUsedPct": 24.166543016266445,
-            "climbWorkKJ": 34.326225
+            "lengthM": 7080.346583175595,
+            "ascentM": 88.199951171875,
+            "descentM": 88.199951171875,
+            "maxSlopeDeg": 5.307566378835693,
+            "walkMin": 142.05668819248416,
+            "evaMin": 172.05668819248416,
+            "batteryUsedPct": 35.845143373434205,
+            "climbWorkKJ": 59.074563295898436
           },
           "gridResM": 40,
           "demResM": 20,
-          "computeMs": 2.5999999940395355,
+          "computeMs": 6.699999995529652,
           "legs": [
             {
-              "lengthM": 2153.000091114363,
-              "ascentM": 32.5625,
-              "descentM": 16.687744140625,
-              "maxSlopeDeg": 3.3934176210946156,
-              "timeMin": 44.068707579198836,
-              "vertices": 55
+              "lengthM": 3540.14399949919,
+              "ascentM": 66.500244140625,
+              "descentM": 20.137939453125,
+              "maxSlopeDeg": 5.307566378835693,
+              "timeMin": 73.98699323238286,
+              "vertices": 87
             },
             {
-              "lengthM": 2153.078106231372,
-              "ascentM": 18.6875,
-              "descentM": 34.562255859375,
-              "maxSlopeDeg": 3.3934176210946156,
-              "timeMin": 41.930698898880095,
-              "vertices": 55
+              "lengthM": 3540.2025836764046,
+              "ascentM": 21.69970703125,
+              "descentM": 68.06201171875,
+              "maxSlopeDeg": 4.6703683565081455,
+              "timeMin": 68.06969496010132,
+              "vertices": 87
             }
           ]
         }
@@ -1461,41 +1516,41 @@
       "turn": 5,
       "kind": "tool",
       "name": "science_at_target",
-      "meta": "58 ms",
+      "meta": "66 ms",
       "raw": {
         "unit": {
-          "symbol": "Njf",
-          "name": "Jezero floor unit"
+          "symbol": "Aeb",
+          "name": "Eolian bedform unit"
         },
         "site": {
           "name": "Three Forks sample depot",
-          "distanceKm": 0.7973023213180825,
+          "distanceKm": 1.3931921888581018,
           "url": "https://science.nasa.gov/resource/perseverances-three-forks-sample-depot-map/",
           "sourceTitle": "Perseverance's 'Three Forks' Sample Depot Map"
         },
         "ground": {
-          "sol": 652,
-          "distanceM": 794.7799046492376,
+          "sol": 418,
+          "distanceM": 1033.269521603587,
           "photos": [
             {
-              "id": "NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
-              "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00652/ids/edr/browse/ncam/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J01_800.jpg",
-              "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
-              "sol": 652,
-              "earthDate": "2022-12-20",
+              "id": "NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
+              "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00418/ids/edr/browse/ncam/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J01_800.jpg",
+              "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
+              "sol": 418,
+              "earthDate": "2022-04-24",
               "camera": "NAVCAM_RIGHT",
               "cameraFull": "Navigation Camera Right",
               "credit": "NASA/JPL-Caltech"
             },
             {
-              "id": "NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J",
-              "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00652/ids/edr/browse/ncam/NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J01_800.jpg",
-              "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J",
-              "sol": 652,
-              "earthDate": "2022-12-20",
-              "camera": "NAVCAM_RIGHT",
-              "cameraFull": "Navigation Camera Right",
-              "credit": "NASA/JPL-Caltech"
+              "id": "ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ",
+              "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00418/ids/edr/browse/zcam/ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ02_800.jpg",
+              "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ",
+              "sol": 418,
+              "earthDate": "2022-04-24",
+              "camera": "MCZ_LEFT",
+              "cameraFull": "Mastcam-Z Left",
+              "credit": "NASA/JPL-Caltech/ASU"
             }
           ]
         }
@@ -1520,9 +1575,9 @@
             "type": "highlight_segment",
             "routeId": "R1",
             "leg": 0,
-            "startIdx": 21,
-            "endIdx": 54,
-            "label": "Radio shadow 2.64 km"
+            "startIdx": 67,
+            "endIdx": 86,
+            "label": "Radio shadow 2.77 km"
           }
         ],
         "result": {
@@ -1538,12 +1593,12 @@
       "question": "What is here?",
       "origin": "map",
       "engine": "deterministic",
-      "started": "2026-11-15T01:09:14.536Z",
-      "ended": "2026-11-15T01:09:14.595Z",
+      "started": "2026-11-15T08:54:52.948Z",
+      "ended": "2026-11-15T08:54:53.010Z",
       "narration": [
         {
           "text": "Read the global layers at your cursor: elevation -263 m, regional slope 0.3°",
-          "durationMs": 6.4
+          "durationMs": 20.1
         },
         {
           "text": "Looked up the geologic unit: Early Hesperian volcanic unit, USGS SIM 3292",
@@ -1558,7 +1613,7 @@
         {
           "kind": "tool",
           "title": "get_site_conditions",
-          "meta": "58 ms",
+          "meta": "61 ms",
           "durationMs": null,
           "text": null,
           "formula": [
@@ -1598,28 +1653,32 @@
                   "label": "Geologic Map of Mars (USGS SIM 3292), unit raster",
                   "value": 27,
                   "unit": "unit index: value k = k-th unit symbol in sorted order of geology_global.json \"units\" (1-based): AHi,AHtu,AHv,ANa,Aa,Ap,Apu,Av,Ave,HNb,HNhu,HNt,Hp,Hpe,Hpu,Ht,Hto,Htu,Hve,Nhe,Nhu,Nve,eAb,eHb,eHh,eHt,eHv,eNh,eNhm,lAa,lApc,lApd,lAv,lAvf,lHb,lHl,lHt,lHv,lHvf,lNh,lNv,mAl,mNh,mNhm",
-                  "source": "Multiple (Viking, MGS, Mars Odyssey, MRO, Mars Express data used by the map) Map compilation (THEMIS, MOLA, HRSC, CTX, HiRISE, Viking VIS); not an instrument product"
+                  "source": "Multiple (Viking, MGS, Mars Odyssey, MRO, Mars Express data used by the map) Map compilation (THEMIS, MOLA, HRSC, CTX, HiRISE, Viking VIS); not an instrument product",
+                  "provenance": "observed"
                 },
                 {
                   "id": "hydrogen",
                   "label": "Odyssey GRS water-equivalent hydrogen (Boynton et al. 2007)",
                   "value": 3.3,
                   "unit": "wt% H2O (water-equivalent hydrogen)",
-                  "source": "2001 Mars Odyssey Gamma Ray Spectrometer (GRS)"
+                  "source": "2001 Mars Odyssey Gamma Ray Spectrometer (GRS)",
+                  "provenance": "observed"
                 },
                 {
                   "id": "thermalInertia",
                   "label": "TES nighttime apparent thermal inertia (Putzig & Mellon 2007)",
                   "value": 331,
                   "unit": "J m^-2 K^-1 s^-1/2 (tiu)",
-                  "source": "Mars Global Surveyor Thermal Emission Spectrometer (TES)"
+                  "source": "Mars Global Surveyor Thermal Emission Spectrometer (TES)",
+                  "provenance": "observed"
                 },
                 {
                   "id": "slope",
                   "label": "Surface slope from the global MOLA DEM",
                   "value": 0.25,
                   "unit": "deg",
-                  "source": "Mars Global Surveyor Mars Orbiter Laser Altimeter (MOLA), slope computed by this pipeline"
+                  "source": "Mars Global Surveyor Mars Orbiter Laser Altimeter (MOLA), slope computed by this pipeline",
+                  "provenance": "observed"
                 }
               ],
               "nearestSites": [
@@ -1673,34 +1732,110 @@
       "question": "Could we land here?",
       "origin": "map",
       "engine": "deterministic",
-      "started": "2026-11-15T01:09:15.179Z",
-      "ended": "2026-11-15T01:09:15.238Z",
+      "started": "2026-11-15T08:54:53.606Z",
+      "ended": "2026-11-15T08:54:53.670Z",
       "narration": [
         {
           "text": "Checked 8 landing criteria at 20.01N 72.00E",
-          "durationMs": 2.3
+          "durationMs": 5.2
         },
         {
-          "text": "Scored each one against its limit: 3 pass, 0 fail, 5 without data",
+          "text": "Scored each one against its limit: 8 pass, 0 fail, 5 from estimates or mock values",
           "durationMs": null
         }
       ],
       "steps": [
         {
+          "kind": "calculation",
+          "title": "Filled values",
+          "meta": null,
+          "durationMs": 0,
+          "text": null,
+          "formula": [
+            "Regional slope (2-5 km length scale): estimate (Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Slope at 200-500 m length scale: estimate (Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Slope at 20-40 m length scale: estimate (Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Slope at 5 m length scale: estimate (Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Rock abundance (damaging rocks under the rover): mock (mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007))"
+          ],
+          "raw": [
+            {
+              "id": "slope-2-5km",
+              "label": "Regional slope (2-5 km length scale)",
+              "value": 0.37,
+              "unit": "deg",
+              "limit": "slope <= 3 deg over a 2-5 km length scale",
+              "result": "pass",
+              "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
+            },
+            {
+              "id": "slope-200-500m",
+              "label": "Slope at 200-500 m length scale",
+              "value": 0.66,
+              "unit": "deg",
+              "limit": "slope <= 5 deg over a 200-500 m length scale",
+              "result": "pass",
+              "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
+            },
+            {
+              "id": "slope-20-40m",
+              "label": "Slope at 20-40 m length scale",
+              "value": 1.23,
+              "unit": "deg",
+              "limit": "slope <= 15 deg over a 20-40 m length scale",
+              "result": "pass",
+              "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
+            },
+            {
+              "id": "slope-5m",
+              "label": "Slope at 5 m length scale",
+              "value": 1.92,
+              "unit": "deg",
+              "limit": "slope <= 15 deg over a 5 m length scale",
+              "result": "pass",
+              "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "estimate",
+              "method": "Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
+            },
+            {
+              "id": "rock-abundance",
+              "label": "Rock abundance (damaging rocks under the rover)",
+              "value": 6.5,
+              "unit": "% area",
+              "limit": "rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)",
+              "result": "pass",
+              "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.6 Rocks",
+              "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+              "provenance": "mock",
+              "method": "mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)"
+            }
+          ]
+        },
+        {
           "kind": "tool",
           "title": "check_landing_site",
-          "meta": "58 ms",
-          "durationMs": 58.4,
+          "meta": "63 ms",
+          "durationMs": 63.1,
           "text": null,
           "formula": [
             "Latitude band: 20.01° vs limit |latitude| <= 60° → PASS",
             "Landing-site elevation (MOLA areoid): -263.16 m vs limit elevation <= +2000 m above the MOLA areoid → PASS",
-            "Regional slope (2-5 km length scale): 0.26° vs limit slope <= 3° over a 2-5 km length scale → NO DATA",
+            "Regional slope (2-5 km length scale): 0.37° est. vs limit slope <= 3° over a 2-5 km length scale → PASS  (Regional slope (2-5 km length scale): MOLA slope 0.26° at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
             "Thermal inertia (not dust-dominated): 331 J m-2 s-0.5 K-1 vs limit thermal inertia > 100 J m-2 s-0.5 K-1 → PASS",
-            "Slope at 200-500 m length scale: no data vs limit slope <= 5° over a 200-500 m length scale → NO DATA",
-            "Slope at 20-40 m length scale: no data vs limit slope <= 15° over a 20-40 m length scale → NO DATA",
-            "Slope at 5 m length scale: no data vs limit slope <= 15° over a 5 m length scale → NO DATA",
-            "Rock abundance (damaging rocks under the rover): no data vs limit rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area) → NO DATA"
+            "Slope at 200-500 m length scale: 0.66° est. vs limit slope <= 5° over a 200-500 m length scale → PASS  (Slope at 200-500 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Slope at 20-40 m length scale: 1.23° est. vs limit slope <= 15° over a 20-40 m length scale → PASS  (Slope at 20-40 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Slope at 5 m length scale: 1.92° est. vs limit slope <= 15° over a 5 m length scale → PASS  (Slope at 5 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption))",
+            "Rock abundance (damaging rocks under the rover): 6.5 % area mock vs limit rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area) → PASS  (mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007))"
           ],
           "raw": {
             "args": {
@@ -1712,7 +1847,7 @@
                 "lon": 72,
                 "lat": 20.01269
               },
-              "verdict": "insufficient-data",
+              "verdict": "meets-all",
               "criteria": [
                 {
                   "id": "latitude",
@@ -1722,7 +1857,8 @@
                   "limit": "|latitude| <= 60 deg",
                   "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.2 Latitude",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "observed"
                 },
                 {
                   "id": "elevation",
@@ -1732,17 +1868,20 @@
                   "limit": "elevation <= +2000 m above the MOLA areoid",
                   "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.3 Altitude",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "observed"
                 },
                 {
                   "id": "slope-2-5km",
                   "label": "Regional slope (2-5 km length scale)",
-                  "value": 0.26,
+                  "value": 0.37,
                   "unit": "deg",
                   "limit": "slope <= 3 deg over a 2-5 km length scale",
-                  "result": "no data",
+                  "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "estimate",
+                  "method": "Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
                 },
                 {
                   "id": "thermal-inertia",
@@ -1752,49 +1891,59 @@
                   "limit": "thermal inertia > 100 J m-2 s-0.5 K-1",
                   "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 3.3 Table 2 (Load bearing surface)",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "observed"
                 },
                 {
                   "id": "slope-200-500m",
                   "label": "Slope at 200-500 m length scale",
-                  "value": null,
+                  "value": 0.66,
                   "unit": "deg",
                   "limit": "slope <= 5 deg over a 200-500 m length scale",
-                  "result": "no data",
+                  "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "estimate",
+                  "method": "Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
                 },
                 {
                   "id": "slope-20-40m",
                   "label": "Slope at 20-40 m length scale",
-                  "value": null,
+                  "value": 1.23,
                   "unit": "deg",
                   "limit": "slope <= 15 deg over a 20-40 m length scale",
-                  "result": "no data",
+                  "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "estimate",
+                  "method": "Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
                 },
                 {
                   "id": "slope-5m",
                   "label": "Slope at 5 m length scale",
-                  "value": null,
+                  "value": 1.92,
                   "unit": "deg",
                   "limit": "slope <= 15 deg over a 5 m length scale",
-                  "result": "no data",
+                  "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.5 Slopes",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "estimate",
+                  "method": "Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)"
                 },
                 {
                   "id": "rock-abundance",
                   "label": "Rock abundance (damaging rocks under the rover)",
-                  "value": null,
+                  "value": 6.5,
                   "unit": "% area",
                   "limit": "rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)",
-                  "result": "no data",
+                  "result": "pass",
                   "sourceTitle": "MSL Landing Site Selection Users Guide, section 1.6 Rocks",
-                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf"
+                  "sourceUrl": "https://marsoweb.nas.nasa.gov/landingsites/msl/memoranda/MSL_Eng_User_Guide_v2.pdf",
+                  "provenance": "mock",
+                  "method": "mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)"
                 }
               ],
+              "estimated": true,
               "ellipse": {
                 "semiMajorKm": 3.85,
                 "semiMinorKm": 3.3,
@@ -1803,11 +1952,11 @@
                 "sourceUrl": "https://science.nasa.gov/resource/perseverance-rover-landing-ellipse-in-jezero-crater/"
               },
               "notes": [
-                "Global DEM slope uses a ~14.8 km baseline, outside the 2-5 km scale of this criterion, so it is not scored.",
-                "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it.",
-                "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM).",
-                "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry.",
-                "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset."
+                "Regional slope (2-5 km length scale): the global DEM slope uses a ~14.8 km baseline, so the 2-5 km slope is an estimate (Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+                "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it; estimate used (Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+                "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM); estimate used (Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+                "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry; estimate used (Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+                "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset; mock value used (mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007))."
               ],
               "caveat": "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
               "provenance": {
@@ -1823,27 +1972,27 @@
         },
         {
           "kind": "verdict",
-          "title": "Not enough data to judge",
-          "meta": "5 without data",
+          "title": "Meets every listed criterion (includes estimates)",
+          "meta": "all pass",
           "durationMs": 0,
-          "text": "latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km length scale) no data, thermal inertia (not dust-dominated) pass, slope at 200-500 m length scale no data, slope at 20-40 m length scale no data, slope at 5 m length scale no data, rock abundance (damaging rocks under the rover) no data",
+          "text": "latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km length scale) pass, thermal inertia (not dust-dominated) pass, slope at 200-500 m length scale pass, slope at 20-40 m length scale pass, slope at 5 m length scale pass, rock abundance (damaging rocks under the rover) pass",
           "formula": [
             "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
-            "Global DEM slope uses a ~14.8 km baseline, outside the 2-5 km scale of this criterion, so it is not scored.",
-            "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it.",
-            "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM).",
-            "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry.",
-            "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset."
+            "Regional slope (2-5 km length scale): the global DEM slope uses a ~14.8 km baseline, so the 2-5 km slope is an estimate (Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it; estimate used (Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM); estimate used (Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry; estimate used (Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+            "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset; mock value used (mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007))."
           ],
           "raw": {
-            "verdict": "insufficient-data",
+            "verdict": "meets-all",
             "caveat": "Thresholds are the Mars Science Laboratory (Curiosity) EDL engineering constraints from the JPL MSL Landing Site Selection Users Guide (Feb/Apr 2006, 'working assumptions subject to future review'). They are a published NASA reference point, NOT the final Mars 2020 requirements: the Mars 2020 elevation and latitude limits could not be verified from a NASA page that was fetched and read, so they are omitted. Perseverance used Range Trigger and Terrain-Relative Navigation, which allow terrain that these constraints would reject.",
             "notes": [
-              "Global DEM slope uses a ~14.8 km baseline, outside the 2-5 km scale of this criterion, so it is not scored.",
-              "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it.",
-              "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM).",
-              "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry.",
-              "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset."
+              "Regional slope (2-5 km length scale): the global DEM slope uses a ~14.8 km baseline, so the 2-5 km slope is an estimate (Regional slope (2-5 km length scale): MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+              "Slope at 200-500 m length scale: needs sub-kilometre topography (stereo or photoclinometry); the global DEM cannot resolve it; estimate used (Slope at 200-500 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+              "Slope at 20-40 m length scale: needs metre-scale topography; only available inside Jezero (20 m CTX DEM); estimate used (Slope at 20-40 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+              "Slope at 5 m length scale: needs HiRISE-class stereo or photoclinometry; estimate used (Slope at 5 m length scale: MOLA slope 0.26 deg at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)).",
+              "Rock abundance (damaging rocks under the rover): needs a rock-abundance map (thermal differencing or high-resolution imagery), which is not in the global dataset; mock value used (mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007))."
             ]
           }
         }
@@ -1854,28 +2003,32 @@
       "question": "Run landing simulation",
       "origin": "tool",
       "engine": "deterministic",
-      "started": "2026-11-15T01:09:15.867Z",
-      "ended": "2026-11-15T01:09:16.272Z",
+      "started": "2026-11-15T08:54:53.861Z",
+      "ended": "2026-11-15T08:54:54.964Z",
       "narration": [
         {
           "text": "Loaded the Mars 2020 EDL timeline: 11 phases from entry to touchdown",
-          "durationMs": 0.5
+          "durationMs": 2
         },
         {
           "text": "Ran 10,000 touchdowns: 100% land on ground under 15°",
-          "durationMs": 347.5
+          "durationMs": 923.8
+        },
+        {
+          "text": "Touchdown planned for 10:00 local solar time at the site (daylight, Mars24)",
+          "durationMs": null
         },
         {
           "text": "Started the descent at 60× on the timeline: parachute, heat shield, powered descent, sky crane",
-          "durationMs": 7.2
+          "durationMs": 17.3
         }
       ],
       "steps": [
         {
           "kind": "tool",
           "title": "show_edl_timeline",
-          "meta": "7 ms",
-          "durationMs": 7.4,
+          "meta": "54 ms",
+          "durationMs": 53.7,
           "text": null,
           "formula": [
             "Cruise stage separation: t = -600 s to -600 s",
@@ -2029,13 +2182,15 @@
         {
           "kind": "tool",
           "title": "run_landing_scenario",
-          "meta": "364 ms",
-          "durationMs": 363.7,
+          "meta": "978 ms",
+          "durationMs": 978.1,
           "text": null,
           "formula": [
             "10,000 samples, seed 2026, ok = 10,000 (100 %) at or under 15°, p50 slope 0.3°, p95 slope 0.3°",
             "ok fraction = N_ok ÷ N = 10,000 ÷ 10,000 = 100 % (N_ok recovered from the reported percentage)",
-            "dispersion = truncated 2-D Gaussian, 3σ = semi-axes 3.85 × 3.3 km, azimuth 0°"
+            "dispersion = truncated 2-D Gaussian, 3σ = semi-axes 3.85 × 3.3 km, azimuth 0°",
+            "verdict rule: GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+            "ok 100.0 % ≥ 99 %, no data 0.0 % < 1 % → GO (includes estimates)"
           ],
           "raw": {
             "args": {
@@ -2064,8 +2219,20 @@
               },
               "terrainModel": "global DEM, ~7.4 km posting",
               "engine": "ts",
-              "computeMs": 3,
+              "computeMs": 8,
               "seed": 2026,
+              "verdict": {
+                "word": "GO",
+                "label": "GO (includes estimates)",
+                "tone": "go",
+                "reason": "100.0 % of touchdowns land within 15° (GO needs 99 %) and 0.0 % have no data. The terrain cell is wider than the ellipse, so the slopes are regional estimates.",
+                "rule": "GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+                "estimated": true,
+                "calc": [
+                  "verdict rule: GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+                  "ok 100.0 % ≥ 99 %, no data 0.0 % < 1 % → GO (includes estimates)"
+                ]
+              },
               "note": "Coarse global DEM: slopes are averaged over kilometres and miss boulders and small craters, so this is an optimistic regional view. Pick a site inside Jezero for 20 m terrain.",
               "method": "Truncated 2-D Gaussian touchdown dispersion, 3 sigma = ellipse semi-axes; slope limit is the user assumption.",
               "globe": {
@@ -2084,6 +2251,30 @@
               }
             }
           }
+        },
+        {
+          "kind": "verdict",
+          "title": "Landing verdict: GO (includes estimates)",
+          "meta": null,
+          "durationMs": 0,
+          "text": "100.0 % of touchdowns land within 15° (GO needs 99 %) and 0.0 % have no data. The terrain cell is wider than the ellipse, so the slopes are regional estimates.",
+          "formula": [
+            "GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+            "verdict rule: GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+            "ok 100.0 % ≥ 99 %, no data 0.0 % < 1 % → GO (includes estimates)"
+          ],
+          "raw": {
+            "word": "GO",
+            "label": "GO (includes estimates)",
+            "tone": "go",
+            "reason": "100.0 % of touchdowns land within 15° (GO needs 99 %) and 0.0 % have no data. The terrain cell is wider than the ellipse, so the slopes are regional estimates.",
+            "rule": "GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+            "estimated": true,
+            "calc": [
+              "verdict rule: GO if ≥ 99 % of touchdowns are within the slope limit and no data < 1 %; HOLD if ≥ 95 % are within it; else NO GO (assumption, not a NASA requirement)",
+              "ok 100.0 % ≥ 99 %, no data 0.0 % < 1 % → GO (includes estimates)"
+            ]
+          }
         }
       ]
     },
@@ -2092,55 +2283,55 @@
       "question": "Take me to Jezero",
       "origin": "tool",
       "engine": "deterministic",
-      "started": "2026-11-15T01:09:49.218Z",
-      "ended": "2026-11-15T01:09:54.024Z",
+      "started": "2026-11-15T08:55:33.263Z",
+      "ended": "2026-11-15T08:55:37.010Z",
       "narration": [
         {
           "text": "Fell from orbit to Jezero Crater with the crosshair locked on the delta",
-          "durationMs": 4800.8
+          "durationMs": 3730.4
         },
         {
           "text": "Loaded the 20 m MRO CTX terrain; base at the Octavia E. Butler site",
-          "durationMs": 1.2
+          "durationMs": 2.3
         }
       ],
       "steps": []
     },
     {
       "turn": 5,
-      "question": "Plan a round trip from base to 18.44N 77.41E",
+      "question": "Plan a round trip from base to 18.43N 77.39E",
       "origin": "drag",
       "engine": "deterministic",
-      "started": "2026-11-15T01:10:06.578Z",
-      "ended": "2026-11-15T01:10:06.669Z",
+      "started": "2026-11-15T08:56:10.129Z",
+      "ended": "2026-11-15T08:56:10.295Z",
       "narration": [
         {
-          "text": "Read the ground at the target: CTX 20 m terrain, elevation -2,551 m",
+          "text": "Read the ground at the target: CTX 20 m terrain, elevation -2,521 m",
           "durationMs": null
         },
         {
-          "text": "Planned a round trip from base with A*, slope limit 15°: 2.15 km out, 2.15 km back",
-          "durationMs": 3
+          "text": "Planned a round trip from base with A*, slope limit 15°: 3.54 km out, 3.54 km back",
+          "durationMs": 7.6
         },
         {
-          "text": "Computed walking time with a suited Tobler model: 1 h 56 min including 30 min at the target",
+          "text": "Computed walking time with a suited Tobler model: 2 h 52 min including 30 min at the target",
           "durationMs": null
         },
         {
-          "text": "Computed the suit battery: 75.8 % left against a 20 % reserve",
+          "text": "Computed the suit battery: 64.2 % left against a 20 % reserve",
           "durationMs": null
         },
         {
-          "text": "Checked line of sight to the 10 m base mast at every vertex: 2.64 km in shadow",
-          "durationMs": 3
+          "text": "Checked line of sight to the 10 m base mast at every vertex: 2.77 km in shadow",
+          "durationMs": 9.3
         },
         {
-          "text": "Read the sun from the same check: daylight lasts the whole EVA, 7 h 32 min margin",
+          "text": "Read the sun from the same check: daylight lasts the whole EVA, 6 h 36 min margin",
           "durationMs": null
         },
         {
-          "text": "Looked up the science at the target: Jezero floor unit (Njf); nearest Perseverance view is sol 652, 795 m away",
-          "durationMs": 6
+          "text": "Looked up the science at the target: Eolian bedform unit (Aeb); nearest Perseverance view is sol 418, 1.03 km away",
+          "durationMs": 13
         },
         {
           "text": "Drew the route and the shadow stretch on the map",
@@ -2151,23 +2342,23 @@
         {
           "kind": "input",
           "title": "You dragged from base to a point",
-          "meta": "01:10:06",
+          "meta": "08:56:10",
           "durationMs": null,
-          "text": "target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear)",
+          "text": "target 18.4340N 77.3927E, elevation -2,521 m (CTX DEM, bilinear)",
           "formula": null,
           "raw": null
         },
         {
           "kind": "tool",
           "title": "plan_round_trip",
-          "meta": "3 ms",
-          "durationMs": 2.6,
+          "meta": "7 ms",
+          "durationMs": 6.7,
           "text": null,
           "formula": [
             "// A* on a 40 m grid from the 20 m CTX DEM, objective fastest",
-            "from 18.4446N 77.4509E  to 18.4410N 77.4148E",
+            "from 18.4446N 77.4509E  to 18.4340N 77.3927E",
             "edge allowed if |grade| <= 15° and cell max slope <= 15° (both endpoint cells included)",
-            "path 110 vertices, outbound 2.15 km + return 2.15 km = 4.31 km, ascent 51.3 m"
+            "path 174 vertices, outbound 3.54 km + return 3.54 km = 7.08 km, ascent 88.2 m"
           ],
           "raw": {
             "args": {
@@ -2183,11 +2374,11 @@
               },
               "to": {
                 "id": "P2",
-                "lon": 77.41480097403465,
-                "lat": 18.440953683337153,
-                "elevationM": -2551.3580250893833,
-                "x": -838.8056924023017,
-                "z": 1491.1885668904738,
+                "lon": 77.39268155371828,
+                "lat": 18.433973779991884,
+                "elevationM": -2521.3783201952992,
+                "x": -2082.4195024083174,
+                "z": 1904.92022642316,
                 "source": "pick",
                 "label": "Target"
               },
@@ -2209,36 +2400,36 @@
               "feasible": true,
               "reasons": [],
               "minFeasibleSlopeDeg": null,
-              "targetSlopeDeg": 1.9916828870773315,
+              "targetSlopeDeg": 7.3893280029296875,
               "totals": {
-                "lengthM": 4306.078197345735,
-                "ascentM": 51.25,
-                "descentM": 51.25,
-                "maxSlopeDeg": 3.3934176210946156,
-                "walkMin": 85.99940647807892,
-                "evaMin": 115.99940647807892,
-                "batteryUsedPct": 24.166543016266445,
-                "climbWorkKJ": 34.326225
+                "lengthM": 7080.346583175595,
+                "ascentM": 88.199951171875,
+                "descentM": 88.199951171875,
+                "maxSlopeDeg": 5.307566378835693,
+                "walkMin": 142.05668819248416,
+                "evaMin": 172.05668819248416,
+                "batteryUsedPct": 35.845143373434205,
+                "climbWorkKJ": 59.074563295898436
               },
               "gridResM": 40,
               "demResM": 20,
-              "computeMs": 2.5999999940395355,
+              "computeMs": 6.699999995529652,
               "legs": [
                 {
-                  "lengthM": 2153.000091114363,
-                  "ascentM": 32.5625,
-                  "descentM": 16.687744140625,
-                  "maxSlopeDeg": 3.3934176210946156,
-                  "timeMin": 44.068707579198836,
-                  "vertices": 55
+                  "lengthM": 3540.14399949919,
+                  "ascentM": 66.500244140625,
+                  "descentM": 20.137939453125,
+                  "maxSlopeDeg": 5.307566378835693,
+                  "timeMin": 73.98699323238286,
+                  "vertices": 87
                 },
                 {
-                  "lengthM": 2153.078106231372,
-                  "ascentM": 18.6875,
-                  "descentM": 34.562255859375,
-                  "maxSlopeDeg": 3.3934176210946156,
-                  "timeMin": 41.930698898880095,
-                  "vertices": 55
+                  "lengthM": 3540.2025836764046,
+                  "ascentM": 21.69970703125,
+                  "descentM": 68.06201171875,
+                  "maxSlopeDeg": 4.6703683565081455,
+                  "timeMin": 68.06969496010132,
+                  "vertices": 87
                 }
               ]
             }
@@ -2248,28 +2439,28 @@
           "kind": "calculation",
           "title": "Walking time",
           "meta": null,
-          "durationMs": 0.2,
+          "durationMs": 0.6,
           "text": null,
           "formula": [
             "v(θ) = f × 6 km/h × e^(-3.5 × |tan θ + 0.05|)",
-            "outbound: tan θ = (33 - 17) m ÷ 2,152 m = 0.007  →  v = 0.6 × 6 × e^(-3.5 × |0.007 + 0.05|) = 2.95 km/h",
-            "return: tan θ = (19 - 35) m ÷ 2,152 m = -0.007  →  v = 0.6 × 6 × e^(-3.5 × |-0.007 + 0.05|) = 3.1 km/h",
-            "t = Σ segment length ÷ v(θ segment) + dwell = 44 min + 42 min + 30 min = 1 h 56 min"
+            "outbound: tan θ = (67 - 20) m ÷ 3,538 m = 0.013  →  v = 0.6 × 6 × e^(-3.5 × |0.013 + 0.05|) = 2.89 km/h",
+            "return: tan θ = (22 - 68) m ÷ 3,538 m = -0.013  →  v = 0.6 × 6 × e^(-3.5 × |-0.013 + 0.05|) = 3.16 km/h",
+            "t = Σ segment length ÷ v(θ segment) + dwell = 74 min + 68 min + 30 min = 2 h 52 min"
           ],
           "raw": {
             "suitSpeedFactor": 0.6,
             "legs": [
               {
-                "horizM": 2152.190787165199,
-                "ascentM": 32.5625,
-                "descentM": 16.687744140625,
-                "timeMin": 44.068707579198836
+                "horizM": 3538.3631591789317,
+                "ascentM": 66.500244140625,
+                "descentM": 20.137939453125,
+                "timeMin": 73.98699323238286
               },
               {
-                "horizM": 2152.188253272859,
-                "ascentM": 18.6875,
-                "descentM": 34.562255859375,
-                "timeMin": 41.930698898880095
+                "horizM": 3538.4069681737647,
+                "ascentM": 21.69970703125,
+                "descentM": 68.06201171875,
+                "timeMin": 68.06969496010132
               }
             ],
             "dwellMin": 30
@@ -2279,79 +2470,89 @@
           "kind": "calculation",
           "title": "Suit battery",
           "meta": null,
-          "durationMs": 0,
+          "durationMs": 0.3,
           "text": null,
           "formula": [
-            "used = P × t ÷ C = 250 W × 1.93 h ÷ 2,000 Wh = 24.2 %",
-            "left = 100 % - 24.2 % = 75.8 %  (reserve 20 %)  pass"
+            "used = P × t ÷ C = 250 W × 2.87 h ÷ 2,000 Wh = 35.8 %",
+            "left = 100 % - 35.8 % = 64.2 %  (reserve 20 %)  pass"
           ],
           "raw": {
             "suitPowerW": 250,
-            "evaMin": 115.99940647807892,
+            "evaMin": 172.05668819248416,
             "batteryWh": 2000,
             "reservePct": 20,
-            "usedPct": 24.166543016266445
+            "usedPct": 35.845143373434205
           }
         },
         {
           "kind": "calculation",
           "title": "Climbing work",
           "meta": null,
-          "durationMs": 0.1,
+          "durationMs": 0,
           "text": null,
           "formula": [
-            "W = m × g × ascent = 180 kg × 3.721 m/s² × 51.3 m = 34 kJ"
+            "W = m × g × ascent = 180 kg × 3.721 m/s² × 88.2 m = 59 kJ"
           ],
           "raw": {
             "crewMassKg": 180,
             "g": 3.721,
-            "ascentM": 51.25
+            "ascentM": 88.199951171875
           }
         },
         {
           "kind": "calculation",
           "title": "Comms line of sight from base",
-          "meta": "110 rays",
-          "durationMs": 3,
+          "meta": "174 rays",
+          "durationMs": 9.3,
           "text": null,
           "formula": [
             "mast 10 m (assumption), suit antenna 1.8 m, ray sampled every 10 m",
-            "curvature drop = d² ÷ 2R = (2,056 m)² ÷ (2 × 3,396,190 m) = 0.62 m",
-            "1 hidden stretch, longest vertices 21 to 88, 2.64 km",
+            "curvature drop = d² ÷ 2R = (3,318 m)² ÷ (2 × 3,396,190 m) = 1.62 m",
+            "3 hidden stretches, longest vertices 67 to 130, 2.77 km",
             "limit 0.5 km per stretch  fail"
           ],
           "raw": {
             "stationHeightM": 10,
             "suitHeightM": 1.8,
-            "longestShadowM": 2642.713630361016,
+            "longestShadowM": 2766.6018873972935,
             "shadows": [
               {
                 "startIdx": 21,
-                "endIdx": 88,
-                "lengthM": 2642.713630361016
+                "endIdx": 65,
+                "lengthM": 1670.6375071342095
+              },
+              {
+                "startIdx": 67,
+                "endIdx": 130,
+                "lengthM": 2766.6018873972935
+              },
+              {
+                "startIdx": 132,
+                "endIdx": 152,
+                "lengthM": 759.1128947537436
               }
             ],
-            "visibleFraction": 0.38181818181818183
+            "visibleFraction": 0.25287356321839083
           }
         },
         {
           "kind": "calculation",
           "title": "Sun along the route",
           "meta": null,
-          "durationMs": 0.4,
+          "durationMs": 1.5,
           "text": null,
           "formula": [
             "Mars24: MSD 54,344.2, Ls 22.4°, LTST 09:00 at the start",
-            "sun elevation 46° at the start, 71° at the end, lowest 46°",
-            "sunset 18:12 LTST, daylight margin at return 7 h 32 min  pass"
+            "sun elevation 46° at the start, 80° at the end, lowest 46°",
+            "sunset 18:12 LTST, daylight margin at return 6 h 36 min  pass"
           ],
           "raw": {
             "ok": true,
             "thresholdDeg": 0,
-            "minElevationDeg": 45.51991296890621,
+            "minElevationDeg": 45.51991281381183,
             "minElevationAtMin": 0,
-            "startElevationDeg": 45.51991296890621,
-            "endElevationDeg": 71.41412822309597,
+            "startElevationDeg": 45.51991281381183,
+            "endElevationDeg": 80.49405160687843,
             "firstViolationMin": null
           }
         },
@@ -2359,21 +2560,21 @@
           "kind": "calculation",
           "title": "Earth link delay",
           "meta": null,
-          "durationMs": 0.1,
+          "durationMs": 0.2,
           "text": null,
           "formula": [
-            "one-way light time = range ÷ c = 1.315639 au × 499.005 s/au = 656.5 s = 10.9 min"
+            "one-way light time = range ÷ c = 1.312878 au × 499.005 s/au = 655.1 s = 10.9 min"
           ],
           "raw": {
-            "rangeAu": 1.3156386462463312,
-            "minutes": 10.941843181747686
+            "rangeAu": 1.3128775630167708,
+            "minutes": 10.918863823020832
           }
         },
         {
           "kind": "verdict",
           "title": "Verdict NO GO",
           "meta": "1 blocker",
-          "durationMs": 0,
+          "durationMs": 0.2,
           "text": "slope pass, battery pass, EVA time pass, daylight pass, comms fail, data pass",
           "formula": null,
           "raw": {
@@ -2382,7 +2583,7 @@
                 "id": "slope",
                 "label": "Max slope on route",
                 "status": "go",
-                "value": 3.4,
+                "value": 5.3,
                 "limit": 15,
                 "unit": "deg",
                 "source": "RouteResult.totals.maxSlopeDeg (CTX 20 m DEM, max |edge grade|) vs MissionConstraints.maxSlopeDeg",
@@ -2393,7 +2594,7 @@
                 "id": "battery",
                 "label": "Battery remaining at EVA end",
                 "status": "go",
-                "value": 75.8,
+                "value": 64.2,
                 "limit": 20,
                 "unit": "%",
                 "source": "RouteResult.totals.batteryUsedPct (suitPowerW × evaMin / batteryWh) vs MissionConstraints.batteryReservePct",
@@ -2404,7 +2605,7 @@
                 "id": "eva-time",
                 "label": "EVA duration (walk + dwell)",
                 "status": "go",
-                "value": 116,
+                "value": 172.1,
                 "limit": 360,
                 "unit": "min",
                 "source": "RouteResult.totals.evaMin vs MissionConstraints.evaMaxMin",
@@ -2426,7 +2627,7 @@
                 "id": "comms",
                 "label": "Longest comms shadow on route",
                 "status": "no-go",
-                "value": 2642.7,
+                "value": 2766.6,
                 "limit": 500,
                 "unit": "m",
                 "source": "Line of sight from habitat (mast 10 m) to suit (1.8 m) on the 20 m DEM, Mars curvature included",
@@ -2455,48 +2656,48 @@
         {
           "kind": "tool",
           "title": "science_at_target",
-          "meta": "58 ms",
-          "durationMs": 58.4,
+          "meta": "66 ms",
+          "durationMs": 66.4,
           "text": null,
           "formula": [
-            "geology = Jezero floor unit (Njf)  (USGS SIM 3464)",
-            "nearest catalogued site = Three Forks sample depot, 0.8 km",
-            "nearest Perseverance frames: sol 652, 795 m from the target, NAVCAM_RIGHT, NAVCAM_RIGHT"
+            "geology = Eolian bedform unit (Aeb)  (USGS SIM 3464)",
+            "nearest catalogued site = Three Forks sample depot, 1.39 km",
+            "nearest Perseverance frames: sol 418, 1.03 km from the target, NAVCAM_RIGHT, MCZ_LEFT"
           ],
           "raw": {
             "unit": {
-              "symbol": "Njf",
-              "name": "Jezero floor unit"
+              "symbol": "Aeb",
+              "name": "Eolian bedform unit"
             },
             "site": {
               "name": "Three Forks sample depot",
-              "distanceKm": 0.7973023213180825,
+              "distanceKm": 1.3931921888581018,
               "url": "https://science.nasa.gov/resource/perseverances-three-forks-sample-depot-map/",
               "sourceTitle": "Perseverance's 'Three Forks' Sample Depot Map"
             },
             "ground": {
-              "sol": 652,
-              "distanceM": 794.7799046492376,
+              "sol": 418,
+              "distanceM": 1033.269521603587,
               "photos": [
                 {
-                  "id": "NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
-                  "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00652/ids/edr/browse/ncam/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J01_800.jpg",
-                  "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J",
-                  "sol": 652,
-                  "earthDate": "2022-12-20",
+                  "id": "NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
+                  "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00418/ids/edr/browse/ncam/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J01_800.jpg",
+                  "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J",
+                  "sol": 418,
+                  "earthDate": "2022-04-24",
                   "camera": "NAVCAM_RIGHT",
                   "cameraFull": "Navigation Camera Right",
                   "credit": "NASA/JPL-Caltech"
                 },
                 {
-                  "id": "NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J",
-                  "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00652/ids/edr/browse/ncam/NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J01_800.jpg",
-                  "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830827_168ECM_N0320148NCAM12652_01_195J",
-                  "sol": 652,
-                  "earthDate": "2022-12-20",
-                  "camera": "NAVCAM_RIGHT",
-                  "cameraFull": "Navigation Camera Right",
-                  "credit": "NASA/JPL-Caltech"
+                  "id": "ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ",
+                  "url": "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00418/ids/edr/browse/zcam/ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ02_800.jpg",
+                  "pageUrl": "https://mars.nasa.gov/mars2020/multimedia/raw-images/ZL0_0418_0704039414_159EBY_N0231180ZCAM08438_1100LMJ",
+                  "sol": 418,
+                  "earthDate": "2022-04-24",
+                  "camera": "MCZ_LEFT",
+                  "cameraFull": "Mastcam-Z Left",
+                  "credit": "NASA/JPL-Caltech/ASU"
                 }
               ]
             }
@@ -2506,8 +2707,8 @@
           "kind": "tool",
           "title": "issue_scene_commands",
           "meta": "1 ms",
-          "durationMs": 0.7,
-          "text": "clear_annotations, draw_route R1, highlight_segment 21 to 54",
+          "durationMs": 1.1,
+          "text": "clear_annotations, draw_route R1, highlight_segment 67 to 86",
           "formula": null,
           "raw": {
             "commands": [
@@ -2523,9 +2724,9 @@
                 "type": "highlight_segment",
                 "routeId": "R1",
                 "leg": 0,
-                "startIdx": 21,
-                "endIdx": 54,
-                "label": "Radio shadow 2.64 km"
+                "startIdx": 67,
+                "endIdx": 86,
+                "label": "Radio shadow 2.77 km"
               }
             ],
             "result": {

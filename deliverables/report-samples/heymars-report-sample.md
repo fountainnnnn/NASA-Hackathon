@@ -1,34 +1,34 @@
-# EVA plan: base to 18.441N 77.415E, Jezero Crater
+# EVA plan: base to 18.434N 77.393E, Jezero Crater
 
 Round trip from the Octavia E. Butler landing site, prepared for surface operations review.
 
-Report HM-2026-11-15-R1, generated 2026-11-15 01:10 UTC.
+Report HM-2026-11-15-R1, generated 2026-11-15 08:56 UTC.
 
-**Verdict: NO GO.** Radio shadow of 2.6 km with no line of sight to base from a 10 m mast.
+**Verdict: NO GO.** Radio shadow of 2.8 km with no line of sight to base from a 10 m mast.
 
 ## 1. Summary and verdict
 
-1 blocker. Radio shadow of 2.6 km with no line of sight to base from a 10 m mast.
+1 blocker. Radio shadow of 2.8 km with no line of sight to base from a 10 m mast.
 
 | Item | Value | Limit | Status |
 | --- | ---: | ---: | --- |
-| Round trip distance | 4.31 km | n/a | info |
-| EVA duration incl. 30 min at target | 1 h 56 min | 6 h 00 min | pass |
-| Suit battery at return | 75.8 % | >= 20 % | pass |
-| Maximum slope on route | 3.4° | <= 15° | pass |
-| Longest comms shadow | 2.64 km | <= 0.5 km | fail |
-| Daylight margin at return | 7 h 32 min | >= 0 | pass |
+| Round trip distance | 7.08 km | n/a | info |
+| EVA duration incl. 30 min at target | 2 h 52 min | 6 h 00 min | pass |
+| Suit battery at return | 64.2 % | >= 20 % | pass |
+| Maximum slope on route | 5.3° | <= 15° | pass |
+| Longest comms shadow | 2.77 km | <= 0.5 km | fail |
+| Daylight margin at return | 6 h 36 min | >= 0 | pass |
 
 | Landing criterion | Value | Limit | Status |
 | --- | ---: | --- | --- |
 | Latitude band | 20.01° | \|latitude\| <= 60° | pass |
 | Landing-site elevation (MOLA areoid) | -263.16 m | elevation <= +2000 m above the MOLA areoid | pass |
-| Regional slope (2-5 km length scale) | 0.26° | slope <= 3° over a 2-5 km length scale | not scored at this scale |
+| Regional slope (2-5 km length scale) | 0.37° (estimate) | slope <= 3° over a 2-5 km length scale | pass |
 | Thermal inertia (not dust-dominated) | 331 J m-2 s-0.5 K-1 | thermal inertia > 100 J m-2 s-0.5 K-1 | pass |
-| Slope at 200-500 m length scale | no data at this scale | slope <= 5° over a 200-500 m length scale | no data |
-| Slope at 20-40 m length scale | no data at this scale | slope <= 15° over a 20-40 m length scale | no data |
-| Slope at 5 m length scale | no data at this scale | slope <= 15° over a 5 m length scale | no data |
-| Rock abundance (damaging rocks under the rover) | no data at this scale | rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area) | no data |
+| Slope at 200-500 m length scale | 0.66° (estimate) | slope <= 5° over a 200-500 m length scale | pass |
+| Slope at 20-40 m length scale | 1.23° (estimate) | slope <= 15° over a 20-40 m length scale | pass |
+| Slope at 5 m length scale | 1.92° (estimate) | slope <= 15° over a 5 m length scale | pass |
+| Rock abundance (damaging rocks under the rover) | 6.5 % area (Mock) | rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area) | pass |
 
 | Landing simulation | Value |
 | --- | ---: |
@@ -41,16 +41,16 @@ Report HM-2026-11-15-R1, generated 2026-11-15 01:10 UTC.
 
 | Science at target | Value | Source |
 | --- | --- | --- |
-| Geologic unit | Jezero floor unit (Njf) | USGS SIM 3464, observed |
-| Nearest catalogued science site | Three Forks sample depot, 0.8 km | Perseverance's 'Three Forks' Sample Depot Map |
-| View from the ground | Sol 652, Navigation Camera Right, 0.79 km from the target, 2022-12-20: https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0652_0724830918_993ECM_N0320148NCAM12652_01_195J | NASA/JPL-Caltech, Perseverance raw image |
+| Geologic unit | Eolian bedform unit (Aeb) | USGS SIM 3464, observed |
+| Nearest catalogued science site | Three Forks sample depot, 1.39 km | Perseverance's 'Three Forks' Sample Depot Map |
+| View from the ground | Sol 418, Navigation Camera Right, 1.03 km from the target, 2022-04-24: https://mars.nasa.gov/mars2020/multimedia/raw-images/NRF_0418_0704059288_987ECM_N0232096NCAM02418_01_195J | NASA/JPL-Caltech, Perseverance raw image |
 
 ## 2. Inputs and constraints
 
 | Parameter | Value | Type |
 | --- | ---: | --- |
 | Start (base) | 18.4446N 77.4509E, -2,567 m | observed, Perseverance waypoint sol 13 |
-| Target | 18.4410N 77.4148E, -2,551 m | computed, CTX DEM bilinear |
+| Target | 18.4340N 77.3927E, -2,521 m | computed, CTX DEM bilinear |
 | Max slope | 15° | assumption, default |
 | Battery reserve | 20 % | assumption, default |
 | EVA time limit | 6 h 00 min | assumption, default |
@@ -66,9 +66,9 @@ Report HM-2026-11-15-R1, generated 2026-11-15 01:10 UTC.
 
 | Leg | Length | Ascent | Max slope | Walk time |
 | --- | ---: | ---: | ---: | ---: |
-| Outbound | 2.15 km | 32.6 m | 3.4° | 44 min |
-| Return | 2.15 km | 18.7 m | 3.4° | 42 min |
-| Round trip (sum of legs) | 4.31 km | 51.3 m | 3.4° | 1 h 26 min |
+| Outbound | 3.54 km | 66.5 m | 5.3° | 1 h 14 min |
+| Return | 3.54 km | 21.7 m | 4.7° | 1 h 08 min |
+| Round trip (sum of legs) | 7.08 km | 88.2 m | 5.3° | 2 h 22 min |
 
 A* on a 40 m grid derived from the 20 m MRO CTX DEM; path snapped to cell centres. The GeoJSON export carries every leg with per-vertex elevation.
 
@@ -78,30 +78,30 @@ A* on a 40 m grid derived from the 20 m MRO CTX DEM; path snapped to cell centre
 
 ```
 v(θ) = f × 6 km/h × e^(-3.5 × |tan θ + 0.05|)
-outbound: tan θ = (33 - 17) m ÷ 2,152 m = 0.007  →  v = 0.6 × 6 × e^(-3.5 × |0.007 + 0.05|) = 2.95 km/h
-return: tan θ = (19 - 35) m ÷ 2,152 m = -0.007  →  v = 0.6 × 6 × e^(-3.5 × |-0.007 + 0.05|) = 3.1 km/h
-t = Σ segment length ÷ v(θ segment) + dwell = 44 min + 42 min + 30 min = 1 h 56 min
+outbound: tan θ = (67 - 20) m ÷ 3,538 m = 0.013  →  v = 0.6 × 6 × e^(-3.5 × |0.013 + 0.05|) = 2.89 km/h
+return: tan θ = (22 - 68) m ÷ 3,538 m = -0.013  →  v = 0.6 × 6 × e^(-3.5 × |-0.013 + 0.05|) = 3.16 km/h
+t = Σ segment length ÷ v(θ segment) + dwell = 74 min + 68 min + 30 min = 2 h 52 min
 ```
 
 **4.2 Suit battery**
 
 ```
-used = P × t ÷ C = 250 W × 1.93 h ÷ 2,000 Wh = 24.2 %
-left = 100 % - 24.2 % = 75.8 %  (reserve 20 %)  pass
+used = P × t ÷ C = 250 W × 2.87 h ÷ 2,000 Wh = 35.8 %
+left = 100 % - 35.8 % = 64.2 %  (reserve 20 %)  pass
 ```
 
 **4.3 Mechanical work of climbing (lower bound on effort)**
 
 ```
-W = m × g × ascent = 180 kg × 3.721 m/s² × 51.3 m = 34 kJ
+W = m × g × ascent = 180 kg × 3.721 m/s² × 88.2 m = 59 kJ
 ```
 
 **4.4 Comms line of sight with planetary curvature**
 
 ```
 mast 10 m (assumption), suit antenna 1.8 m, ray sampled every 10 m
-curvature drop = d² ÷ 2R = (2,056 m)² ÷ (2 × 3,396,190 m) = 0.62 m
-1 hidden stretch, longest vertices 21 to 88, 2.64 km
+curvature drop = d² ÷ 2R = (3,318 m)² ÷ (2 × 3,396,190 m) = 1.62 m
+3 hidden stretches, longest vertices 67 to 130, 2.77 km
 limit 0.5 km per stretch  fail
 ```
 
@@ -109,14 +109,14 @@ limit 0.5 km per stretch  fail
 
 ```
 Mars24: MSD 54,344.2, Ls 22.4°, LTST 09:00 at the start
-sun elevation 46° at the start, 71° at the end, lowest 46°
-sunset 18:12 LTST, daylight margin at return 7 h 32 min  pass
+sun elevation 46° at the start, 80° at the end, lowest 46°
+sunset 18:12 LTST, daylight margin at return 6 h 36 min  pass
 ```
 
 **4.6 Earth link (NASA JPL Horizons)**
 
 ```
-one-way light time = range ÷ c = 1.315638 au × 499.005 s/au = 656.5 s = 10.9 min
+one-way light time = range ÷ c = 1.312876 au × 499.005 s/au = 655.1 s = 10.9 min
 ```
 
 **4.7 Landing criteria at 20.013N 72.000E**
@@ -124,12 +124,12 @@ one-way light time = range ÷ c = 1.315638 au × 499.005 s/au = 656.5 s = 10.9 m
 ```
 Latitude band: 20.01° vs limit |latitude| <= 60°  pass
 Landing-site elevation (MOLA areoid): -263.16 m vs limit elevation <= +2000 m above the MOLA areoid  pass
-Regional slope (2-5 km length scale): 0.26° vs limit slope <= 3° over a 2-5 km length scale  no data
+Regional slope (2-5 km length scale): 0.37° (estimate: Regional slope (2-5 km length scale): MOLA slope 0.26° at a ~14.8 km baseline scaled to 3.5 km as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 3° over a 2-5 km length scale  pass
 Thermal inertia (not dust-dominated): 331 J m-2 s-0.5 K-1 vs limit thermal inertia > 100 J m-2 s-0.5 K-1  pass
-Slope at 200-500 m length scale: no data vs limit slope <= 5° over a 200-500 m length scale  no data
-Slope at 20-40 m length scale: no data vs limit slope <= 15° over a 20-40 m length scale  no data
-Slope at 5 m length scale: no data vs limit slope <= 15° over a 5 m length scale  no data
-Rock abundance (damaging rocks under the rover): no data vs limit rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)  no data
+Slope at 200-500 m length scale: 0.66° (estimate: Slope at 200-500 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 350 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 5° over a 200-500 m length scale  pass
+Slope at 20-40 m length scale: 1.23° (estimate: Slope at 20-40 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 30 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 15° over a 20-40 m length scale  pass
+Slope at 5 m length scale: 1.92° (estimate: Slope at 5 m length scale: MOLA slope 0.26° at a ~14.8 km baseline scaled to 5 m as s(L) = s(L0) * (L0 / L)^(1 - H), H = 0.75 (assumption)) vs limit slope <= 15° over a 5 m length scale  pass
+Rock abundance (damaging rocks under the rover): 6.5 % area (mock: mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)) vs limit rock abundance of around 10% or less (less than 0.25% chance of a rock taller than 0.6 m in a 4 m2 area)  pass
 ```
 
 **4.8 Landing Monte Carlo**
@@ -178,27 +178,29 @@ Validation: DEM heights agree with 708 Perseverance waypoints, median offset 1.1
 
 | # | Step | Kind | Time |
 | --- | --- | --- | ---: |
-| 1 | Asked on the map: What is here? | input | 01:09:14 |
-| 2 | get_site_conditions | tool | 58 ms |
-| 3 | Asked on the map: Could we land here? | input | 01:09:15 |
-| 4 | check_landing_site | tool | 58 ms |
-| 5 | Not enough data to judge: latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km length scale) no data, therm | deterministic | under 1 ms |
-| 6 | Used a tool: Run landing simulation | input | 01:09:15 |
-| 7 | show_edl_timeline | tool | 7 ms |
-| 8 | run_landing_scenario | tool | 0.36 s |
-| 9 | Used a tool: Take me to Jezero | input | 01:09:49 |
-| 10 | Dragged on the map: Plan a round trip from base to 18.44N 77.41E | input | 01:10:06 |
-| 11 | You dragged from base to a point: target 18.4410N 77.4148E, elevation -2,551 m (CTX DEM, bilinear) | deterministic | 01:10:06 |
-| 12 | plan_round_trip | tool | 3 ms |
-| 13 | Walking time | deterministic | under 1 ms |
-| 14 | Suit battery | deterministic | under 1 ms |
-| 15 | Climbing work | deterministic | under 1 ms |
-| 16 | Comms line of sight from base | deterministic | 3 ms |
-| 17 | Sun along the route | deterministic | under 1 ms |
-| 18 | Earth link delay | deterministic | under 1 ms |
-| 19 | Verdict NO GO: slope pass, battery pass, EVA time pass, daylight pass, comms fail, data pass | deterministic | under 1 ms |
-| 20 | science_at_target | tool | 58 ms |
-| 21 | issue_scene_commands: clear_annotations, draw_route R1, highlight_segment 21 to 54 | tool | under 1 ms |
+| 1 | Asked on the map: What is here? | input | 08:54:52 |
+| 2 | get_site_conditions | tool | 61 ms |
+| 3 | Asked on the map: Could we land here? | input | 08:54:53 |
+| 4 | Filled values | deterministic | under 1 ms |
+| 5 | check_landing_site | tool | 63 ms |
+| 6 | Meets every listed criterion (includes estimates): latitude band pass, landing-site elevation (mola areoid) pass, regional slope (2-5 km len | deterministic | under 1 ms |
+| 7 | Used a tool: Run landing simulation | input | 08:54:53 |
+| 8 | show_edl_timeline | tool | 54 ms |
+| 9 | run_landing_scenario | tool | 0.98 s |
+| 10 | Landing verdict: GO (includes estimates): 100.0 % of touchdowns land within 15° (GO needs 99 %) and 0.0 % have no data. The terrain cell is  | deterministic | under 1 ms |
+| 11 | Used a tool: Take me to Jezero | input | 08:55:33 |
+| 12 | Dragged on the map: Plan a round trip from base to 18.43N 77.39E | input | 08:56:10 |
+| 13 | You dragged from base to a point: target 18.4340N 77.3927E, elevation -2,521 m (CTX DEM, bilinear) | deterministic | 08:56:10 |
+| 14 | plan_round_trip | tool | 7 ms |
+| 15 | Walking time | deterministic | under 1 ms |
+| 16 | Suit battery | deterministic | under 1 ms |
+| 17 | Climbing work | deterministic | under 1 ms |
+| 18 | Comms line of sight from base | deterministic | 9 ms |
+| 19 | Sun along the route | deterministic | 2 ms |
+| 20 | Earth link delay | deterministic | under 1 ms |
+| 21 | Verdict NO GO: slope pass, battery pass, EVA time pass, daylight pass, comms fail, data pass | deterministic | under 1 ms |
+| 22 | science_at_target | tool | 66 ms |
+| 23 | issue_scene_commands: clear_annotations, draw_route R1, highlight_segment 67 to 86 | tool | 1 ms |
 
 Arguments and results of every step are in the JSON export.
 
