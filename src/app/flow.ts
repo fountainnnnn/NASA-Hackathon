@@ -23,7 +23,7 @@ import { daylightLeftMin } from '@/lib/ops/lighting';
 import type { RouteOps } from '@/components/Ops/routeOps';
 import { startLandingSimulation, stopLandingSimulation } from '@/components/Planet';
 import { onAsk, onClickPoint, useCompanion, type AskMeta } from '@/state/companion';
-import { onGlobePick, useGlobeStore } from '@/state/globe';
+import { onGlobePick, setGroundHold, useGlobeStore } from '@/state/globe';
 import { LANDING_TOUCHDOWN_LTST_H, MAST_RANGE_M, landingStartUtcMs, useHud } from '@/state/hud';
 import type { PreviewLine } from '@/state/hud';
 import { formatMissionTime, usePlayback } from '@/state/playback';
@@ -166,9 +166,12 @@ async function onGlobeClick(p: LonLat) {
 }
 
 async function landHere(meta: AskMeta) {
-  const p = useGlobeStore.getState().mode === 'jezero' ? (useWorld.getState().selected ?? lastGlobe) : lastGlobe;
+  // the point asked about: the card's point, else the selection; in Jezero with nothing picked, the base (Perseverance's own
+  // landing site); on the planet with nothing clicked, the spot at the centre of the view
+  const g = useGlobeStore.getState(), jez = g.mode === 'jezero';
+  const p = meta.at ?? (jez ? (useWorld.getState().selected ?? useWorld.getState().base ?? lastGlobe) : (lastGlobe ?? (g.view.altitudeKm < 3000 ? { lon: g.view.lon, lat: g.view.lat } : null)));
   const n = begin({ text: 'Could we land here?', origin: meta.origin, at: p });
-  if (!p) { n.say('I need a point first: click the planet').fail(); end(n, { text: 'Click the planet first, then ask again.', mood: 'warning' }); return; }
+  if (!p) { n.say('I need a point first: click the planet').fail(); end(n, { text: 'Click a spot on the planet, then pick Landing again.', mood: 'warning' }); return; }
   try {
     const t0 = performance.now();
     const r = await n.run(`Checking published landing constraints at ${ll2(p)}`, () => callTool<{
@@ -307,7 +310,7 @@ async function goJezero(meta: AskMeta) {
   await waitFor(() => !!useRuntime.getState().rt && useWorld.getState().ready, 20_000);
   l2.done(`Loaded the ${meta2?.nominalResM ?? 20} m MRO CTX terrain; base at the Octavia E. Butler site`);
   useSession.getState().patch({ region: 'Jezero Crater', place: 'Western delta', site: world.snapshot().base ?? null });
-  end(n, { text: 'You are on the 20 m terrain of Jezero Crater. Drag to look around, pick Plan on the left and drag from the base to plan a walk, or click the ground to ask about it.' });
+  end(n, { text: 'You are on the 20 m terrain of Jezero Crater. Drag to look around. To plan a walk, pick Plan on the left and click where you want to go, or click the ground to ask about it.' });
 }
 
 /* ------------------------------------------------------------------ jezero point */
@@ -810,8 +813,8 @@ export function timelineNow() {
 }
 function needRoute(n: Narrator): boolean {
   if (activeRoute()) return true;
-  n.say(useGlobeStore.getState().mode === 'jezero' ? 'I need a route first: drag from the base to a target' : 'I need a route first: take me to Jezero, then drag from the base').fail();
-  end(n, { text: useGlobeStore.getState().mode === 'jezero' ? 'Drag on the ground from the base to plan a walk first.' : 'Routes need the 20 m Jezero terrain. Use Take me to Jezero, then drag from the base.', mood: 'warning' });
+  n.say(useGlobeStore.getState().mode === 'jezero' ? 'I need a route first: pick Plan and click a target' : 'I need a route first: take me to Jezero, then pick Plan and click a target').fail();
+  end(n, { text: useGlobeStore.getState().mode === 'jezero' ? 'Pick Plan on the left and click a target to plan a walk first.' : 'Routes need the 20 m Jezero terrain. Use Take me to Jezero, then pick Plan and click a target.', mood: 'warning' });
   return false;
 }
 function startWalk() {
@@ -1116,6 +1119,16 @@ async function askAgent(text: string, meta: AskMeta) {
   if (askBusy) return;
   askBusy = true;
   const n = begin({ text, origin: meta.origin, at: meta.at ?? null }, { engine: 'model' });
+  // A question asked at a point (the map card, or voice at the reticle) is about that point: it becomes the selected
+  // point the agent reads as "here", and on the planet the camera drops to a low oblique view of its terrain.
+  if (meta.at) {
+    try { world.setSelected(world.makePoint(meta.at.lon, meta.at.lat, 'pick', 'Selected point')); } catch { /* 20 m model not loaded yet */ }
+    const g = useGlobeStore.getState();
+    if (g.mode === 'globe') {
+      if (g.view.altitudeKm > 80 || Math.hypot(g.view.lon - meta.at.lon, g.view.lat - meta.at.lat) > 0.5) g.flyToGround(meta.at.lon, meta.at.lat);
+      setGroundHold(meta.at);
+    }
+  }
   let modelName: string | null = null;
   const cur: { l: ReturnType<Narrator['say']> | null } = { l: null }; // the one line for work in progress (model round or tool call)
   setAgentObserver((e) => {
@@ -1139,7 +1152,13 @@ async function askAgent(text: string, meta: AskMeta) {
     }
   });
   try {
-    const res = await runAgentTurn({ userText: text, history, deps: toolDeps(), onTrace: () => {} });
+    const g = useGlobeStore.getState(), sel = world.snapshot().selected;
+    const context = {
+      mode: g.mode === 'jezero' ? 'jezero (20 m terrain)' : 'globe (whole planet)',
+      // a selected point outside the 20 m Jezero model is answered with the globe tools (get_site_conditions)
+      selectedInJezero20m: sel ? insideBounds(useWorld.getState().bounds, sel.lon, sel.lat) : null,
+    };
+    const res = await runAgentTurn({ userText: text, history, deps: toolDeps(), onTrace: () => {}, context });
     history = res.history;
     syncScatter();
     if (res.offline || !res.text) {
@@ -1152,7 +1171,7 @@ async function askAgent(text: string, meta: AskMeta) {
   } catch {
     if (cur.l) cur.l.fail('The language model did not answer'); else n.say('The language model did not answer').fail();
     end(n, { text: 'I could not reach the language model. Map clicks, checks, routes and maths follow-ups still work without it.', mood: 'warning', status: 'error' });
-  } finally { askBusy = false; setAgentObserver(null); }
+  } finally { askBusy = false; setAgentObserver(null); setGroundHold(null); }
 }
 
 function syncScatter() {
@@ -1199,7 +1218,7 @@ function dispatch(text: string, meta: AskMeta) {
     case V.plan:
       if (useGlobeStore.getState().mode !== 'jezero') { void goJezero(meta).then(() => useShell.getState().setTool('plan')); return; }
       useShell.getState().setTool('plan');
-      return simpleTurn(V.plan, meta, 'Ready to plan: press on the base and drag to a target', 'Drag from the base ring to any point on the 20 m terrain. I draw a live preview while you drag and check the round trip when you let go.');
+      return simpleTurn(V.plan, meta, 'Ready to plan: click where you want to walk', 'Click any point on the 20 m terrain and I plan the round trip from the base. Or drag from the base ring to see a live preview before you let go.');
     case V.lasso:
       if (useGlobeStore.getState().mode !== 'jezero') { void goJezero(meta).then(() => useShell.getState().setTool('lasso')); return; }
       useShell.getState().setTool('lasso');

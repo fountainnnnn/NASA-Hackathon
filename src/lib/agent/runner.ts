@@ -91,14 +91,14 @@ function summarize(name: string, result: any): string { // eslint-disable-line @
 /* ---------------------------------------------------------------- loop */
 
 export async function runAgentTurn(args: Parameters<AgentApi['runAgentTurn']>[0]): Promise<TurnResult> {
-  const { userText, history, deps, onTrace, signal } = args;
+  const { userText, history, deps, onTrace, signal, context } = args;
   const trace: TraceStep[] = [];
   const emit = () => onTrace(trace.map((s) => ({ ...s })));
   const fail = (extra: Partial<TurnResult>): TurnResult => ({
     text: '', history, trace, unverifiedNumbers: [], offline: false, ...extra,
   });
 
-  const sceneJson = JSON.stringify(compactSnapshot(deps.world.snapshot()));
+  const sceneJson = JSON.stringify({ ...(context ?? {}), ...compactSnapshot(deps.world.snapshot()) });
   const sources: string[] = [sceneJson, userText];
   const messages: ChatMessage[] = [
     ...prepareHistory(history),

@@ -39,7 +39,7 @@ export function Rail() {
   const stopWalk = () => { useWalkUi.getState().setHelmet(false); useHud.getState().patch({ walkOn: false }); usePlayback.getState().pause(); };
 
   const tools: Tool[] = [
-    { id: 'plan', label: 'Plan', Icon: Route, tip: 'Drag from the base to plan a round trip', active: tool === 'plan', run: () => (tool === 'plan' ? useShell.getState().setTool(null) : ask(V.plan)) },
+    { id: 'plan', label: 'Plan', Icon: Route, tip: 'Click a target to plan a round trip from the base', active: tool === 'plan', run: () => (tool === 'plan' ? useShell.getState().setTool(null) : ask(V.plan)) },
     { id: 'lasso', label: 'Lasso', Icon: Lasso, tip: 'Draw a loop to read slope, geology and stops inside', active: tool === 'lasso', run: () => (tool === 'lasso' ? useShell.getState().setTool(null) : ask(V.lasso)) },
     { id: 'landing', label: 'Landing', Icon: PlaneLanding, tip: 'Check the clicked point against landing criteria', active: !!landing, run: () => ask(V.land) },
     { id: 'walk', label: 'Walk', Icon: Footprints, tip: 'Play two astronauts walking the planned route', active: walkOn && !helmet && rover === 0, run: () => (walkOn && !helmet && rover === 0 ? stopWalk() : ask(V.walk)) },

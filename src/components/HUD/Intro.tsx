@@ -67,7 +67,7 @@ export function Intro() {
     <div ref={rootRef} className={s.intro} data-out={!open} data-modal role="dialog" aria-modal="true" aria-labelledby="intro-title" aria-hidden={!open} inert={!open}>
       <div className={s.introBox}>
         <h1 id="intro-title" className={s.introTitle}>HEYMARS</h1>
-        <p className={s.introLede}>Click anywhere on Mars and MarsAgent reads the data there. In Jezero Crater, drag to look around, pick Plan on the left and drag from the base to plan a walk, then see every calculation behind the verdict.</p>
+        <p className={s.introLede}>Click anywhere on Mars and MarsAgent reads the data there. In Jezero Crater, drag to look around, pick Plan on the left and click a target to plan a walk, then see every calculation behind the verdict.</p>
         <div className={s.introActions}>
           <button ref={startRef} className={s.primary} onClick={() => useIntro.getState().hide()}>Start</button>
           <button className={s.link} onClick={sources}>Sources</button>

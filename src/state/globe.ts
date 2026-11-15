@@ -8,6 +8,9 @@ import type { LonLat } from '../lib/contracts';
 import type { GlobalLayerId, GlobalManifest, GlobeCommand } from '../lib/globeContracts';
 
 export const MIN_ALT_KM = 150;
+/** Ground view for a question about a place: low and oblique, under the 300 km line where relief is drawn 2.5x. */
+export const GROUND_VIEW_ALT_KM = 35;
+export const GROUND_VIEW_PITCH_DEG = -28;
 export const MAX_ALT_KM = 25_000;
 export const JEZERO_ENTER_ALT_KM = 200;
 export const DEFAULT_EXAGGERATION = 20;
@@ -29,7 +32,7 @@ export interface GlobeScatterRef { id: string; scenarioId: string }
 /** Packed [lon, lat, slopeDeg] × n. slope NaN = no data (drawn grey). */
 export interface ScatterSet { points: Float32Array; maxSlopeDeg: number }
 export interface GlobeView { lon: number; lat: number; altitudeKm: number }
-export interface GlobeFlight { seq: number; lon: number; lat: number; altitudeKm: number; /** hand off to the Jezero planner on arrival */ enterJezero: boolean }
+export interface GlobeFlight { seq: number; lon: number; lat: number; altitudeKm: number; /** hand off to the Jezero planner on arrival */ enterJezero: boolean; /** camera pitch on arrival (negative looks down); default follows altitude */ pitchDeg?: number }
 /** What a click / double-click on the planet resolved to. Mars-fixed, east-positive, planetocentric. */
 export interface GlobePick extends LonLat { elevationM: number | null; kind: 'click' | 'dblclick'; altitudeKm: number; at: number }
 
@@ -62,6 +65,8 @@ export interface GlobeState {
   setExaggeration(v: number): void;
   setView(v: GlobeView): void;
   flyTo(lon: number, lat: number, altitudeKm?: number, enterJezero?: boolean): void;
+  /** Fly low and oblique over a point so its terrain reads in relief (a question asked about a place). */
+  flyToGround(lon: number, lat: number): void;
   /** Register a scenario's touchdown samples (so `globe_scatter` can show them). maxSlopeDeg splits cyan/red. */
   setScatter(scenarioId: string, points: Float32Array, maxSlopeDeg?: number): void;
   clearScatter(scenarioId?: string): void;
@@ -114,6 +119,10 @@ function label(v: unknown): string | null {
   return t.length === 0 ? null : t.slice(0, MAX_LABEL);
 }
 
+/** While set, the camera holds a ground view of this point: an agent fly-to near it is skipped (the user is already looking at it). */
+let groundHold: LonLat | null = null;
+export const setGroundHold = (p: LonLat | null) => { groundHold = p; };
+
 /** Returns the next slice patch, or throws Error(message) for an invalid command. */
 function reduceOne(s: GlobeCmdSlice, cmd: GlobeCommand): Partial<GlobeCmdSlice> {
   const c = cmd as unknown as Record<string, unknown>;
@@ -121,6 +130,7 @@ function reduceOne(s: GlobeCmdSlice, cmd: GlobeCommand): Partial<GlobeCmdSlice> 
   switch (c.type) {
     case 'globe_fly_to': {
       if (!validLon(c.lon) || !validLat(c.lat)) throw new Error('lon must be -180..180 and lat -90..90');
+      if (groundHold && Math.hypot(c.lon - groundHold.lon, c.lat - groundHold.lat) < 2) return {};
       let alt = 3000;
       if (c.altitudeKm !== undefined) {
         if (!isNum(c.altitudeKm) || c.altitudeKm <= 0 || c.altitudeKm > 100_000) throw new Error('altitudeKm must be a positive number');
@@ -235,6 +245,10 @@ export const useGlobeStore = create<GlobeState>((set, get) => ({
   flyTo: (lon, lat, altitudeKm = 3000, enterJezero = false) => {
     if (!validLon(lon) || !validLat(lat) || !isNum(altitudeKm)) return;
     set((s) => ({ flight: { seq: (s.flight?.seq ?? 0) + 1, lon, lat, altitudeKm: clampAlt(altitudeKm), enterJezero } }));
+  },
+  flyToGround: (lon, lat) => {
+    if (!validLon(lon) || !validLat(lat)) return;
+    set((s) => ({ flight: { seq: (s.flight?.seq ?? 0) + 1, lon, lat, altitudeKm: GROUND_VIEW_ALT_KM, enterJezero: false, pitchDeg: GROUND_VIEW_PITCH_DEG } }));
   },
   setScatter: (scenarioId, points, maxSlopeDeg = 15) => set((s) => ({ scatter: { ...s.scatter, [scenarioId]: { points, maxSlopeDeg } } })),
   clearScatter: (scenarioId) => set((s) => {

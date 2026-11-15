@@ -148,7 +148,7 @@ export function buildReport(i: ReportInput): Report {
     ? `${o!.goNoGo.blockers.length ? `${o!.goNoGo.blockers.length} blocker${o!.goNoGo.blockers.length === 1 ? '' : 's'}` : 'No blockers'}. ${o!.verdict.reason}`
     : noPath ? `No path under ${c.maxSlopeDeg}° reaches the target at ${llStr(r!.to, 3)}, so no route was drawn and nothing below is computed for a walk.${r!.minFeasibleSlopeDeg ? ` The smallest slope limit with a path is ${r!.minFeasibleSlopeDeg}°.` : ''}`
     : i.landing ? `Landing check at ${llStr(i.landing.site, 3)}: ${i.landing.criteria.some((x) => x.result === 'fail') ? `fails ${i.landing.criteria.filter((x) => x.result === 'fail').length} of ${i.landing.criteria.length} criteria` : 'meets every listed criterion'}${i.landing.criteria.some((x) => x.provenance === 'estimate' || x.provenance === 'mock') ? ' (includes estimates)' : ''}.`
-      : 'No route or landing check yet. Drag from the base in Jezero Crater to plan a walk.';
+      : 'No route or landing check yet. In Jezero Crater, pick Plan and click a target to plan a walk.';
 
   /* 2 inputs */
   const inputs: Table = { head: ['Parameter', 'Value', 'Type'], num: [1], rows: [] };

@@ -129,10 +129,10 @@ export function StatusLine() {
   else if (progress) { kind = 'progress'; text = `Base camp reach: ${progress}`; }
   else if (mode === 'jezero' && !rt) { kind = 'loading'; text = 'Loading the 20 m terrain'; }
   else if (mode === 'globe' && !gs && !gErr) { kind = 'loading'; text = 'Loading the global datasets'; }
-  else if (mode === 'jezero' && tool === 'plan') text = 'Drag from the base to a target to plan a round trip. Esc stops.';
+  else if (mode === 'jezero' && tool === 'plan') text = 'Click where you want to walk: I plan the round trip from the base. Esc stops.';
   else if (mode === 'jezero' && tool === 'lasso') text = 'Draw a loop on the ground to read the area. Esc stops.';
   else text = mode === 'jezero' ? 'Drag to orbit, right-drag to pan. Plan tool draws a route.' : 'Click the planet to ask about a place. Drag to turn it, scroll to zoom.';
-  const short = kind === 'hint' ? (mode === 'jezero' ? (tool === 'plan' ? 'Drag from the base to plan. Esc stops.' : tool === 'lasso' ? 'Draw a loop. Esc stops.' : 'Drag to orbit. Plan tool draws routes.') : 'Click the planet to ask.') : text;
+  const short = kind === 'hint' ? (mode === 'jezero' ? (tool === 'plan' ? 'Click a target to plan. Esc stops.' : tool === 'lasso' ? 'Draw a loop. Esc stops.' : 'Drag to orbit. Pick Plan, then click a target.') : 'Click the planet to ask.') : text;
   return (
     <footer className={s.status} data-avoid>
       <span className={`${s.hint} ${s.long}`} data-kind={kind} role={kind === 'hint' ? undefined : 'status'}>{text}</span>

@@ -289,7 +289,7 @@ export interface TraceStep { id: string; tool: string; label: string; status: 'r
 export interface ChatMessage { role: 'user' | 'assistant' | 'tool'; content: string; tool_calls?: { id: string; type: 'function'; function: { name: string; arguments: string } }[]; tool_call_id?: string; name?: string }
 export interface AgentApi {
   /** One user turn: proxy round-trips + client-side tool execution (≤8 rounds, ≤12 tool calls). */
-  runAgentTurn(args: { userText: string; history: ChatMessage[]; deps: ToolDeps; onTrace: (steps: TraceStep[]) => void; signal?: AbortSignal }):
+  runAgentTurn(args: { userText: string; history: ChatMessage[]; deps: ToolDeps; onTrace: (steps: TraceStep[]) => void; signal?: AbortSignal; /** merged into the turn's scene_context (for example the view mode) */ context?: Record<string, unknown> }):
     Promise<{ text: string; history: ChatMessage[]; trace: TraceStep[]; unverifiedNumbers: string[]; offline: boolean; error?: string }>;
   /** Deterministic path used by HUD buttons (same executors the LLM uses). Returns the tool's JSON result. */
   executeTool(name: string, args: unknown, deps: ToolDeps): Promise<unknown>;

@@ -134,7 +134,18 @@ function PointerTools({ onPlan, onLasso, preview, clearPreview }: JezeroLayerPro
       if (e.pointerId !== owner) return;
       window.clearTimeout(timer);
       const m = mode; mode = 'none';
-      if (!moved) return;
+      if (!moved) {
+        // a plain click with Plan on: round trip from the base to the clicked point (dragging from the base still previews)
+        const b = useWorld.getState().base, g = m === 'plan' ? pick(e.clientX, e.clientY) : null;
+        if (b && g && insideBounds(bounds(), g.lon, g.lat) && snapToBase(g) !== g) { start = null; return; }
+        if (b && g && insideBounds(bounds(), g.lon, g.lat)) {
+          clickGuard.until = performance.now() + 400;
+          cb.current.onPlan({ lon: b.lon, lat: b.lat }, g);
+          useShell.getState().setTool(null);
+        }
+        start = null;
+        return;
+      }
       clickGuard.until = performance.now() + 400;
       useHud.getState().patch({ dragging: false });
       if (m === 'plan' && start) {

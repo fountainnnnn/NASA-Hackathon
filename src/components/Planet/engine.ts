@@ -329,7 +329,7 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
 
   const runStoreFlight = (f: GlobeFlight) => {
     if (f.enterJezero) void flyView({ lon: f.lon, lat: f.lat }, { altKm: 20, pitchDeg: -55, jezero: true });
-    else void flyView({ lon: f.lon, lat: f.lat }, { altKm: f.altitudeKm });
+    else void flyView({ lon: f.lon, lat: f.lat }, { altKm: f.altitudeKm, pitchDeg: f.pitchDeg });
   };
   let seenFlight = store.getState().flight?.seq ?? 0;
   const unsubFlight = store.subscribe((s) => {
