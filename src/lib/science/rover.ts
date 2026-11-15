@@ -108,6 +108,9 @@ const azGap = (a?: number, b?: number) => (a == null || b == null ? null : Math.
  * (more than SAME_LOOK_S apart in time, and more than DISTINCT_AZ_DEG apart in mast azimuth when both are known; never
  * the stereo partner or the next mosaic tile). Frames within SAME_LOOK_S of an already kept frame are dropped.
  */
+/** Instrument without the eye or the string suffix: NAVCAM_LEFT and NAVCAM_RIGHT are one camera. */
+const cameraFamily = (camera: string) => camera.replace(/_(LEFT|RIGHT)(_[A-Z])?$/, '');
+
 export function selectImages(images: RoverImage[], limit = 2): RoverImage[] {
   const sorted = [...images].filter((i) => cameraRank(i.camera) < 99).sort((a, b) => viewScore(a) - viewScore(b));
   const picked: RoverImage[] = [];
@@ -115,6 +118,8 @@ export function selectImages(images: RoverImage[], limit = 2): RoverImage[] {
     if (picked.length >= limit) break;
     const t = sclkOf(im);
     const sameLook = picked.some((p) => {
+      // same sol, same camera (either eye of a stereo pair): one frame is enough (QA round 3, P2-11)
+      if (p.sol === im.sol && cameraFamily(p.camera) === cameraFamily(im.camera)) return true;
       const tp = sclkOf(p);
       if (t != null && tp != null && Math.abs(t - tp) < SAME_LOOK_S) return true;
       const gap = azGap(im.mastAzDeg, p.mastAzDeg);

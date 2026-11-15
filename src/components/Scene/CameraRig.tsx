@@ -7,6 +7,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { setAnchor } from '@/state/ui';
 import { useWalkUi } from '@/components/Scenario/walkStore';
 import { useHud } from '@/state/hud';
+import { useShell } from '@/state/shell';
 import { useWorld } from '@/state/world';
 import { groundAt, useScene } from './sceneCtx';
 import { HAZE_NEAR_M, HAZE_SPAN_M } from './atmosphere';
@@ -37,6 +38,8 @@ export function CameraRig() {
   const ctrl = useRef<OrbitControlsImpl>(null);
   const { camera, scene, size } = useThree();
   const walkOn = useHud((h) => h.walkOn);
+  // the Plan and Lasso tools own the left button (and one finger); otherwise the controls are plain map navigation
+  const drawing = useShell((sh) => sh.tool === 'plan' || sh.tool === 'lasso');
   const pose = useMemo(() => initialPose(grid), [grid]);
   const tween = useRef<Tween | null>(null);
   const last = useRef({ near: 0 });
@@ -109,10 +112,11 @@ export function CameraRig() {
   return (
     <OrbitControls
       ref={ctrl} makeDefault enableDamping dampingFactor={0.09} screenSpacePanning={false}
-      // left-drag is the planner (Ops layer): orbit moves to the right button, pan to the middle one
-      mouseButtons={{ LEFT: -1 as unknown as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE }}
-      // touch: one finger is the planner (drag to plan, like the left mouse button); two fingers orbit and zoom
-      touches={{ ONE: -1 as unknown as THREE.TOUCH, TWO: THREE.TOUCH.DOLLY_ROTATE }}
+      // standard map navigation: left-drag orbits (Shift + left pans), right-drag pans, wheel zooms. With the Plan or
+      // Lasso tool on, the left button (and one finger) belongs to the tool and orbit moves to the right button
+      mouseButtons={drawing ? { LEFT: -1 as unknown as THREE.MOUSE, MIDDLE: THREE.MOUSE.PAN, RIGHT: THREE.MOUSE.ROTATE } : { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN }}
+      // touch: one finger orbits, two fingers pan and zoom; with a tool on, one finger draws and two orbit and zoom
+      touches={drawing ? { ONE: -1 as unknown as THREE.TOUCH, TWO: THREE.TOUCH.DOLLY_ROTATE } : { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN }}
       minDistance={walkOn ? 12 : 120} maxDistance={MAX_DISTANCE_M} maxPolarAngle={(84 * Math.PI) / 180}
       zoomToCursor target={[0, 0, 0]}
     />

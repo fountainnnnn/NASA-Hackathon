@@ -19,6 +19,9 @@ export const V = {
   lasso: 'Lasso an area',
   layers: 'Layers',
   sources: 'Sources',
+  replay: 'Replay',
+  phases: 'Step through phases',
+  planHere: 'Plan a walk from here',
 } as const;
 
 /** Older phrasings that still map to a verb. */

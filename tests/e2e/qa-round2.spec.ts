@@ -36,6 +36,7 @@ test.describe('QA round 2', () => {
     const to = await page.evaluate((t) => (window as unknown as { __mw: { projectJezero(p: unknown): { x: number; y: number; visible: boolean } } }).__mw.projectJezero(t), GO_TARGET);
     expect(to.visible).toBe(true);
     const before = await H.turnCount(page);
+    await page.evaluate("window.__mw.shell.getState().setTool('plan')");
     await page.mouse.move(base.x, base.y);
     await page.mouse.down();
     for (let i = 1; i <= 12; i++) { await page.mouse.move(base.x + ((to.x - base.x) * i) / 12, base.y + ((to.y - base.y) * i) / 12); await page.waitForTimeout(90); }
@@ -74,6 +75,45 @@ test.describe('QA round 2', () => {
     expect(r2.some((r) => /^\d\. /.test(r.label))).toBe(false);
     await expect(S.card(page).getByRole('button', { name: /mast/i })).toHaveCount(0);
     await expect(S.lastTurn(page)).toContainText('GO.');
+    // QA round 3: the answer explains the verdict ("Why GO") with the checks that passed
+    await expect(S.lastTurn(page).getByLabel('Why GO')).toContainText('Passed:');
     console.log('GO path, after:', JSON.stringify({ verdict: v2, rows: r2 }));
+
+    // 4. QA round 3 end state: walk it, jump to the end; a completion turn and card appear and the timeline offers Replay
+    const b3 = await H.turnCount(page);
+    await S.cardAction(page, 'Walk it').click();
+    await H.waitTurnDone(page, b3);
+    // free camera during the walk: a wheel zoom breaks out of the chase camera, Recenter appears and re-engages it
+    const st = await page.locator('[data-stage]').boundingBox();
+    await page.mouse.move(st!.x + st!.width * 0.4, st!.y + st!.height * 0.4);
+    await page.mouse.wheel(0, -300);
+    const rc = page.getByRole('button', { name: 'Recenter' });
+    await expect(rc).toBeVisible();
+    expect(await page.evaluate('window.__mw.walkUi.getState().followCrew')).toBe(false);
+    await rc.click();
+    await expect(rc).toHaveCount(0);
+    expect(await page.evaluate('window.__mw.walkUi.getState().followCrew')).toBe(true);
+    const b4 = await H.turnCount(page);
+    await page.evaluate('(() => { const p = window.__mw.playback.getState(); p.pause(); p.seek(p.durationS); })()');
+    await H.waitTurnDone(page, b4);
+    await expect(S.lastTurn(page)).toContainText('Walk complete.');
+    await expect(S.lastTurn(page)).toContainText('Simulation finished at T+');
+    await expect(S.card(page).getByRole('button', { name: 'Replay', exact: true })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Timeline' }).getByRole('button', { name: 'Replay' })).toBeVisible();
+  });
+
+  test('navigation: a left drag without the Plan tool moves the camera and plans nothing', async ({ page }) => {
+    await H.gotoApp(page);
+    await H.enterJezero(page);
+    const base = await H.baseScreen(page);
+    const before = await H.turnCount(page);
+    await page.mouse.move(base.x, base.y);
+    await page.mouse.down();
+    for (let i = 1; i <= 8; i++) { await page.mouse.move(base.x - i * 15, base.y - i * 4); await page.waitForTimeout(60); }
+    await page.mouse.up();
+    await page.waitForTimeout(1500);
+    expect(await H.turnCount(page)).toBe(before);
+    expect(await page.evaluate('window.__mw.hud.getState().activeRouteId')).toBeNull();
+    await expect(page.locator('footer').filter({ hasText: 'Plan tool draws a route' }).first()).toBeVisible();
   });
 });

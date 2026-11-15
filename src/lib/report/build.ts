@@ -37,7 +37,7 @@ export interface TargetScienceFact {
 }
 export interface LandingFact {
   site: LonLat; verdict: string; caveat?: string;
-  criteria: { label: string; value: number | null; unit: string; limit: string; result: string; sourceTitle: string; sourceUrl?: string }[];
+  criteria: { label: string; value: number | null; unit: string; limit: string; result: string; sourceTitle: string; sourceUrl?: string; provenance?: string; method?: string }[];
 }
 export interface ScenarioFact { site: LonLat; samples: number; okPercent: number; maxSlopeDeg: number; slopeP50Deg: number | null; slopeP95Deg: number | null; terrainModel: string; engine: string; ellipse: { semiMajorKm: number; semiMinorKm: number; azimuthDeg: number } }
 
@@ -115,7 +115,7 @@ export function buildReport(i: ReportInput): Report {
   if (i.landing) {
     tables1.push({
       head: ['Landing criterion', 'Value', 'Limit', 'Status'], num: [1],
-      rows: i.landing.criteria.map((k) => [k.label, k.value == null ? 'no data at this scale' : degSign(`${fmt(k.value, 2)} ${k.unit}`.trim()), degSign(k.limit), { text: k.result === 'no data' && k.value != null ? 'not scored at this scale' : k.result, status: k.result === 'pass' ? 'pass' : k.result === 'fail' ? 'fail' : 'info' }]),
+      rows: i.landing.criteria.map((k) => [k.label, degSign(`${fmt(k.value ?? 0, 2)} ${k.unit}`.trim()) + (k.provenance === 'estimate' ? ' (estimate)' : k.provenance === 'mock' ? ' (Mock)' : ''), degSign(k.limit), { text: k.result === 'fail' ? 'fail' : 'pass', status: k.result === 'fail' ? 'fail' : 'pass' }]),
     });
   }
   if (i.scenario) {
@@ -137,9 +137,9 @@ export function buildReport(i: ReportInput): Report {
     tables1.push({
       head: ['Science at target', 'Value', 'Source'],
       rows: [
-        ['Geologic unit', sc.unit ? `${sc.unit.name} (${sc.unit.symbol})` : 'none mapped', { text: 'USGS SIM 3464, observed', kind: 'observed' }],
+        ['Geologic unit', sc.unit ? `${sc.unit.name} (${sc.unit.symbol})` : 'unit not resolved at 20 m', { text: 'USGS SIM 3464, observed', kind: 'observed' }],
         ['Nearest catalogued science site', sc.site ? `${sc.site.name}, ${fmt(sc.site.distanceKm, 2)} km` : 'none within 50 km', { text: sc.site?.sourceTitle ?? 'HeyMars science sites (NASA pages)', kind: 'observed' }],
-        ['View from the ground', p0 && g ? `Sol ${g.sol}, ${p0.cameraFull}, ${fmt(g.distanceM / 1000, 2)} km from the target, ${p0.earthDate}: ${p0.pageUrl ?? p0.url}` : 'no Perseverance photo within 2 km', { text: p0 ? `${p0.credit}, Perseverance raw image` : 'n/a', kind: 'observed' }],
+        ['View from the ground', p0 && g ? `Sol ${g.sol}, ${p0.cameraFull}, ${fmt(g.distanceM / 1000, 2)} km from the target, ${p0.earthDate}: ${p0.pageUrl ?? p0.url}` : 'nearest Perseverance frame not in the cache', { text: p0 ? `${p0.credit}, Perseverance raw image` : 'n/a', kind: 'observed' }],
       ],
     });
   }
@@ -147,7 +147,7 @@ export function buildReport(i: ReportInput): Report {
   const lead1 = has
     ? `${o!.goNoGo.blockers.length ? `${o!.goNoGo.blockers.length} blocker${o!.goNoGo.blockers.length === 1 ? '' : 's'}` : 'No blockers'}. ${o!.verdict.reason}`
     : noPath ? `No path under ${c.maxSlopeDeg}° reaches the target at ${llStr(r!.to, 3)}, so no route was drawn and nothing below is computed for a walk.${r!.minFeasibleSlopeDeg ? ` The smallest slope limit with a path is ${r!.minFeasibleSlopeDeg}°.` : ''}`
-    : i.landing ? `Landing check at ${llStr(i.landing.site, 3)}: ${i.landing.verdict === 'meets-all' ? 'meets every listed criterion' : i.landing.verdict === 'fails-some' ? `fails ${i.landing.criteria.filter((x) => x.result === 'fail').length} of ${i.landing.criteria.length} criteria` : 'not enough data to judge'}.`
+    : i.landing ? `Landing check at ${llStr(i.landing.site, 3)}: ${i.landing.criteria.some((x) => x.result === 'fail') ? `fails ${i.landing.criteria.filter((x) => x.result === 'fail').length} of ${i.landing.criteria.length} criteria` : 'meets every listed criterion'}${i.landing.criteria.some((x) => x.provenance === 'estimate' || x.provenance === 'mock') ? ' (includes estimates)' : ''}.`
       : 'No route or landing check yet. Drag from the base in Jezero Crater to plan a walk.';
 
   /* 2 inputs */
@@ -202,7 +202,7 @@ export function buildReport(i: ReportInput): Report {
   const e = i.earth ? earthCalc(i.earth.rangeAu, i.earth.minutes) : null;
   calcs.push(e ? { n: `4.${calcs.length + 1}`, title: 'Earth link (NASA JPL Horizons)', lines: e } : { n: `4.${calcs.length + 1}`, title: 'Earth link (NASA JPL Horizons)', lines: ['Mock: Horizons data not loaded in this session.'], note: 'Mock' });
   if (!e) mocks.push('Earth light delay is Mock: the Horizons table did not load.');
-  if (i.landing) calcs.push({ n: `4.${calcs.length + 1}`, title: `Landing criteria at ${llStr(i.landing.site, 3)}`, lines: i.landing.criteria.map((k) => degSign(`${k.label}: ${k.value == null ? 'no data' : `${fmt(k.value, 2)} ${k.unit}`.trim()} vs limit ${k.limit}  ${k.result}`)) });
+  if (i.landing) calcs.push({ n: `4.${calcs.length + 1}`, title: `Landing criteria at ${llStr(i.landing.site, 3)}`, lines: i.landing.criteria.map((k) => degSign(`${k.label}: ${`${fmt(k.value ?? 0, 2)} ${k.unit}`.trim()}${k.provenance === 'estimate' || k.provenance === 'mock' ? ` (${k.provenance}: ${k.method ?? 'method not given'})` : ''} vs limit ${k.limit}  ${k.result}`)) });
   if (i.scenario) {
     const s = i.scenario, ok = Math.round((s.okPercent / 100) * s.samples);
     calcs.push({ n: `4.${calcs.length + 1}`, title: 'Landing Monte Carlo', lines: [

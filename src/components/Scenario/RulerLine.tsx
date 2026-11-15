@@ -12,6 +12,12 @@ import { useHud } from '@/state/hud';
 import { fadeBasicMaterial } from './sceneAdapter';
 
 const LABEL_GAP_PX = 80;
+/** Clearance (px) between a route time label and a crew or rover tag. */
+const CREW_TAG_GAP_PX = 40;
+/** Ticks closer than this to the camera are not drawn (walk chase view: no bar across the crew's feet, QA round 3, P1-6). */
+const TICK_HIDE_NEAR_M = 30;
+/** Smallest tick half-length in metres (0.6 m across): a near tick never grows into a bar. */
+const TICK_MIN_HALF_M = 0.3;
 
 export interface RulerLineProps {
   timeline: Timeline;
@@ -53,7 +59,7 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
   const buf = useMemo(() => new Float32Array(ticks.length * 6), [ticks.length]);
   const attr = useMemo(() => new THREE.BufferAttribute(buf, 3), [buf]);
   const tv = useMemo(() => new THREE.Vector3(), []);
-  /** Tick half-lengths are screen-constant (about 4 px, 9 px for the 10 min ticks) from each tick's own distance. */
+  /** Tick half-lengths are screen-constant (about 4 px, 9 px for the 10 min ticks) from each tick's own distance; none within 30 m. */
   const fill = (heightPx: number) => {
     const g = lineGeo.current;
     if (!g) return;
@@ -62,7 +68,7 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
     const k2 = (2 * Math.tan((cam.fov * Math.PI) / 360)) / Math.max(1, heightPx);
     ticks.forEach((k: RulerTick, i) => {
       const d = camera.position.distanceTo(tv.set(k.x, ys[i], k.z));
-      const half = Math.max(helmet ? 0.35 : 1.5, (k.kind === 'time' ? 9 : 4) * k2 * d);
+      const half = d < TICK_HIDE_NEAR_M ? 0 : Math.max(TICK_MIN_HALF_M, (k.kind === 'time' ? 9 : 4) * k2 * d);
       buf[i * 6] = k.x - k.nx * half; buf[i * 6 + 1] = ys[i]; buf[i * 6 + 2] = k.z - k.nz * half;
       buf[i * 6 + 3] = k.x + k.nx * half; buf[i * 6 + 4] = ys[i]; buf[i * 6 + 5] = k.z + k.nz * half;
     });
@@ -75,6 +81,8 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
     // screen-space declutter: at most one minute label per LABEL_GAP_PX on screen, nearest the start wins
     let kept: { x: number; y: number }[] = [];
     const blocks = Array.from(document.querySelectorAll('[data-avoid], [data-companion]')).filter((n) => !(n as HTMLElement).className.toString().includes('tick') && getComputedStyle(n).visibility !== 'hidden').map((n) => n.getBoundingClientRect());
+    // crew and rover tags (drei Html, no data-avoid): a time label never sits within 40 px of one
+    const crewTags = Array.from(document.querySelectorAll('[data-stage] [class*="_tag__"], [data-stage] [class*="__tag"]')).filter((n) => !(n as HTMLElement).className.toString().includes('tick')).map((n) => n.getBoundingClientRect());
     ticks.forEach((k, i) => {
       const el = labelEls.current[i];
       if (!el) return;
@@ -85,7 +93,8 @@ export function RulerLine({ timeline, ground, color = '#e0884a', showLine = fals
       // from the canvas size drifts from the Base tag and the other labels while the canvas is being resized
       const r = el.getBoundingClientRect();
       const box = { l: r.left, r: r.right, t: r.top, b: r.bottom };
-      const free = !blocks.some((b) => box.l < b.right + 3 && box.r > b.left - 3 && box.t < b.bottom + 3 && box.b > b.top - 3);
+      const free = !blocks.some((b) => box.l < b.right + 3 && box.r > b.left - 3 && box.t < b.bottom + 3 && box.b > b.top - 3)
+        && !crewTags.some((b) => box.l < b.right + CREW_TAG_GAP_PX && box.r > b.left - CREW_TAG_GAP_PX && box.t < b.bottom + CREW_TAG_GAP_PX && box.b > b.top - CREW_TAG_GAP_PX);
       const clear = inside && free && kept.every((q) => Math.hypot(q.x - sx, q.y - sy) >= LABEL_GAP_PX);
       if (clear) kept = [...kept, { x: sx, y: sy }];
       el.style.visibility = clear ? 'visible' : 'hidden';

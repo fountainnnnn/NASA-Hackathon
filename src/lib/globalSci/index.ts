@@ -10,6 +10,7 @@ import { gcBearingDeg, gcDistanceKm, pointInUnwrapped, ringsBBox, unwrapRing, wr
 import { evaluateLanding, type CriteriaFile } from './landing';
 import { decodeRaster, gunzip, sampleBilinear, sampleNearest, slopeGrid, slopeHorn, type Raster } from './raster';
 import type { GlobalScienceApi } from './types';
+import { dustFromThermalInertia, fillFromRaster, mockElevation, mockHydrogen, mockSlope, mockThermalInertia, FILL_RADIUS_KM } from './fill';
 
 export * from './types';
 export * from './geo';
@@ -87,6 +88,20 @@ export function createGlobalScience(fetchFn: FetchFn = (...a) => fetch(...a), ba
 
   const demResKm = () => manifest?.dem.resKm ?? null;
 
+  /** Nearest mapped geologic unit within 200 km: probed on rings of 10 to 200 km, 16 bearings each. */
+  function nearestGeology(lon: number, lat: number): SiteConditions['geology'] {
+    for (const dKm of [10, 25, 50, 75, 100, 150, 200]) {
+      for (let b = 0; b < 16; b++) {
+        const a = (b / 16) * 2 * Math.PI, dDeg = dKm / 59.16;
+        const plat = Math.max(-89.9, Math.min(89.9, lat + dDeg * Math.cos(a)));
+        const plon = wrap180(lon + (dDeg * Math.sin(a)) / Math.max(0.05, Math.cos((lat * Math.PI) / 180)));
+        const g = geologyAt(plon, plat);
+        if (g) return { ...g, distanceKm: dKm };
+      }
+    }
+    return null;
+  }
+
   const slopeSource: SlopeSource = {
     get demResM() { return (demResKm() ?? 0) * 1000; },
     slopeDegAt: (lon, lat) => (dem ? slopeHorn(dem, lon, lat) : null),
@@ -132,31 +147,54 @@ export function createGlobalScience(fetchFn: FetchFn = (...a) => fetch(...a), ba
       const lon = wrap180(lonIn);
       const point: LonLat = { lon, lat };
       const notes: string[] = [];
-      const elevationM = dem ? sampleBilinear(dem, lon, lat) : null;
-      const slopeDeg = dem ? slopeHorn(dem, lon, lat) : null;
+      // missing values are filled (QA round 3): nearest valid cell within 200 km as an estimate, else a labelled mock
+      const fills: NonNullable<SiteConditions['fills']> = {};
+      const elevF = fillFromRaster(dem, lon, lat, dem ? sampleBilinear(dem, lon, lat) : null, 'MOLA elevation', mockElevation);
+      if (elevF.provenance !== 'observed') fills.elevation = { provenance: elevF.provenance, method: elevF.method };
+      const elevationM = elevF.value;
+      const slopeObs = dem ? slopeHorn(dem, lon, lat) : null;
+      const slopeR = layerRasters.get('slope') ?? null;
+      const slopeF = fillFromRaster(slopeR, lon, lat, slopeObs, 'MOLA slope', mockSlope);
+      if (slopeF.provenance !== 'observed') fills.slope = { provenance: slopeF.provenance, method: slopeF.method };
+      const slopeDeg = slopeF.value;
       const resKm = demResKm();
       if (!dem) notes.push('Global elevation data is not loaded.');
       else {
         notes.push(`Global DEM at ~${resKm ?? '?'} km posting: it cannot see boulders, small craters or rover-scale slopes. Slope is averaged over about ${resKm == null ? '?' : (2 * resKm).toFixed(1)} km.`);
-        if (elevationM == null) notes.push('No elevation data at this point (nodata).');
-        if (slopeDeg == null) notes.push(Math.abs(lat) > 89 ? 'No slope at the polar rows (no row above or below).' : 'No slope here (nodata nearby).');
+        if (fills.elevation) notes.push(`No elevation value at this point (nodata): ${fills.elevation.provenance} used, ${fills.elevation.method}.`);
+        if (slopeObs == null) notes.push(`${Math.abs(lat) > 89 ? 'No slope at the polar rows (no row above or below)' : 'No slope here (nodata nearby)'}: ${slopeF.provenance} used, ${slopeF.method}.`);
       }
-      const layers = m_layers().map((l) => {
+      const mocks: Partial<Record<string, (lon: number, lat: number) => number>> = { thermalInertia: mockThermalInertia, hydrogen: mockHydrogen, slope: mockSlope };
+      const layers: SiteConditions['layers'] = m_layers().map((l) => {
         const r = layerRasters.get(l.id);
         const v = r ? sampleNearest(r, lon, lat) : null;
-        if (!r) notes.push(`${l.title}: raster unavailable.`);
         if (l.simulated) notes.push(`${l.title} is a simulated layer, not an observation.`);
-        return { id: l.id, value: v == null ? null : v, unit: l.valueEncoding?.unit ?? '', label: l.title, source: `${l.mission} ${l.instrument}`.trim() };
+        const base = { id: l.id, unit: l.valueEncoding?.unit ?? '', label: l.title, source: `${l.mission} ${l.instrument}`.trim() };
+        const mock = mocks[l.id];
+        if (mock) { const f = fillFromRaster(r ?? null, lon, lat, v, l.title, mock); return { ...base, value: f.value, provenance: f.provenance, method: f.method }; }
+        if (l.id === 'elevation') return { ...base, value: elevationM, unit: 'm', provenance: elevF.provenance, method: elevF.method };
+        return { ...base, value: v == null ? null : v, provenance: 'observed' as const };
       });
-      const geo = geologyAt(lon, lat);
+      // dust cover has no numeric raster (colourised map only): estimated from thermal inertia
+      const ti = layers.find((l) => l.id === 'thermalInertia');
+      const dust = layers.find((l) => l.id === 'dust');
+      if (dust && dust.value == null && ti?.value != null) {
+        dust.value = dustFromThermalInertia(ti.value); dust.unit = 'dust cover index';
+        dust.provenance = ti.provenance === 'mock' ? 'mock' : 'estimate';
+        dust.method = `estimated from thermal inertia ${Math.round(ti.value)} tiu (low inertia reads as dust-covered; Ruff & Christensen 2002 trend, assumption)`;
+      }
+      let geo = geologyAt(lon, lat);
       if (!geology) notes.push('Global geologic map not loaded.');
-      else if (!geo) notes.push('No mapped geologic unit at this point.');
+      else if (!geo) {
+        geo = nearestGeology(lon, lat);
+        notes.push(geo ? `No mapped unit at the point; nearest mapped unit ${geo.symbol}, ${Math.round(geo.distanceKm ?? 0)} km away.` : `No mapped geologic unit within ${FILL_RADIUS_KM} km.`);
+      }
       const near = nearestSites(lon, lat).slice(0, 4).map((s) => ({ name: s.site.name, kind: s.site.kind, distanceKm: s.distanceKm, bearingDeg: s.bearingDeg }));
       const insideJezero = lon >= jez[0] && lon <= jez[2] && lat >= jez[1] && lat <= jez[3];
       if (insideJezero) notes.push('Inside the 20 m Jezero terrain tile: enter Jezero for rover-scale terrain.');
       return {
         point, placeName: placeName(lon, lat), elevationM, slopeDeg, geology: geo, layers, nearestSites: near,
-        insideJezeroHighRes: insideJezero, notes,
+        insideJezeroHighRes: insideJezero, notes, ...(fills.elevation || fills.slope ? { fills } : {}),
       };
     },
 

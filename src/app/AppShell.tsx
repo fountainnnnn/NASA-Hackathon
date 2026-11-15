@@ -1,4 +1,5 @@
 'use client';
+import { Recenter } from '@/components/HUD/Recenter';
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useRef } from 'react';
 import { Panel, Scout } from '@/components/Companion';
@@ -19,7 +20,7 @@ import { useSession } from '@/state/session';
 import { useShell } from '@/state/shell';
 import { useThread } from '@/state/thread';
 import { useWorld } from '@/state/world';
-import { clearPreview, commitPlan, lassoAnalyze, requestPreview, startFlow } from './flow';
+import { clearPreview, commitPlan, lassoAnalyze, requestPreview, startFlow, timelineNow } from './flow';
 import { gatherReportInput } from './reportInput';
 import { sampleGlobe, sampleJezero } from './sampling';
 
@@ -57,6 +58,8 @@ export default function AppShell() {
         /** true once the planet canvas is on the stage and the global science data has loaded */
         /** commit a round trip from the base to a lon/lat, as a drag would (QA and e2e use it for a known target) */
         plan: (to: { lon: number; lat: number }) => { const b = useWorld.getState().base; if (b) void commitPlan({ lon: b.lon, lat: b.lat }, to, { text: `Plan a round trip from base to ${to.lat.toFixed(2)}N ${to.lon.toFixed(2)}E`, origin: 'drag', at: to }); },
+        /** the walk timeline of the active route (rover hand-off time included), for QA captures inside the ride */
+        walkTimeline: () => { const tl = timelineNow(); return tl ? { durationS: tl.durationS, roverEndS: tl.roverEndS } : null; },
         ready: () => document.querySelector<HTMLElement>('[data-stage]')?.dataset.ready === 'true' && !!useGlobal.getState().gs,
       };
     }
@@ -98,6 +101,7 @@ export default function AppShell() {
         {mode === 'jezero' && rt && !helmet && <BaseMark />}
         <HelmetLayer />
         {!helmet && <Legend />}
+        <Recenter />
         <CuffSheet />
       </div>
       {simOn ? <Timeline /> : <StatusLine />}

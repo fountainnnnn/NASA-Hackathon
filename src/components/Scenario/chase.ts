@@ -1,19 +1,32 @@
 /**
  * Pure maths for the walk camera and the astronaut gait (no three.js, unit-tested in tests/scenario/chase.test.ts).
  *
- * Chase camera: behind, a little above and to the side of the pair at true scale, looking along the walk so the horizon
- * and the real terrain ahead fill the top of the frame. The stage is about 724 px tall at a 1440 x 810
- * window (40 px top bar, 46 px timeline); an astronaut is 1.99 m to the top of the helmet. With a 28 degree vertical field
- * of view from about 28 m the figure is about 100 px tall: px = h / d * stagePx / fovRad.
+ * Chase camera: behind, a little above and to the side of the pair, looking along the walk so the horizon and the real
+ * terrain ahead fill the top of the frame. The crew and the rover are drawn CREW_DRAW_SCALE (3) times true size under the
+ * chase camera (lib/scenario/drawScale, the legend says so) and the camera stands CREW_CAM_SCALE (1.75) times farther
+ * out than it would at true size. The stage is about 724 px tall at a 1440 x 810 window (40 px top bar, 46 px timeline);
+ * an astronaut is 1.99 m to the top of the helmet, drawn 5.97 m. With a 28 degree vertical field of view from about 48 m
+ * the figure is about 180 px tall: px = h / d * stagePx / fovRad.
  */
+import { CREW_CAM_SCALE, CREW_DRAW_SCALE } from '../../lib/scenario/drawScale';
 
-export const CHASE_BACK_M = 27;        // horizontal distance behind the pair's centre
-export const CHASE_UP_M = 3.5;         // camera height above the pair's ground: low, so the horizon and the real terrain fill the top of the frame
+export const CHASE_BACK_M = 27 * CREW_CAM_SCALE;  // horizontal distance behind the pair's centre
+export const CHASE_UP_M = 3.5 * CREW_CAM_SCALE;    // camera height above the pair's ground: low, so the horizon and the real terrain fill the top of the frame
 export const CHASE_SIDE_DEG = 16;      // swing off the walking axis so the two figures do not overlap
 export const CHASE_FOV_DEG = 28;       // narrow lens: the crew reads at true scale and the near ground stays a small share of the frame
 export const CHASE_MIN_CLEAR_M = 2.5;  // never closer than this above the ground under the camera
-export const CHASE_LOOK_UP_M = 1.4;    // aim height of the look point
-export const CHASE_LOOK_AHEAD_M = 30;  // look point this far ahead of the pair, so the camera looks along the walk, nearly level
+export const CHASE_LOOK_UP_M = 1.4 * CREW_CAM_SCALE;   // aim height of the look point
+export const CHASE_LOOK_AHEAD_M = 30 * CREW_CAM_SCALE;  // look point this far ahead of the pair, so the camera looks along the walk, nearly level
+/** Smallest horizontal field of view (deg): the pair sits about 8.4 degrees off the view axis (side swing plus look-ahead). */
+export const CHASE_MIN_HFOV_DEG = 26;
+/**
+ * Vertical field of view for a stage aspect (width / height): CHASE_FOV_DEG, widened on a portrait phone stage so the
+ * horizontal view still holds the pair (and the rover they ride), which sit off the view axis.
+ */
+export function chaseFovDeg(aspect: number): number {
+  const need = (2 * Math.atan(Math.tan((CHASE_MIN_HFOV_DEG * Math.PI) / 360) / Math.max(aspect, 0.1)) * 180) / Math.PI;
+  return Math.max(CHASE_FOV_DEG, need);
+}
 
 /** On-screen height (px) of an object `heightM` tall at `distM`, for a vertical field of view and stage height. */
 export function screenHeightPx(heightM: number, distM: number, fovDeg: number, stagePx: number): number {
@@ -48,11 +61,13 @@ export function chasePose(centre: { x: number; y: number; z: number }, headingRa
 }
 
 /**
- * Visible scale of the crew and rover. True size whenever the chase camera follows (or in the helmet); from a far orbit
- * camera they are enlarged so they stay visible, and the tag says so. Positions, times and battery are never scaled.
+ * Visible scale of the crew and rover: CREW_DRAW_SCALE under the chase camera; true size in the helmet (first person, the
+ * partner must not fill the view); from a far orbit camera enlarged further with distance so they stay visible. The legend
+ * and the crew tags say how much. Positions, times and battery are never scaled.
  */
-export function visibleScale(distM: number, trueSize: boolean): number {
-  return trueSize ? 1 : Math.min(160, Math.max(1, distM / 70));
+export function visibleScale(distM: number, following: boolean, helmet = false): number {
+  if (helmet) return 1;
+  return following ? CREW_DRAW_SCALE : Math.min(160, Math.max(CREW_DRAW_SCALE, distM / 70));
 }
 
 /* ------------------------------------------------------------------ gait */

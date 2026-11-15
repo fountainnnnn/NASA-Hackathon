@@ -10,10 +10,10 @@ import { LandingLayer } from './landing';
 import { Overlays, type PlanetCtx } from './overlays';
 import type { Screen } from './projection';
 import { CESIUM_CDN_BASE, CESIUM_JS_SRI, CESIUM_LOCAL_BASE } from './cesiumCdn';
-import { marsImagery } from './imagery';
+import { VIKING_TEXEL_M, ctxLevelFor, ctxTexelM, floorRangeM, groundPxM, marsImagery } from './imagery';
 import { withTerrainNormals } from './terrainNormals';
 import {
-  DATA_CREDIT, JEZERO_HANDOFF_ALT_KM, MARS_RADII_M, MIN_CAMERA_HEIGHT_M, SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG, TERRAIN_DATUM_OFFSET_M, TERRAIN_URL,
+  CTX, DATA_CREDIT, JEZERO_HANDOFF_ALT_KM, MARS_RADII_M, MIN_CAMERA_HEIGHT_M, SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG, TERRAIN_DATUM_OFFSET_M, TERRAIN_URL,
   ctxAlpha, effectiveExaggeration, reliefShading, elevationFromHeight, flightDurationS, globeLightBlend, inJezero, pitchForAltitudeKm,
   rangeForAltitudeM, roundAltKm,
   PICK_RETRY_MS, retryEachFrame,
@@ -27,7 +27,12 @@ export interface PlanetDebug {
   view(lon: number, lat: number, altKm: number, opts?: { pitchDeg?: number; headingDeg?: number; instant?: boolean }): Promise<void>;
   handoff: boolean;
   datumCheck(points: LonLat[]): Promise<number[]>;
-  stats(): { altKm: number; rangeM: number; tilesLoaded: boolean; terrainLevels: number; imageryFailures: number; fuseThreads: number };
+  stats(): {
+    altKm: number; rangeM: number; tilesLoaded: boolean; terrainLevels: number; imageryFailures: number; fuseThreads: number;
+    /** Zoom floor: finest CTX level delivered under the view centre (-1 = Viking only), its m / px, the floor (m), the
+     *  controller's current minimum (m, lower than the floor only while holding), and whether "Loading CTX" shows. */
+    ctxLevel: number; texelM: number; floorM: number; minZoomM: number; ctxPending: number; prefetched: number; ctxLoading: boolean;
+  };
 }
 
 export interface PlanetHandle {
@@ -89,6 +94,10 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
   C.Ellipsoid.default = MARS;
   C.Ion.defaultAccessToken = '';
   C.RequestScheduler.maximumRequestsPerServer = 24;
+  // Viking and CTX tiles now share this origin (the /api/tiles proxy), so give it the two hosts' combined budget
+  // (key format of Cesium's RequestScheduler.getServerKey: authority with the default port added)
+  const loc = window.location;
+  C.RequestScheduler.requestsByServer[loc.port ? loc.host : `${loc.host}:${loc.protocol === 'https:' ? 443 : 80}`] = 48;
 
   const widget = new C.CesiumWidget(o.container, {
     baseLayer: false, skyBox: false, skyAtmosphere: false, scene3DOnly: true, requestRenderMode: false,
@@ -218,10 +227,70 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
   cc.zoomEventTypes = [C.CameraEventType.WHEEL, C.CameraEventType.PINCH];
   cc.tiltEventTypes = [C.CameraEventType.RIGHT_DRAG, C.CameraEventType.MIDDLE_DRAG, C.CameraEventType.PINCH, { eventType: C.CameraEventType.LEFT_DRAG, modifier: C.KeyboardEventModifier.CTRL }];
   cc.inertiaSpin = 0.85; cc.inertiaZoom = 0.8;
+  // Mars terrain sits ~8 km above the ellipsoid, above Cesium's Mars defaults for these (8.4 km / 16 km of ellipsoid height):
+  // keep the camera above terrain + minimumZoomDistance, and measure wheel zoom to the terrain, at every height the zoom
+  // floor below can reach (up to ~150 km for Viking-only ground)
+  cc.minimumCollisionTerrainHeight = 400_000;
+  cc.minimumPickingTerrainHeight = 400_000;
   canvas.style.touchAction = 'none';
 
   const v0 = store.getState().view;
   camera.setView({ destination: C.Cartesian3.fromDegrees(v0.lon, v0.lat, v0.altitudeKm * 1000 + datum, MARS), orientation: { heading: 0, pitch: -C.Math.PI_OVER_TWO, roll: 0 } });
+
+  /* ------------------------------------------------------------ honest zoom floor */
+  // The camera may come no closer than the imagery under the view centre supports: one imagery pixel spans at most
+  // MAX_SCREEN_PX_PER_TEXEL screen pixels (CTX level 12, 5.1 m: ~2 km at 810 px; Viking only, 326 m: ~135 km). The floor
+  // follows the finest CTX level actually delivered there, so it drops as sharper tiles arrive. If the floor rises above the
+  // camera (panned into ground still loading, or a flight ended low) the camera is held where it is, never pushed up.
+  // Inside Jezero the floor stops above the hand-off height, so the 20 m scene (HiRISE near the base) still takes over.
+  // Flights and the landing simulation are not limited.
+  const ctxStatus = document.createElement('div');
+  ctxStatus.setAttribute('role', 'status'); ctxStatus.setAttribute('aria-live', 'polite'); ctxStatus.dataset.avoid = '';
+  Object.assign(ctxStatus.style, {
+    position: 'absolute', left: 'calc((100% - var(--stage-right, var(--log-w, 0px))) / 2)', bottom: 'calc(var(--inset, 0px) + 44px)',
+    transform: 'translateX(-50%)', zIndex: '2', pointerEvents: 'none', whiteSpace: 'nowrap', display: 'none',
+    font: '400 11px/16px var(--font-mono, "Martian Mono", ui-monospace, monospace)', color: 'var(--text-2, #a39c95)',
+    background: 'var(--chip, rgba(6, 5, 5, 0.88))', borderRadius: '4px', padding: '2px 8px',
+  } satisfies Partial<CSSStyleDeclaration>);
+  ctxStatus.textContent = 'Loading CTX 5 m imagery';
+  o.container.appendChild(ctxStatus);
+  const zf = { level: -1, texelM: VIKING_TEXEL_M, floorM: MIN_CAMERA_HEIGHT_M, minZoomM: MIN_CAMERA_HEIGHT_M, hold: null as number | null, want: false, since: 0, shown: false };
+  const M_PER_DEG = (Math.PI * MARS_RADII_M.x) / 180;
+  const setCtxStatus = (want: boolean) => {
+    const now = performance.now();
+    if (want !== zf.want) { zf.want = want; zf.since = now; }
+    // show after 400 ms of loading, hide after 800 ms without: no flicker while tiles trickle in
+    const show = want ? zf.shown || now - zf.since > 400 : zf.shown && now - zf.since < 800;
+    if (show !== zf.shown) { zf.shown = show; ctxStatus.style.display = show ? 'block' : 'none'; }
+  };
+  const updateFloor = (altKm: number) => {
+    const c = st.centre;
+    if (st.sim || st.flying || !c || store.getState().mode !== 'globe') {
+      zf.hold = null; zf.minZoomM = cc.minimumZoomDistance = MIN_CAMERA_HEIGHT_M; setCtxStatus(false); return;
+    }
+    const fovy = (camera.frustum as CesiumNS.PerspectiveFrustum).fovy ?? C.Math.toRadians(40);
+    const hPx = canvas.clientHeight || 1;
+    zf.level = imagery.ctxLevelAt(c.lon, c.lat);
+    zf.texelM = zf.level >= 0 ? ctxTexelM(zf.level) : VIKING_TEXEL_M;
+    let floor = Math.max(MIN_CAMERA_HEIGHT_M, floorRangeM(zf.texelM, hPx, fovy));
+    if (inJezero(c.lon, c.lat, 0.1)) floor = Math.min(floor, JEZERO_HANDOFF_ALT_KM * 1000 * 0.8);
+    zf.floorM = floor;
+    const pc = camera.positionCartographic;
+    // the same ground height the controller's terrain collision uses (Scene#globeHeight is public at runtime, untyped)
+    const above = pc.height - ((scene as unknown as { globeHeight?: number }).globeHeight ?? globe.getHeight(pc) ?? datum);
+    if (floor <= above + 2) zf.hold = null; else zf.hold ??= Math.max(above, MIN_CAMERA_HEIGHT_M);
+    zf.minZoomM = cc.minimumZoomDistance = zf.hold === null ? floor : Math.min(floor, zf.hold);
+
+    // what the view wants: Cesium picks imagery finer than a screen pixel at the centre
+    const want = Math.min(CTX.maxLevel, ctxLevelFor(groundPxM(st.rangeM, hPx, fovy)));
+    if (altKm < 300) {
+      // prefetch the next two levels around the centre the user zooms toward: the central half of the view, then a quarter
+      const halfH = (st.rangeM * Math.tan(fovy / 2)) / M_PER_DEG;
+      const halfW = (halfH * (canvas.clientWidth / hPx)) / Math.max(Math.cos(C.Math.toRadians(c.lat)), 0.2);
+      imagery.prefetch(c.lon, c.lat, [{ level: want + 1, halfW: halfW / 2, halfH: halfH / 2 }, { level: want + 2, halfW: halfW / 4, halfH: halfH / 4 }]);
+    }
+    setCtxStatus(altKm < 300 && zf.level < want && imagery.ctxPending() > 0);
+  };
 
   /* ------------------------------------------------------------ flights */
   let flightToken = 0;
@@ -289,6 +358,7 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     store.getState().setView({ lon: st.centre.lon, lat: st.centre.lat, altitudeKm: roundAltKm(v.altKm) });
     if (!st.armed && v.altKm > 60) st.armed = true;
     if (dbg.handoff && !st.sim && st.armed && !handing && (!st.flying || st.flightJezero) && v.altKm <= JEZERO_HANDOFF_ALT_KM && inJezero(st.centre.lon, st.centre.lat, 0.05)) startHandoff();
+    updateFloor(v.altKm);
   };
 
   /* ------------------------------------------------------------ per-frame: light, imagery fades, exaggeration, labels */
@@ -425,6 +495,8 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
       altKm: st.altKm, rangeM: st.rangeM,
       tilesLoaded: globe.tilesLoaded, terrainLevels: (scene.terrainProvider as { availability?: { _maximumLevel?: number } }).availability?._maximumLevel ?? 0,
       imageryFailures: imagery.failures(), fuseThreads: imagery.threads(),
+      ctxLevel: zf.level, texelM: zf.texelM, floorM: zf.floorM, minZoomM: zf.minZoomM, ctxPending: imagery.ctxPending(), prefetched: imagery.prefetched(),
+      ctxLoading: zf.shown,
     }),
   };
 
@@ -434,7 +506,7 @@ export async function createPlanet(o: EngineOpts): Promise<PlanetHandle> {
     canvas.removeEventListener('pointermove', onMove); canvas.removeEventListener('pointerleave', onLeave);
     canvas.removeEventListener('pointerdown', stopFlightOnInput); canvas.removeEventListener('wheel', stopFlightOnInput);
     handler.destroy(); landing.dispose(); overlays.dispose(); ctx.labels.destroy();
-    widget.destroy(); imagery.destroy();
+    widget.destroy(); imagery.destroy(); ctxStatus.remove();
   };
 
   return {

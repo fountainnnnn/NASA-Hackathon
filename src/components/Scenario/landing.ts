@@ -1,11 +1,13 @@
 /** Landing playback maths (pure). EDL phases come from NASA material via the caller; nothing about them is invented here. */
 import type { EdlPhase } from '../../lib/globeContracts';
+import { POST_TOUCHDOWN_S } from '../../lib/scenario/playback';
 
 /**
- * ASSUMPTION (visual only): seconds of simulated time after touchdown over which the Monte-Carlo touchdown points
- * appear. The real EDL timeline ends at touchdown; this window is just the reveal animation.
+ * ASSUMPTION (visual only): seconds of simulated time after touchdown for the hold on the rover, the pull-back, the
+ * "Testing 10,000 landings" Monte-Carlo playback and the end state (lib/scenario/playback.ts). The real EDL timeline
+ * ends at touchdown; this window is just the animation.
  */
-export const LANDING_REVEAL_S = 90;
+export const LANDING_REVEAL_S = POST_TOUCHDOWN_S;
 /** ASSUMPTION (schematic only): the approach comes from this compass bearing relative to the site (270 = from the west). */
 export const APPROACH_FROM_BEARING_DEG = 270;
 /** ASSUMPTION (schematic only): ground range of the drawn approach arc, km. NOT the mission's entry-to-touchdown range. */

@@ -6,11 +6,15 @@ import * as THREE from 'three';
 import { formatMissionTime, usePlayback } from '@/state/playback';
 import { SHADOW_GEOMETRY, contactShadowTexture, createAstronaut, poseAstronaut } from './astronaut';
 import type { Astronaut } from './astronaut';
-import { CHASE_FOV_DEG, angLerp, chasePose, visibleScale } from './chase';
+import { angLerp, chaseFovDeg, chasePose, visibleScale } from './chase';
 import { PAIR_SEPARATION_M, batteryLeftAt, sampleAtOdometer, sampleAtTime } from './model';
 import type { GroundApi, Sample, Timeline } from './model';
 import { SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG } from './sceneAdapter';
 import { useWalkUi } from './walkStore';
+import { useDrawScale } from '@/lib/scenario/drawScale';
+import { emitScenarioEnd } from '@/lib/scenario/outcome';
+import { walkVerdict } from '@/lib/scenario/verdict';
+import { getOps } from '@/app/opsCache';
 import css from './scenario.module.css';
 
 const STRIDE_M = 1.6;          // one full gait cycle (two steps), cosmetic only
@@ -62,7 +66,7 @@ function Tag({ timeline, name, scaleRef, reserveHint, side }: { timeline: Timeli
   if (txt.s > 60 || (txt.s > 12 && !reserveHint)) return null; // far away: fewer, then no, tags so the view stays clean
   const low = txt.bat <= timeline.constraints.batteryReservePct;
   const note = txt.s > 1
-    ? `Drawn at ${txt.s} times true size so the crew is visible from here. Positions, times and battery are not scaled.`
+    ? `Drawn at ${txt.s} times true size so the crew reads clearly. Positions, times and battery are not scaled.`
     : 'Drawn at true size.';
   return (
     <div ref={el} className={css.tag} title={note} style={{ transform: `translate(${flip.current * 56}px, -4px)` }}>
@@ -167,7 +171,7 @@ export function ChaseCamera({ timeline, ground }: { timeline: Timeline; ground: 
     heading.current = null; centreY.current = null;
     const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd);
     from.current = { pos: camera.position.clone(), look: ctrl?.target.clone() ?? camera.position.clone().add(fwd.multiplyScalar(100)), fov: persp.fov };
-    if (persp.fov !== CHASE_FOV_DEG) baseFov.current = persp.fov;
+    if (persp.fov !== chaseFovDeg(persp.aspect)) baseFov.current = persp.fov;
     return () => {
       persp.fov = baseFov.current; persp.updateProjectionMatrix();
       if (!ctrl) return;
@@ -227,10 +231,10 @@ export function ChaseCamera({ timeline, ground }: { timeline: Timeline; ground: 
     if (f && k < 1) {
       camera.position.set(p.cam.x, p.cam.y, p.cam.z).lerp(f.pos, 1 - k);
       look.lerp(f.look, 1 - k);
-      persp.fov = f.fov + (CHASE_FOV_DEG - f.fov) * k;
+      persp.fov = f.fov + (chaseFovDeg(persp.aspect) - f.fov) * k;
     } else {
       camera.position.set(p.cam.x, p.cam.y, p.cam.z);
-      persp.fov = CHASE_FOV_DEG;
+      persp.fov = chaseFovDeg(persp.aspect);
     }
     persp.updateProjectionMatrix();
     camera.lookAt(look);
@@ -281,6 +285,23 @@ export function Crew({ timeline, ground, scale = 'auto', tags = true, separation
   const m4 = useMemo(() => new THREE.Matrix4(), []);
 
   useEffect(() => { initd.current = false; }, [timeline]);
+  useEffect(() => () => useDrawScale.getState().set('crew', null), []);
+
+  // end of playback: the route's go/no-go for the shell's completion card, once per pass (again after Replay or a seek back)
+  useEffect(() => {
+    let ended = false;
+    const check = (t: number, id: string | null) => {
+      if (id !== timeline.routeId || timeline.durationS <= 0) return;
+      const done = t >= timeline.durationS - 1e-6;
+      if (done && !ended) {
+        ended = true;
+        const v = walkVerdict(getOps(timeline.routeId)?.verdict, timeline);
+        emitScenarioEnd({ kind: timeline.roverEndS > 0 ? 'rover-walk' : 'walk', id: timeline.routeId, ...v });
+      } else if (!done) ended = false;
+    };
+    const p0 = usePlayback.getState(); check(p0.t, p0.scenarioId);
+    return usePlayback.subscribe((p) => check(p.t, p.scenarioId));
+  }, [timeline]);
 
   const spawn = (x: number, y: number, z: number, size: number) => {
     const p = puffState.current[puffHead.current++ % PUFFS];
@@ -298,10 +319,11 @@ export function Crew({ timeline, ground, scale = 'auto', tags = true, separation
     // visible scale: true size under the chase camera and in the helmet
     const leadY = ground.y(lead.x, lead.z, lead.h);
     const dist = camera.position.distanceTo(new THREE.Vector3(lead.x, leadY, lead.z));
-    const trueSize = helmet || (chase && ui.followCrew);
-    const targetS = scale === 'auto' ? visibleScale(dist, trueSize) : scale;
+    const trueSize = helmet || (chase && ui.followCrew); // the scale snaps (no easing) under the chase camera and in the helmet
+    const targetS = scale === 'auto' ? visibleScale(dist, chase && ui.followCrew, helmet) : scale;
     scaleRef.current += (targetS - scaleRef.current) * (initd.current && !trueSize ? 1 - Math.exp(-8 * dt) : 1);
     const s = scaleRef.current;
+    useDrawScale.getState().set('crew', helmet ? null : s);
 
     const riding = lead.mode === 'rover';
     // helmet view: the partner walks well behind and to the side, so nothing ever fills the near field of the camera

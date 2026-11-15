@@ -456,6 +456,7 @@ const STATES = [
   { name: 'drag-preview', nofocus: 'pointer is held down mid-drag', run: async ({ page }) => {
     await closeAll(page);
     const base = await baseScreen(page);
+    await page.evaluate(() => window.__mw.shell.getState().setTool('plan')); // left-drag navigates unless the Plan tool is on
     await page.mouse.move(base.x, base.y);
     await page.mouse.down();
     const to = { x: base.x - 150, y: base.y - 40 };
@@ -486,6 +487,7 @@ const STATES = [
     const to = await page.evaluate((t) => window.__mw.projectJezero(t), GO_TARGET);
     const b0 = await turnCount(page);
     if (to.visible && to.x > st.x + 12 && to.x < st.x + st.width - 12 && to.y > st.y + 12 && to.y < st.y + st.height - 12) {
+      await page.evaluate(() => window.__mw.shell.getState().setTool('plan'));
       await page.mouse.move(base.x, base.y);
       await page.mouse.down();
       for (let i = 1; i <= 12; i++) { await page.mouse.move(base.x + ((to.x - base.x) * i) / 12, base.y + ((to.y - base.y) * i) / 12); await sleep(page, 100); }
@@ -514,10 +516,11 @@ const STATES = [
     await pauseAt(page, 0.3);
     await sleep(page, 2000);
   }, after: async ({ page }) => { await page.evaluate(() => window.__mw.walkUi.getState().setHelmet(false)); await sleep(page, 800); } },
+  // captured in the riding half (QA round 3, P1-7): the crew on the rover's deck, chase camera behind them
   { name: 'rover-assist', run: async ({ page }) => {
     await askWait(page, 'Rover assist');
     await sleep(page, 1500);
-    await pauseAt(page, 0.25);
+    await page.evaluate(() => { const p = window.__mw.playback, tl = window.__mw.walkTimeline(); p.getState().pause(); p.getState().seek(tl && tl.roverEndS > 0 ? tl.roverEndS * 0.5 : p.getState().durationS * 0.1); });
     await sleep(page, 2000);
   } },
   { name: 'base-camp-reach', run: async ({ page }) => {
@@ -532,12 +535,11 @@ const STATES = [
     await sleep(page, 600);
     const c = await jezeroPt(page, 40, 60);
     const before = await turnCount(page);
-    await page.keyboard.down('Shift');
+    await page.evaluate(() => window.__mw.shell.getState().setTool('lasso')); // the Lasso tool owns the left button
     await page.mouse.move(c.x - 90, c.y - 60);
     await page.mouse.down();
     for (const [dx, dy] of [[-90, -60], [90, -60], [110, 40], [0, 90], [-100, 50], [-90, -60]]) { await page.mouse.move(c.x + dx, c.y + dy, { steps: 6 }); await sleep(page, 60); }
     await page.mouse.up();
-    await page.keyboard.up('Shift');
     await waitTurn(page, before, 60_000);
   } },
   { name: 'layers', run: async ({ page }) => { await closeAll(page); await page.locator('#rail-layers').click(); await park(page); await sleep(page, 500); }, after: ({ page }) => closeAll(page) },

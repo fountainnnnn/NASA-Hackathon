@@ -19,6 +19,10 @@ export const MAST_RANGE_M = { min: 2, max: 30 } as const;
  */
 export const DEFAULT_START_LTST_H = 9;
 export const defaultStartUtcMs = (fromMs: number = Date.now()) => nextLtstUtcMs(BASE_LONLAT.lon, DEFAULT_START_LTST_H, fromMs);
+/** Landing simulations touch down in daylight: 10:00 local true solar time at the site (Mars24), not "now". */
+export const LANDING_TOUCHDOWN_LTST_H = 10;
+/** Entry time (UTC ms) for a descent of `touchdownS` seconds that lands at 10:00 LTST at `lon`. */
+export const landingStartUtcMs = (lon: number, touchdownS: number, fromMs: number = Date.now()) => nextLtstUtcMs(lon, LANDING_TOUCHDOWN_LTST_H, fromMs) - touchdownS * 1000;
 
 export type Tone = 'go' | 'caution' | 'nogo';
 
@@ -35,6 +39,8 @@ export interface PreviewLine {
 export interface LandingView {
   scenarioId: string;
   site: LonLat;
+  /** UTC (ms) of atmospheric entry, chosen so touchdown falls at LANDING_TOUCHDOWN_LTST_H local solar time at the site */
+  startUtcMs?: number;
   maxSlopeDeg: number;
   ellipse: { semiMajorKm: number; semiMinorKm: number; azimuthDeg: number };
 }

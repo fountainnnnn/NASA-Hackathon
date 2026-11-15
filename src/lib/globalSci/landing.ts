@@ -1,4 +1,5 @@
-import type { GlobalLayerId, LandingCheck, LandingCriterion, SiteConditions } from '../globeContracts';
+import type { FillProvenance, GlobalLayerId, LandingCheck, LandingCriterion, SiteConditions } from '../globeContracts';
+import { HURST, mockElevation, mockRockAbundance, mockSlope, mockThermalInertia, scaleSlope, siteHash } from './fill';
 import type { LandingCheckResult } from './types';
 
 /** Shape of public/data/global/landing_criteria.json */
@@ -37,10 +38,16 @@ export interface LandingInputs {
   demResKm: number | null;
 }
 
+/** Baseline (km) at which each rover-scale slope criterion is defined; used to scale the MOLA slope as an estimate. */
+const BASELINE_KM: Record<string, number> = { 'slope-2-5km': 3.5, 'slope-200-500m': 0.35, 'slope-20-40m': 0.03, 'slope-5m': 0.005 };
+
 /**
- * Evaluates the criteria against what the global data can say. Missing data -> pass = null (never a guess).
- * Verdict: fails-some if any evaluated criterion fails; meets-all if every required criterion is evaluated and
- * passes; otherwise insufficient-data.
+ * Evaluates the criteria. Every criterion gets a value and a pass/fail (QA round 3: no "not enough data" verdict):
+ *  - observed: read from the global data at the point;
+ *  - estimate: derived from real data (a slope at another baseline scaled from the MOLA slope with a Hurst exponent of
+ *    0.75; thermal inertia or elevation from the nearest valid cell within 200 km);
+ *  - mock: a plausible, deterministic value seeded by lon/lat when nothing can be derived (rock abundance).
+ * Verdict: fails-some if any criterion fails, else meets-all; `estimated` is true when any value is an estimate or a mock.
  */
 export function evaluateLanding(file: CriteriaFile | null, inp: LandingInputs): LandingCheckResult {
   const site = { lon: inp.lon, lat: inp.lat };
@@ -53,52 +60,58 @@ export function evaluateLanding(file: CriteriaFile | null, inp: LandingInputs): 
     };
   }
   const c = inp.conditions;
+  const base = inp.demResKm == null ? null : 2 * inp.demResKm;
+  const slopeProv = c.fills?.slope;
+  const slopeFrom = (toKm: number, label: string): { value: number; provenance: FillProvenance; method: string } => {
+    const s0 = c.slopeDeg ?? mockSlope(inp.lon, inp.lat);
+    const prov: FillProvenance = c.slopeDeg == null || slopeProv?.provenance === 'mock' ? 'mock' : 'estimate';
+    const b = base ?? 14.8;
+    return {
+      value: scaleSlope(s0, b, toKm), provenance: prov,
+      method: `${label}: MOLA slope ${s0.toFixed(2)} deg at a ~${b.toFixed(1)} km baseline scaled to ${toKm >= 1 ? `${toKm} km` : `${Math.round(toKm * 1000)} m`} as s(L) = s(L0) * (L0 / L)^(1 - H), H = ${HURST} (assumption)`,
+    };
+  };
   const criteria: LandingCriterion[] = file.criteria.map((d) => {
-    let value: number | null = null;
-    let pass: boolean | null = null;
+    let value: number, provenance: FillProvenance = 'observed', method = d.source.title;
     switch (d.kind) {
       case 'latitude':
-        value = inp.lat; pass = cmp(d.op, value, d.limit); break;
+        value = inp.lat; break;
       case 'elevation':
-        value = c.elevationM;
-        pass = value == null ? null : cmp(d.op, value, d.limit);
+        if (c.elevationM == null) { value = mockElevation(inp.lon, inp.lat); provenance = 'mock'; method = 'mock elevation, seeded by lon/lat'; }
+        else { value = c.elevationM; if (c.fills?.elevation) ({ provenance, method } = c.fills.elevation); }
         break;
       case 'slope-global': {
-        value = c.slopeDeg;
-        const base = inp.demResKm == null ? null : 2 * inp.demResKm;
         const [lo, hi] = d.baselineKmRange ?? [0, Infinity];
-        if (value == null) pass = null;
-        else if (base == null || base < lo || base > hi) {
-          pass = null;
-          notes.push(`Global DEM slope uses a ~${base == null ? '?' : base.toFixed(1)} km baseline, outside the ${lo}-${hi} km scale of this criterion, so it is not scored.`);
-        } else pass = cmp(d.op, value, d.limit);
+        if (c.slopeDeg != null && base != null && base >= lo && base <= hi) { value = c.slopeDeg; if (slopeProv) ({ provenance, method } = slopeProv); }
+        else {
+          ({ value, provenance, method } = slopeFrom(BASELINE_KM[d.id] ?? (lo + hi) / 2, d.label));
+          notes.push(`${d.label}: the global DEM slope uses a ~${base == null ? '?' : base.toFixed(1)} km baseline, so the ${lo}-${hi} km slope is an estimate (${method}).`);
+        }
         break;
       }
       case 'layer': {
         const layer = c.layers.find((l) => l.id === d.layerId);
-        value = layer?.value ?? null;
-        if (value == null) pass = null;
-        else if (layer && !unitMatchesTI(layer.unit)) {
-          pass = null;
-          notes.push(`${d.label}: layer unit "${layer.unit}" does not match ${d.unit}, so it is not scored.`);
-        } else pass = cmp(d.op, value, d.limit);
+        if (layer?.value != null && unitMatchesTI(layer.unit)) {
+          value = layer.value;
+          if (layer.provenance && layer.provenance !== 'observed') { provenance = layer.provenance; method = layer.method ?? method; }
+        } else { value = mockThermalInertia(inp.lon, inp.lat); provenance = 'mock'; method = 'mock thermal inertia, seeded by lon/lat'; }
         break;
       }
-      case 'unassessable':
-        notes.push(`${d.label}: ${d.unassessableReason ?? 'not assessable from global data'}.`);
+      default: {
+        // rover-scale criteria the global data cannot resolve: slopes are scaled from MOLA, the rest are labelled mocks
+        if (BASELINE_KM[d.id]) ({ value, provenance, method } = slopeFrom(BASELINE_KM[d.id], d.label));
+        else if (d.id === 'rock-abundance') { value = mockRockAbundance(inp.lon, inp.lat); provenance = 'mock'; method = 'mock rock abundance, seeded by lon/lat, 3 to 12 % around the Mars median of about 6 % (Nowicki & Christensen 2007)'; }
+        else { value = Math.round(d.limit * (0.4 + 0.8 * siteHash(inp.lon, inp.lat, d.id)) * 100) / 100; provenance = 'mock'; method = 'mock value, seeded by lon/lat'; }
+        notes.push(`${d.label}: ${d.unassessableReason ?? 'not resolved by the global data'}; ${provenance === 'mock' ? 'mock value' : 'estimate'} used (${method}).`);
         break;
+      }
     }
     return {
-      id: d.id, label: d.label, value: value == null || Number.isNaN(value) ? null : value, unit: d.unit,
-      limit: d.limitText, pass, source: { title: d.source.title, url: d.source.url },
+      id: d.id, label: d.label, value, unit: d.unit, limit: d.limitText, pass: cmp(d.op, value, d.limit),
+      source: { title: d.source.title, url: d.source.url }, provenance, method,
     };
   });
-  const byId = new Map(file.criteria.map((d) => [d.id, d]));
-  const scored = criteria.filter((x) => x.pass !== null);
-  const required = criteria.filter((x) => byId.get(x.id)?.required);
-  let verdict: LandingCheck['verdict'];
-  if (scored.some((x) => x.pass === false)) verdict = 'fails-some';
-  else if (required.length > 0 && required.every((x) => x.pass === true)) verdict = 'meets-all';
-  else verdict = 'insufficient-data';
-  return { site, criteria, verdict, ellipse: { ...file.ellipse }, notes, criteriaCaveat: file.caveat };
+  const verdict: LandingCheck['verdict'] = criteria.some((x) => x.pass === false) ? 'fails-some' : 'meets-all';
+  const estimated = criteria.some((x) => x.provenance !== 'observed');
+  return { site, criteria, verdict, estimated, ellipse: { ...file.ellipse }, notes, criteriaCaveat: file.caveat };
 }

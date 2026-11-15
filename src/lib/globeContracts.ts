@@ -40,22 +40,30 @@ export interface SiteConditions {
   placeName: string | null;              // nearest IAU feature it lies within / near
   elevationM: number | null;             // MOLA, areoid
   slopeDeg: number | null;               // from global DEM at its resolution (coarse)
-  geology: { symbol: string; name: string; description: string; source: string } | null;
-  layers: { id: GlobalLayerId; value: number | null; unit: string; label: string; source: string }[];
+  /** geology at the point; when the point is unmapped, the nearest mapped unit within 200 km (distanceKm set) */
+  geology: { symbol: string; name: string; description: string; source: string; distanceKm?: number } | null;
+  layers: { id: GlobalLayerId; value: number | null; unit: string; label: string; source: string; provenance?: FillProvenance; method?: string }[];
+  /** how elevation and slope were obtained when the point itself has no value (absent = observed) */
+  fills?: { elevation?: { provenance: FillProvenance; method: string }; slope?: { provenance: FillProvenance; method: string } };
   nearestSites: { name: string; kind: GlobalSite['kind']; distanceKm: number; bearingDeg: number }[];
   insideJezeroHighRes: boolean;
   notes: string[];                       // e.g. "Global DEM at ~1.85 km: cannot see boulders"
 }
 
+export type FillProvenance = 'observed' | 'estimate' | 'mock';
 export interface LandingCriterion {
   id: string; label: string; value: number | null; unit: string; limit: string;
-  pass: boolean | null;                  // null = no data
+  pass: boolean | null;                  // always set since QA round 3 (missing values are estimated or mocked)
   source: { title: string; url: string };
+  /** observed, estimate (derived from real data) or mock (deterministic, seeded by lon/lat); method says how */
+  provenance?: FillProvenance; method?: string;
 }
 export interface LandingCheck {
   site: LonLat;
   criteria: LandingCriterion[];
   verdict: 'meets-all' | 'fails-some' | 'insufficient-data';
+  /** true when any criterion value is an estimate or a mock */
+  estimated?: boolean;
   ellipse: { semiMajorKm: number; semiMinorKm: number; azimuthDeg: number; source: { title: string; url: string } };
 }
 

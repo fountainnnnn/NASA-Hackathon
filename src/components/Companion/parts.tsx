@@ -1,7 +1,7 @@
 'use client';
 /** Small pieces shared by the map card and the panel: the MarsAgent mark, formula blocks, answer text, status dots, icons. */
 import {
-  AlertCircle, Check, ClipboardList, Crosshair, Footprints, Globe, Loader, MapPin, Navigation, PlaneLanding, Play, RadioTower, Route,
+  AlertCircle, Check, ClipboardList, Crosshair, Footprints, Globe, ListOrdered, Loader, MapPin, Navigation, PlaneLanding, Play, RadioTower, RotateCcw, Route,
   ScanEye, SlidersHorizontal, Sun, Truck, type LucideIcon,
 } from 'lucide-react';
 import { Fragment, useState } from 'react';
@@ -13,7 +13,7 @@ import s from './agent.module.css';
 const ICONS: Record<string, LucideIcon> = {
   'plane-landing': PlaneLanding, play: Play, navigation: Navigation, route: Route, footprints: Footprints, 'scan-eye': ScanEye,
   'radio-tower': RadioTower, truck: Truck, 'clipboard-list': ClipboardList, sun: Sun, 'sliders-horizontal': SlidersHorizontal, globe: Globe,
-  crosshair: Crosshair,
+  crosshair: Crosshair, 'rotate-ccw': RotateCcw, 'list-ordered': ListOrdered,
 };
 export function ActionIcon({ name, size = 13 }: { name: string; size?: number }) {
   const I = ICONS[name] ?? MapPin;
@@ -105,7 +105,7 @@ export function ScienceBlock({ sci, compact = false }: { sci: ScienceNote; compa
   const first = g?.photos[0];
   return (
     <div className={s.sci} data-compact={compact}>
-      <div className={s.sciRow}><span>Science at target</span><b>{sci.unit ? `${sci.unit.name} (${sci.unit.symbol})` : 'No mapped geologic unit'}</b></div>
+      <div className={s.sciRow}><span>Science at target</span><b>{sci.unit ? `${sci.unit.name} (${sci.unit.symbol})` : 'Unit not resolved at 20 m'}</b></div>
       {sci.site && <div className={s.sciRow}><span>Nearest catalogued site</span><b>{sci.site.name}, <span className={s.num}>{km(sci.site.distanceKm * 1000)}</span></b></div>}
       {g && first ? (
         <figure className={s.ground}>
@@ -115,7 +115,7 @@ export function ScienceBlock({ sci, compact = false }: { sci: ScienceNote; compa
             {g.distanceM <= 150 ? 'Taken at the target.' : <>Taken <span className={s.num}>{km(g.distanceM)}</span> from the target.</>}
           </figcaption>
         </figure>
-      ) : <div className={s.sciRow}><span>View from the ground</span><b>No Perseverance photo within 2 km</b></div>}
+      ) : <div className={s.sciRow}><span>View from the ground</span><b>Nearest frame loading from the traverse cache</b></div>}
     </div>
   );
 }

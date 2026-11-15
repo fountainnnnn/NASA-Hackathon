@@ -11,7 +11,7 @@ import { runAgentTurn, describeToolCall, setAgentObserver } from '@/lib/agent/ru
 import {
   batteryCalc, commsCalc, daylightMargin, degSign, earthCalc, explainTool, fmt, hmin, kmStr, llStr, routeRows, routeSteps, sunCalc, walkingCalc, SRC,
 } from '@/lib/agent/explain';
-import { getScenario } from '@/lib/scenario';
+import { getScenario, onScenarioEnd, type ScenarioOutcome } from '@/lib/scenario';
 import { buildTimeline, PAIR_SEPARATION_M } from '@/components/Scenario/model';
 import { computeReach, reachAreaKm2 } from '@/components/Scenario/reach';
 import { useWalkUi } from '@/components/Scenario/walkStore';
@@ -24,10 +24,11 @@ import type { RouteOps } from '@/components/Ops/routeOps';
 import { startLandingSimulation, stopLandingSimulation } from '@/components/Planet';
 import { onAsk, onClickPoint, useCompanion, type AskMeta } from '@/state/companion';
 import { onGlobePick, useGlobeStore } from '@/state/globe';
-import { MAST_RANGE_M, useHud } from '@/state/hud';
+import { LANDING_TOUCHDOWN_LTST_H, MAST_RANGE_M, landingStartUtcMs, useHud } from '@/state/hud';
 import type { PreviewLine } from '@/state/hud';
-import { usePlayback } from '@/state/playback';
+import { formatMissionTime, usePlayback } from '@/state/playback';
 import { callTool, toolDeps, useGlobal, useRuntime } from '@/state/services';
+import { mockElevation } from '@/lib/globalSci/fill';
 import { useSession } from '@/state/session';
 import { useShell } from '@/state/shell';
 import { narrator, useThread, type Answer, type Ask, type CardAction, type GroundView, type MapCard, type Narrator, type Row, type ScienceNote, type Tone } from '@/state/thread';
@@ -74,8 +75,8 @@ function begin(ask: Ask, o: { point?: LonLat | null; engine?: string; card?: boo
 }
 
 /** Finish a turn. A card with a point is shown on the map (synced), unless `card: false`. */
-function end(n: Narrator, p: { text: string; lead?: Answer['lead']; rows?: Row[]; card?: MapCard; report?: boolean; recompute?: { title: string; code: string[] }; unverified?: string[]; science?: ScienceNote | null; mood?: 'idle' | 'warning' | 'drawing'; status?: 'done' | 'error' }) {
-  n.finish({ answer: { text: p.text, lead: p.lead ?? null, rows: p.rows, unverified: p.unverified, science: p.science ?? null }, card: p.card, report: p.report, recompute: p.recompute, status: p.status });
+function end(n: Narrator, p: { text: string; why?: Answer['why']; lead?: Answer['lead']; rows?: Row[]; card?: MapCard; report?: boolean; recompute?: { title: string; code: string[] }; unverified?: string[]; science?: ScienceNote | null; mood?: 'idle' | 'warning' | 'drawing'; status?: 'done' | 'error' }) {
+  n.finish({ answer: { text: p.text, why: p.why ?? null, lead: p.lead ?? null, rows: p.rows, unverified: p.unverified, science: p.science ?? null }, card: p.card, report: p.report, recompute: p.recompute, status: p.status });
   C().setBusy(false, null);
   C().setMood(p.mood ?? 'idle');
   if (p.card) {
@@ -113,41 +114,48 @@ function shortUnit(u: string): string {
   return t.length > 8 ? '' : ` ${t}`;
 }
 
+/** Small suffix on a filled value: " est." (derived from real data) or " mock" (deterministic placeholder). */
+const provTag = (p?: string) => (p === 'estimate' ? ' est.' : p === 'mock' ? ' mock' : '');
+
 async function onGlobeClick(p: LonLat) {
   lastGlobe = p;
   useSession.getState().patch({ site: p, place: ll2(p), region: null });
   const n = begin({ text: 'What is here?', origin: 'map', at: p });
   if (!useGlobal.getState().gs) {
     n.say('Reading the global data at your cursor').fail('The global dataset did not load, so there is no verified data here');
-    end(n, { text: 'No verified data here. The global dataset did not load.', mood: 'warning', status: 'error' });
+    end(n, { text: 'The global dataset did not load. Reload the page to try again.', mood: 'warning', status: 'error' });
     return;
   }
   try {
     const t0 = performance.now();
     const r = await n.run('Reading MOLA elevation, geology and orbital layers at your cursor', () => callTool<{
       placeName: string | null; elevationM: number | null; slopeDeg: number | null;
-      geology: { name: string; symbol: string; source: string } | null;
-      layers: { id: string; label: string; value: number | null; unit: string }[];
+      geology: { name: string; symbol: string; source: string; distanceKm?: number } | null;
+      layers: { id: string; label: string; value: number | null; unit: string; provenance?: string; method?: string }[];
+      provenance?: { elevation?: { kind: string }; slope?: { kind: string } };
       nearestSites: { name: string; distanceKm: number; bearingDeg: number }[];
-    }>('get_site_conditions', { lon: p.lon, lat: p.lat }), (r) => `Read the global layers at your cursor: ${r.elevationM == null ? 'no elevation data' : `elevation ${nf(r.elevationM)} m`}${r.slopeDeg == null ? '' : `, regional slope ${r.slopeDeg}°`}`);
+    }>('get_site_conditions', { lon: p.lon, lat: p.lat }), (r) => `Read the global layers at your cursor: elevation ${nf(r.elevationM ?? 0)} m${r.slopeDeg == null ? '' : `, regional slope ${r.slopeDeg}°`}`);
     const ex = explainTool('get_site_conditions', { lon: p.lon, lat: p.lat }, r);
     n.step({ kind: 'tool', title: 'get_site_conditions', meta: ms(t0), code: [`// global datasets sampled at ${llStr(p)}`, ...ex.kv.map(([k, v]) => `${k} = ${v}`), ...ex.calcs], sources: ex.sources, raw: { args: { lon: p.lon, lat: p.lat }, result: r } });
-    if (r.geology) n.note(`Looked up the geologic unit: ${r.geology.name}${r.geology.symbol ? ` (${r.geology.symbol})` : ''}, USGS SIM 3292`);
+    if (r.geology) n.note(`Looked up the geologic unit: ${r.geology.name}${r.geology.symbol ? ` (${r.geology.symbol})` : ''}, USGS SIM 3292${r.geology.distanceKm ? `, nearest mapped unit ${r.geology.distanceKm} km away` : ''}`);
     const near = r.nearestSites[0];
     if (near) n.note(`Found the nearest catalogued site: ${near.name}, ${nf(near.distanceKm)} km ${compass(near.bearingDeg)}`);
-    const head = r.geology ? r.geology.name : r.placeName ?? 'No mapped geologic unit here';
+    const head = r.geology ? `${r.geology.name}${r.geology.distanceKm ? `, ${r.geology.distanceKm} km away` : ''}` : r.placeName ?? `Plains at ${ll2(p)}`;
     const val = (id: string) => r.layers.find((l) => l.id === id && l.value != null);
+    const lsrc = (l: { provenance?: string; method?: string }, s: string) => (l.provenance && l.provenance !== 'observed' ? `${l.provenance === 'mock' ? 'Mock' : 'Estimate'}: ${l.method}` : s);
+    const eP = r.provenance?.elevation?.kind, sP = r.provenance?.slope?.kind;
     const rows: Row[] = [
-      ...(r.elevationM == null ? [] : [{ label: 'Elevation', value: `${nf(r.elevationM)} m`, tone: 'info' as const, src: 'MGS MOLA' }]),
-      ...(r.slopeDeg == null ? [] : [{ label: 'Regional slope', value: `${r.slopeDeg}°`, tone: 'info' as const, src: 'Horn slope on MOLA' }]),
-      ...(val('hydrogen') ? [{ label: 'Hydrogen', value: `${val('hydrogen')!.value} wt% water`, tone: 'info' as const, src: 'Odyssey GRS' }] : []),
-      ...(val('thermalInertia') ? [{ label: 'Thermal inertia', value: `${val('thermalInertia')!.value} tiu`, tone: 'info' as const, src: 'MGS TES' }] : []),
+      ...(r.elevationM == null ? [] : [{ label: 'Elevation', value: `${nf(r.elevationM)} m${provTag(eP)}`, tone: 'info' as const, src: 'MGS MOLA' }]),
+      ...(r.slopeDeg == null ? [] : [{ label: 'Regional slope', value: `${r.slopeDeg}°${provTag(sP === 'computed' ? undefined : sP)}`, tone: 'info' as const, src: 'Horn slope on MOLA' }]),
+      ...(val('hydrogen') ? [{ label: 'Hydrogen', value: `${val('hydrogen')!.value} wt% water${provTag(val('hydrogen')!.provenance)}`, tone: 'info' as const, src: lsrc(val('hydrogen')!, 'Odyssey GRS') }] : []),
+      ...(val('thermalInertia') ? [{ label: 'Thermal inertia', value: `${val('thermalInertia')!.value} tiu${provTag(val('thermalInertia')!.provenance)}`, tone: 'info' as const, src: lsrc(val('thermalInertia')!, 'MGS TES') }] : []),
+      ...(val('dust') ? [{ label: 'Dust cover index', value: `${val('dust')!.value}${provTag(val('dust')!.provenance)}`, tone: 'info' as const, src: lsrc(val('dust')!, 'MGS TES') }] : []),
       ...(near ? [{ label: 'Nearest site', value: `${near.name}, ${nf(near.distanceKm)} km ${compass(near.bearingDeg)}`, tone: 'info' as const }] : []),
     ].slice(0, 6);
     useSession.getState().patch({ region: near && near.distanceKm < 400 ? near.name : r.placeName, place: r.geology?.symbol ? `${r.geology.symbol} unit` : ll2(p) });
     const sentence = [
-      r.elevationM == null ? 'There is no elevation data here' : `Elevation is ${nf(r.elevationM)} m${r.slopeDeg == null ? '' : ` with a regional slope of ${r.slopeDeg}°`}`,
-      r.geology ? `the ground maps as ${r.geology.name}` : null,
+      `Elevation is ${nf(r.elevationM ?? 0)} m${provTag(eP)}${r.slopeDeg == null ? '' : ` with a regional slope of ${r.slopeDeg}°`}`,
+      r.geology ? (r.geology.distanceKm ? `the nearest mapped unit, ${r.geology.distanceKm} km away, is ${r.geology.name}` : `the ground maps as ${r.geology.name}`) : null,
       near ? `${near.name} is ${nf(near.distanceKm)} km ${compass(near.bearingDeg)}` : null,
     ].filter(Boolean).join(', ') + '.';
     end(n, {
@@ -164,27 +172,37 @@ async function landHere(meta: AskMeta) {
   try {
     const t0 = performance.now();
     const r = await n.run(`Checking published landing constraints at ${ll2(p)}`, () => callTool<{
-      verdict: string; caveat: string; notes?: string[];
-      criteria: { label: string; value: number | null; unit: string; limit: string; result: string; sourceTitle: string; sourceUrl: string }[];
+      verdict: string; caveat: string; notes?: string[]; estimated?: boolean;
+      criteria: { label: string; value: number | null; unit: string; limit: string; result: string; sourceTitle: string; sourceUrl: string; provenance?: string; method?: string }[];
     }>('check_landing_site', { lon: p.lon, lat: p.lat }), (r) => `Checked ${r.criteria.length} landing criteria at ${ll2(p)}`);
     // the tool tags the site on the globe with its verdict; the tag waits until this turn is complete on screen
     const tag = useGlobeStore.getState().markers.find((m) => m.id === 'landing-marker');
     if (tag) useGlobeStore.getState().removeMarker(tag.id);
-    const fails = r.criteria.filter((c) => c.result === 'fail'), none = r.criteria.filter((c) => c.result === 'no data');
-    const passN = r.criteria.length - fails.length - none.length;
-    n.note(`Scored each one against its limit: ${passN} pass, ${fails.length} fail${none.length ? `, ${none.length} without data` : ''}`);
+    const fails = r.criteria.filter((c) => c.result === 'fail'), est = r.criteria.filter((c) => c.provenance && c.provenance !== 'observed');
+    const passN = r.criteria.length - fails.length;
+    n.note(`Scored each one against its limit: ${passN} pass, ${fails.length} fail${est.length ? `, ${est.length} from estimates or mock values` : ''}`);
+    if (est.length) n.step({ kind: 'calculation', title: 'Filled values', durMs: 0, code: est.map((c) => `${c.label}: ${c.provenance} (${c.method ?? 'method not given'})`), raw: est });
     const ex = explainTool('check_landing_site', { lon: p.lon, lat: p.lat }, r);
     n.step({ kind: 'tool', title: 'check_landing_site', meta: ms(t0), durMs: performance.now() - t0, code: ex.calcs, sources: ex.sources, raw: { args: { lon: p.lon, lat: p.lat }, result: r } });
-    const head = r.verdict === 'meets-all' ? 'Meets every listed criterion' : r.verdict === 'fails-some' ? `Fails ${fails.length} of ${r.criteria.length} criteria` : 'Not enough data to judge';
-    const tone: Tone = r.verdict === 'meets-all' ? 'go' : r.verdict === 'fails-some' ? 'nogo' : 'caution';
+    const head = `${fails.length ? `Fails ${fails.length} of ${r.criteria.length} criteria` : 'Meets every listed criterion'}${est.length ? ' (includes estimates)' : ''}`;
+    const tone: Tone = fails.length ? 'nogo' : 'go';
     // the long caveat and the per-criterion notes belong in the working, not in the answer
-    n.step({ kind: 'verdict', title: head, meta: fails.length ? `${fails.length} fail` : none.length ? `${none.length} without data` : 'all pass', durMs: 0, text: r.criteria.map((c) => `${c.label.toLowerCase()} ${c.result}`).join(', '), code: [r.caveat, ...(r.notes ?? [])].filter(Boolean), tone, raw: { verdict: r.verdict, caveat: r.caveat, notes: r.notes } });
+    n.step({ kind: 'verdict', title: head, meta: fails.length ? `${fails.length} fail` : 'all pass', durMs: 0, text: r.criteria.map((c) => `${c.label.toLowerCase()} ${c.result}`).join(', '), code: [r.caveat, ...(r.notes ?? [])].filter(Boolean), tone, raw: { verdict: r.verdict, caveat: r.caveat, notes: r.notes } });
     useSession.getState().patch({ landing: { site: p, verdict: r.verdict, caveat: r.caveat, criteria: r.criteria } });
-    const rows: Row[] = r.criteria.slice(0, 6).map((c) => ({ label: shortLabel(c.label), value: c.value == null ? 'no data' : `${fmt(c.value, 1)}${shortUnit(c.unit)}`, tone: c.result === 'pass' ? 'go' : c.result === 'fail' ? 'nogo' : 'none', src: degSign(`${c.label}, limit ${c.limit}. ${c.sourceTitle}`) }));
+    const rows: Row[] = r.criteria.slice(0, 6).map((c) => ({ label: shortLabel(c.label), value: `${fmt(c.value ?? 0, 1)}${shortUnit(c.unit)}${provTag(c.provenance)}`, tone: c.result === 'fail' ? 'nogo' : 'go', src: degSign(`${c.label}, limit ${c.limit}. ${c.provenance && c.provenance !== 'observed' ? `${c.provenance === 'mock' ? 'Mock' : 'Estimate'}: ${c.method}. ` : ''}${c.sourceTitle}`) }));
     const f0 = fails[0];
-    const counts = `${passN} of ${r.criteria.length} criteria pass${f0 ? `, and ${f0.label.toLowerCase().replace(/\s*\(.*?\)/g, '')} fails (${f0.value == null ? 'unknown' : `${fmt(f0.value, 1)}${shortUnit(f0.unit)}`} against ${degSign(f0.limit)})${fails.length > 1 ? ` with ${fails.length - 1} more` : ''}` : ''}${none.length ? `${f0 ? ';' : ' and'} ${none.length} cannot be scored from the global data` : ''}.`;
+    const counts = `${passN} of ${r.criteria.length} criteria pass${f0 ? `, and ${f0.label.toLowerCase().replace(/\s*\(.*?\)/g, '')} fails (${fmt(f0.value ?? 0, 1)}${shortUnit(f0.unit)}${provTag(f0.provenance)} against ${degSign(f0.limit)})${fails.length > 1 ? ` with ${fails.length - 1} more` : ''}` : ''}${est.length ? `${f0 ? ';' : ' and'} ${est.length} of the values are estimates or mock values, marked est. and mock` : ''}.`;
+    const why: Answer['why'] = {
+      word: fails.length ? 'NO GO' : 'GO', tone,
+      lines: [
+        f0 ? { text: `${f0.label}: ${fmt(f0.value ?? 0, 1)}${shortUnit(f0.unit)}${provTag(f0.provenance)} against ${degSign(f0.limit)}.`, step: 'check_landing_site' } : { text: `All ${r.criteria.length} criteria are within their limits.`, step: 'check_landing_site' },
+        { text: `Passed: ${r.criteria.filter((c) => c.result !== 'fail').map((c) => shortLabel(c.label).toLowerCase()).slice(0, 5).join(', ')}${passN > 5 ? ` and ${passN - 5} more` : ''}.` },
+        ...(f0 ? [{ text: 'A site with gentler regional slopes or lower elevation would change it; the simulation shows where touchdowns land.' }] : []),
+        ...(est.length ? [{ text: `(includes estimates: ${est.length} values marked est. or mock)`, step: 'Filled values' }] : []),
+      ].slice(0, 4),
+    };
     end(n, {
-      lead: { text: `${head}.`, tone },
+      lead: { text: `${head}.`, tone }, why,
       text: `${counts} Limits are the Curiosity landing-site constraints (JPL, 2006), used as a reference, not the Mars 2020 requirements.`,
       rows: rows.slice(0, 4), report: true, mood: tone === 'go' ? 'idle' : 'warning',
       card: card({ title: head, sub: llStr(p), rows, point: p, actions: [act(V.scenario, 'play'), act(V.jezero, 'navigation')], askHint: 'Ask about this site' }),
@@ -211,6 +229,7 @@ async function runScenario(meta: AskMeta) {
     const r = await n.run(`Running 10,000 seeded Monte Carlo touchdowns across the${size} ellipse`, () => callTool<{
       scenarioId: string; samples: number; maxSlopeDeg: number; okPercent: number; slopeP50Deg: number | null; slopeP95Deg: number | null; seed?: number;
       terrainModel: string; engine: string; ellipse: { semiMajorKm: number; semiMinorKm: number; azimuthDeg: number }; note: string;
+      verdict?: { word: 'GO' | 'HOLD' | 'NO GO'; label: string; tone: Tone; reason: string; rule: string; estimated: boolean; calc?: string[] };
     }>('run_landing_scenario', { lon: p.lon, lat: p.lat, samples: 10000, maxSlopeDeg: 15 }), (r) => `Ran ${nf(r.samples)} touchdowns: ${r.okPercent}% land on ground under ${r.maxSlopeDeg}°`);
     const ex = explainTool('run_landing_scenario', {}, r);
     n.step({ kind: 'tool', title: 'run_landing_scenario', meta: ms(t0), durMs: performance.now() - t0, code: ex.calcs, sources: ex.sources, raw: { args: { lon: p.lon, lat: p.lat, samples: 10000, maxSlopeDeg: 15 }, result: r } });
@@ -218,7 +237,9 @@ async function runScenario(meta: AskMeta) {
     useSession.getState().patch({ scenario: { site: p, samples: r.samples, okPercent: r.okPercent, maxSlopeDeg: r.maxSlopeDeg, slopeP50Deg: r.slopeP50Deg, slopeP95Deg: r.slopeP95Deg, terrainModel: r.terrainModel, engine: r.engine, ellipse: r.ellipse } });
     if (rec) {
       useGlobeStore.getState().clearScatter(r.scenarioId); // the simulation reveals the touchdowns itself after landing
-      H().patch({ landing: { scenarioId: r.scenarioId, site: p, maxSlopeDeg: r.maxSlopeDeg, ellipse: r.ellipse }, edl: true, walkOn: false });
+      const touchdownS = phases.reduce((m, x) => Math.max(m, x.tEndS), 0) || 420;
+      H().patch({ landing: { scenarioId: r.scenarioId, site: p, maxSlopeDeg: r.maxSlopeDeg, ellipse: r.ellipse, startUtcMs: landingStartUtcMs(p.lon, touchdownS) }, edl: true, walkOn: false });
+      n.note(`Touchdown planned for ${String(LANDING_TOUCHDOWN_LTST_H).padStart(2, '0')}:00 local solar time at the site (daylight, Mars24)`);
       await n.run('Starting the descent along the EDL arc at 60× on the timeline', () => startLandingSimulation(p, { points: rec.result.points, okFraction: r.okPercent / 100 }, { maxSlopeDeg: r.maxSlopeDeg, ellipse: r.ellipse, speed: 60, caption: true }),
         () => 'Started the descent at 60× on the timeline: parachute, heat shield, powered descent, sky crane');
     }
@@ -227,10 +248,18 @@ async function runScenario(meta: AskMeta) {
     const minorKm = 2 * r.ellipse.semiMinorKm;
     const coarse = resKm != null && resKm >= minorKm;
     const ell = ellipseText(r.ellipse);
-    const okTone: Tone = r.okPercent >= 90 ? 'go' : r.okPercent >= 70 ? 'caution' : 'nogo';
+    // the one documented landing rule (lib/scenario/verdict.ts), returned by the tool
+    const okTone: Tone = r.verdict?.tone ?? (r.okPercent >= 99 ? 'go' : r.okPercent >= 95 ? 'caution' : 'nogo');
+    if (r.verdict) n.step({ kind: 'verdict', title: `Landing verdict: ${r.verdict.label}`, durMs: 0, text: r.verdict.reason, code: [r.verdict.rule, ...(r.verdict.calc ?? [])], tone: okTone, raw: r.verdict });
+    const why: Answer['why'] = r.verdict ? { word: r.verdict.word, tone: okTone, lines: [
+      { text: r.verdict.reason, step: 'Landing verdict' },
+      { text: `Median slope ${r.slopeP50Deg ?? 0}°, 95th percentile ${r.slopeP95Deg ?? 0}°, against a ${r.maxSlopeDeg}° limit.`, step: 'run_landing_scenario' },
+      { text: r.verdict.word === 'GO' ? 'A steeper site or a tighter slope limit would change it.' : 'A site with gentler ground, or a site inside Jezero on the 20 m terrain, would change it.' },
+      ...(r.verdict.estimated ? [{ text: '(includes estimates: the terrain cell is wider than the ellipse)' }] : []),
+    ] } : null;
     const slopes = `Median slope ${r.slopeP50Deg ?? 'n/a'}°, 95th percentile ${r.slopeP95Deg ?? 'n/a'}°.`;
     end(n, coarse ? {
-      lead: { text: 'Coarse terrain only.', tone: 'info' },
+      lead: { text: 'Coarse terrain only.', tone: 'info' }, why,
       text: `${nf(r.samples)} simulated touchdowns across a ${ell} ellipse. The global terrain cell is ${fmt(resKm!, 1)} km, wider than the ellipse, so the ${r.okPercent}% under ${r.maxSlopeDeg}° describes the region, not the touchdown spots. ${slopes}`,
       rows: [
         { label: 'Terrain cell, wider than the ellipse', value: `${fmt(resKm!, 1)} km`, tone: 'caution', src: r.terrainModel },
@@ -239,7 +268,7 @@ async function runScenario(meta: AskMeta) {
       ],
       report: true,
     } : {
-      lead: { text: `${r.okPercent}% land under ${r.maxSlopeDeg}°.`, tone: okTone },
+      lead: { text: `${r.okPercent}% land under ${r.maxSlopeDeg}°.`, tone: okTone }, why,
       text: `${nf(r.samples)} simulated touchdowns across a ${ell} ellipse on the ${r.terrainModel}. ${slopes} The slope limit is an assumption.`,
       rows: [
         { label: 'Touchdowns under the limit', value: `${r.okPercent} %`, tone: okTone },
@@ -278,10 +307,17 @@ async function goJezero(meta: AskMeta) {
   await waitFor(() => !!useRuntime.getState().rt && useWorld.getState().ready, 20_000);
   l2.done(`Loaded the ${meta2?.nominalResM ?? 20} m MRO CTX terrain; base at the Octavia E. Butler site`);
   useSession.getState().patch({ region: 'Jezero Crater', place: 'Western delta', site: world.snapshot().base ?? null });
-  end(n, { text: 'You are on the 20 m terrain of Jezero Crater. Drag from the base to plan a walk, shift-drag to lasso an area, or click the ground to ask about it.' });
+  end(n, { text: 'You are on the 20 m terrain of Jezero Crater. Drag to look around, pick Plan on the left and drag from the base to plan a walk, or click the ground to ask about it.' });
 }
 
 /* ------------------------------------------------------------------ jezero point */
+
+/** Elevation text at a Jezero point: the 20 m DEM, or the global MOLA value marked est. where the DEM has a gap. */
+function jezeroElevation(p: LonLat, demM: number | null): string {
+  if (demM != null) return `${fmt(demM, 0)} m`;
+  const g = useGlobal.getState().gs?.conditionsAt(p.lon, p.lat).elevationM;
+  return g == null ? `${fmt(mockElevation(p.lon, p.lat), 0)} m mock` : `${fmt(g, 0)} m est.`;
+}
 
 async function onJezeroClick(p: LonLat) {
   const r = rt();
@@ -289,13 +325,16 @@ async function onJezeroClick(p: LonLat) {
   useSession.getState().patch({ site: p });
   const n = begin({ text: 'What is the ground like here?', origin: 'map', at: p });
   if (!insideBounds(useWorld.getState().bounds, p.lon, p.lat)) {
-    n.say('This point is outside the 20 m terrain, so I cannot plan here').fail();
-    end(n, { text: 'Routes need the high-resolution Jezero area. Pick a point inside it.', mood: 'warning', card: card({ title: 'Outside the 20 m terrain', sub: llStr(p), rows: [], point: p, actions: [act(V.back, 'globe')] }) });
+    // outside the 20 m tile: answer from the global layers (filled where they have gaps) instead of a dead end
+    n.note('This point is outside the 20 m terrain, so I read the global layers here instead');
+    end(n, { text: 'Outside the 20 m Jezero terrain: routes need the high-resolution area. The global layers for this point follow.' });
+    void onGlobeClick(p);
     return;
   }
   try {
     const sel = useWorld.getState().selected;
-    n.note(`Read the ground at your cursor: CTX 20 m terrain, elevation ${sel?.elevationM == null ? 'no data' : `${fmt(sel.elevationM, 0)} m`}`);
+    const elev = jezeroElevation(p, sel?.elevationM ?? null);
+    n.note(`Read the ground at your cursor: CTX 20 m terrain, elevation ${elev}`);
     const t0 = performance.now();
     const overText = (pct: number, lim: number, r: number) => (pct > 0 ? `${pct}% of the ground within ${r} m is steeper than ${lim}°` : `none of the ground within ${r} m is steeper than ${lim}°`);
     const ana = await n.run(`Measuring slope within 250 m against the ${useWorld.getState().constraints.maxSlopeDeg}° limit`, () => callTool<{ slopeMeanDeg: number; slopeP90Deg: number; pctAboveLimit: number; limitDeg: number; radiusM: number }>('analyze_terrain', { target: 'selected', radiusM: 250 }),
@@ -318,10 +357,10 @@ async function onJezeroClick(p: LonLat) {
     const near = ctx.namedFeaturesNear[0];
     useSession.getState().patch({ region: 'Jezero Crater', place: near?.name ?? ctx.geology?.name ?? ll2(p) });
     const rows: Row[] = ([
-      { label: 'Elevation', value: sel?.elevationM == null ? 'no data' : `${fmt(sel.elevationM, 0)} m`, tone: 'info', src: 'CTX DEM 20 m' },
+      { label: 'Elevation', value: elev, tone: 'info', src: sel?.elevationM == null ? 'Estimate: global MOLA elevation at this point (20 m DEM gap)' : 'CTX DEM 20 m' },
       { label: `Over ${ana.limitDeg}° within ${ana.radiusM} m`, value: `${ana.pctAboveLimit} %`, tone, src: 'Horn slope' },
       { label: 'Mean / 90th pct slope', value: `${ana.slopeMeanDeg}° / ${ana.slopeP90Deg}°`, tone: 'info' },
-      { label: 'Geologic unit', value: ctx.geology ? ctx.geology.symbol : 'none mapped', tone: 'info', src: 'USGS SIM 3464' },
+      { label: 'Geologic unit', value: ctx.geology ? ctx.geology.symbol : `${useGlobal.getState().gs?.conditionsAt(p.lon, p.lat).geology?.symbol ?? 'unmapped'} est.`, tone: 'info', src: ctx.geology ? 'USGS SIM 3464' : 'Estimate: global geologic map (USGS SIM 3292), SIM 3464 has no unit here' },
       ...(near ? [{ label: 'Nearest feature', value: `${near.name}, ${near.distanceKm} km`, tone: 'info' as const }] : []),
       ...(e?.minutes != null ? [{ label: 'Earth light delay', value: `${fmt(e.minutes, 1)} min`, tone: 'info' as const, src: 'JPL Horizons' }] : []),
     ] as Row[]).slice(0, 6);
@@ -338,6 +377,31 @@ async function onJezeroClick(p: LonLat) {
 /* ------------------------------------------------------------------ routes */
 
 function pt(p: LonLat, label: string): WorldPoint { return world.makePoint(p.lon, p.lat, 'pick', label); }
+
+/** Working-step title patterns per go / no-go item, so a "Why" line links to the calculation behind it. */
+const STEP_OF: Record<string, string> = { slope: 'slope', battery: 'battery', 'eva-time': 'EVA|time', daylight: 'daylight|sun', comms: 'comms|line of sight|radio', data: 'data|terrain' };
+const val = (v: number | null, unit: string) => (v == null ? '' : `${fmt(v, Math.abs(v) < 10 ? 1 : 0)}${unit ? ` ${unit}` : ''}`);
+/** "Why GO / HOLD / NO GO" for a round trip: the limiting check against its limit, what passed, what would change it. */
+function whyRoute(ops: RouteOps): Answer['why'] {
+  const items = ops.goNoGo.items;
+  const lim = items.find((x) => x.status === 'no-go') ?? items.find((x) => x.status === 'caution');
+  const passed = items.filter((x) => x.status === 'go').map((x) => x.label.toLowerCase());
+  const lines: NonNullable<Answer['why']>['lines'] = [];
+  if (lim) lines.push({ text: `${lim.label}: ${val(lim.value, lim.unit)}${lim.limit != null ? ` against a limit of ${val(lim.limit, lim.unit)}` : ''}${lim.status === 'caution' ? ' (close to the limit)' : ''}.`, step: STEP_OF[lim.id] });
+  if (passed.length) lines.push({ text: `Passed: ${passed.join(', ')}.` });
+  const mast = H().mastHeightM, next = Math.min(MAST_RANGE_M.max, mast + 10);
+  const fix: Record<string, string> = {
+    comms: mast < MAST_RANGE_M.max ? `Raise the mast to ${next} m to shorten the radio shadow, then check again.` : 'Pick a target with line of sight to the base.',
+    slope: 'Pick a target off the steep ground, or relax the slope limit in Limits.',
+    battery: 'Use the rover for part of the way out, or pick a nearer target.',
+    'eva-time': 'Pick a nearer target or shorten the time at the target.',
+    daylight: 'Start the walk at local noon.',
+    data: 'Pick a target inside the 20 m terrain.',
+  };
+  if (lim && fix[lim.id]) lines.push({ text: fix[lim.id] });
+  if (items.some((x) => x.provenance === 'estimate' || x.provenance === 'mock')) lines.push({ text: '(includes estimates)' });
+  return { word: ops.verdict.word, tone: ops.verdict.tone as Tone, lines: lines.slice(0, 4) };
+}
 
 export function routeActions(ops: RouteOps | null): CardAction[] {
   const blockers = ops?.goNoGo.blockers ?? [];
@@ -379,6 +443,14 @@ const kmOrM = (m: number) => (m < 1000 ? `${Math.round(m)} m` : kmStr(m));
  * Jacobian at the route centre (pixels per metre east and north) to turn the wanted screen shift into a ground shift.
  */
 const CARD_W = 300;
+/** Recenter in Jezero with no simulation: the active route's framing, else the default view of the base. */
+export function recenterJezero() {
+  const route = activeRoute();
+  if (route) { try { frameRouteBesideCard(route); return; } catch { /* fall back to the base */ } }
+  const b = world.snapshot().base;
+  if (b) world.applyCommands([{ type: 'focus_camera', lon: b.lon, lat: b.lat, distanceM: 9000 }]);
+}
+
 function frameRouteBesideCard(route: RouteResult) {
   if (useGlobeStore.getState().mode !== 'jezero' || !route.legs.length) return;
   const st = document.querySelector('[data-stage]')?.getBoundingClientRect();
@@ -423,7 +495,7 @@ function frameRouteBesideCard(route: RouteResult) {
 
 /* ------------------------------------------------------------------ science at the target and the view from the ground */
 
-const GROUND_NEAR_M = 150, GROUND_MAX_M = 2000;
+const GROUND_NEAR_M = 150;
 let cachedSols: Promise<Set<number>> | null = null;
 /** Sols with a pre-fetched Perseverance image list in /data/rover_cache (index.json, written by scripts/fetch-rover-cache.mjs). */
 function roverCacheSols(): Promise<Set<number>> {
@@ -443,13 +515,14 @@ async function imagesFor(url: string, ms: number): Promise<RoverImage[]> {
 
 /**
  * The nearest Perseverance view to a target. A sol whose waypoint is within 150 m is asked for live (NASA raw images
- * API through /api/rover-images, 4 s at most) when it is not cached; otherwise the nearest cached sol within 2 km is
+ * API through /api/rover-images, 4 s at most) when it is not cached; otherwise the nearest cached sol (at any distance) is
  * used, and the strip says how far from the target those frames were taken.
  */
 async function groundViewAt(to: LonLat): Promise<GroundView | null> {
   const pts = rt()?.traverse?.points ?? [];
   const bySol = new Map<number, number>();
-  for (const q of pts) { const d = groundDist(to, q); if (d <= GROUND_MAX_M && d < (bySol.get(q.sol) ?? Infinity)) bySol.set(q.sol, d); }
+  // nearest waypoint per sol at any distance: past 2 km the strip still shows the nearest frame and says how far it is
+  for (const q of pts) { const d = groundDist(to, q); if (d < (bySol.get(q.sol) ?? Infinity)) bySol.set(q.sol, d); }
   if (!bySol.size) return null;
   const order = [...bySol.entries()].sort((x, y) => x[1] - y[1]);
   const cache = await roverCacheSols();
@@ -461,7 +534,7 @@ async function groundViewAt(to: LonLat): Promise<GroundView | null> {
     const live = await imagesFor(`/api/rover-images?sol=${nearSol}`, 4000);
     if (live.length) return pack(nearSol, nearD, live);
   }
-  for (const [sol, d] of order) {
+  for (const [sol, d] of order.slice(0, 40)) {
     if (!cache.has(sol)) continue;
     const imgs = await imagesFor(`/data/rover_cache/${sol}.json`, 4000);
     if (imgs.length) return pack(sol, d, imgs);
@@ -472,7 +545,9 @@ async function groundViewAt(to: LonLat): Promise<GroundView | null> {
 /** Science at a target: the mapped unit, the nearest curated site and the nearest Perseverance view. */
 async function scienceAt(to: LonLat): Promise<ScienceNote> {
   const sc = rt()?.science;
-  const unit = sc?.geologyAt(to) ?? null;
+  // SIM 3464 covers the crater floor only; elsewhere the global map (SIM 3292) stands in, marked est.
+  const g = sc?.geologyAt(to) ?? null, gg = g ? null : useGlobal.getState().gs?.conditionsAt(to.lon, to.lat).geology ?? null;
+  const unit = g ?? (gg ? { symbol: `${gg.symbol} est.`, name: `${gg.name}, global map` } : null);
   const site = sc?.sitesNear(to, 50)[0] ?? null;
   let ground: GroundView | null = null;
   try { ground = await groundViewAt(to); } catch { /* no photo: the strip says so */ }
@@ -517,8 +592,8 @@ export async function commitPlan(from: LonLat, to: LonLat, ask?: Ask, opts: { sn
       useThread.getState().patch(n.id, { point: to });
     }
     const target = pt(to, 'Target');
-    n.step({ kind: 'input', title: moved ? 'Moved to the nearest reachable point' : ask?.origin === 'drag' || !ask ? 'You dragged from base to a point' : 'Round trip requested', meta: clock(), text: `target ${llStr(to)}, elevation ${target.elevationM == null ? 'no data' : `${fmt(target.elevationM, 0)} m`} (CTX DEM, bilinear)` });
-    n.note(`Read the ground at the target: CTX 20 m terrain, elevation ${target.elevationM == null ? 'no data' : `${fmt(target.elevationM, 0)} m`}`);
+    n.step({ kind: 'input', title: moved ? 'Moved to the nearest reachable point' : ask?.origin === 'drag' || !ask ? 'You dragged from base to a point' : 'Round trip requested', meta: clock(), text: `target ${llStr(to)}, elevation ${jezeroElevation(to, target.elevationM)} (CTX DEM, bilinear)` });
+    n.note(`Read the ground at the target: CTX 20 m terrain, elevation ${jezeroElevation(to, target.elevationM)}`);
     const res = await n.run(`Planning a round trip from base with A*, slope limit ${c.maxSlopeDeg}°`, () => r.terrain!.planRoute({ from, to, roundTrip: true, constraints: c }),
       (x) => x.legs.length ? `Planned a round trip from base with A*, slope limit ${c.maxSlopeDeg}°: ${kmStr(x.legs[0].lengthM)} out, ${kmStr(x.legs[x.legs.length - 1].lengthM)} back` : `Found no path under ${c.maxSlopeDeg}° between the base and the target, in either direction`);
     if (seq !== planSeq) { end(n, { text: 'A newer plan replaced this one.' }); return; }
@@ -577,12 +652,12 @@ export async function commitPlan(from: LonLat, to: LonLat, ask?: Ask, opts: { sn
     for (const s2 of routeSteps(route, ops, c, world.snapshot().base, e, opsMs)) n.step(s2);
     const tS = performance.now();
     const sci = await n.run('Looking up the science at the target and the nearest Perseverance photo', () => scienceAt(to),
-      (x) => `Looked up the science at the target: ${x.unit ? `${x.unit.name} (${x.unit.symbol})` : 'no mapped unit'}${x.ground ? `; nearest Perseverance view is sol ${x.ground.sol}, ${kmOrM(x.ground.distanceM)} away` : '; no Perseverance photo within 2 km'}`);
+      (x) => `Looked up the science at the target: ${x.unit ? `${x.unit.name} (${x.unit.symbol})` : 'no mapped unit'}${x.ground ? `; nearest Perseverance view is sol ${x.ground.sol}, ${kmOrM(x.ground.distanceM)} away` : '; the nearest Perseverance frame is not in the cache'}`);
     if (seq !== planSeq) { end(n, { text: 'A newer plan replaced this one.' }); return; }
     n.step({ kind: 'tool', title: 'science_at_target', meta: ms(tS), durMs: performance.now() - tS, code: [
       `geology = ${sci.unit ? `${sci.unit.name} (${sci.unit.symbol})` : 'none mapped'}  (USGS SIM 3464)`,
       `nearest catalogued site = ${sci.site ? `${sci.site.name}, ${fmt(sci.site.distanceKm, 2)} km` : 'none within 50 km'}`,
-      sci.ground ? `nearest Perseverance frames: sol ${sci.ground.sol}, ${kmOrM(sci.ground.distanceM)} from the target, ${sci.ground.photos.map((p) => p.camera).join(', ')}` : 'no Perseverance raw image within 2 km',
+      sci.ground ? `nearest Perseverance frames: sol ${sci.ground.sol}, ${kmOrM(sci.ground.distanceM)} from the target, ${sci.ground.photos.map((p) => p.camera).join(', ')}` : 'nearest Perseverance frame: not in the cache',
     ], sources: [{ title: 'USGS SIM 3464 geologic map', url: 'https://pubs.usgs.gov/publication/sim3464' }, { title: 'Perseverance raw images, NASA/JPL-Caltech', url: 'https://mars.nasa.gov/mars2020/multimedia/raw-images/' }], raw: sci });
     useSession.getState().patch({ science: { target: { lon: route.to.lon, lat: route.to.lat }, unit: sci.unit, site: sci.site, ground: sci.ground } });
     // draw: the route, and the longest radio shadow as a highlighted stretch with its label
@@ -601,10 +676,11 @@ export async function commitPlan(from: LonLat, to: LonLat, ask?: Ask, opts: { sn
     n.note(`Drew the route${cmds.some((x) => x.type === 'highlight_segment') ? ' and the shadow stretch' : ''} on the map`);
     n.step({ kind: 'tool', title: 'issue_scene_commands', meta: ms(tD), durMs: performance.now() - tD, text: cmds.map((x) => x.type === 'draw_route' ? `draw_route ${x.routeId}` : x.type === 'highlight_segment' ? `highlight_segment ${x.startIdx} to ${x.endIdx}` : x.type).join(', '), raw: { commands: cmds, result: applied } });
     const ans = answerForRoute(route, ops);
+    const why = whyRoute(ops);
     const rows: Row[] = routeRows(route, ops, c);
     const first = rows.find((x) => x.label.startsWith('1. ')); // issue 1 in ops.order, the card headline
     end(n, {
-      lead: ans.lead, text: ans.text, report: true, mood: ops.verdict.tone === 'go' ? 'drawing' : 'warning', science: sci,
+      lead: ans.lead, text: ans.text, why, report: true, mood: ops.verdict.tone === 'go' ? 'drawing' : 'warning', science: sci,
       rows: [rows[0], rows[2], first && first !== rows[2] ? first : rows[3]].filter(Boolean) as Row[],
       card: card({
         word: { text: ops.verdict.word, tone: ops.verdict.tone },
@@ -727,7 +803,7 @@ function currentPlan(): RouteResult | null {
   const id = H().activeRouteId;
   return id ? useWorld.getState().routes[id] ?? null : null;
 }
-function timelineNow() {
+export function timelineNow() {
   const route = activeRoute(), r = rt();
   if (!route || !r) return null;
   return buildTimeline(route, { toLocal: (lon, lat) => r.geo.toLocal(r.meta, lon, lat) }, { roverFraction: useWalkUi.getState().roverFraction });
@@ -1115,6 +1191,11 @@ function dispatch(text: string, meta: AskMeta) {
     case V.back: return back(meta);
     case V.nearest: return nearestPoint(meta);
     case V.lassoWalk: if (lassoStop) void commitPlan(world.snapshot().base ?? lassoStop, lassoStop, { text, origin: meta.origin, at: lassoStop }); return;
+    case V.replay: { const p = usePlayback.getState(); if (p.durationS > 0) { C().closeBubble(); p.seek(0); p.play(); } return; }
+    case V.phases: return stepPhase();
+    case V.planHere:
+      if (useGlobeStore.getState().mode !== 'jezero') { void goJezero(meta).then(() => useShell.getState().setTool('plan')); return; }
+      useShell.getState().setTool('plan'); return;
     case V.plan:
       if (useGlobeStore.getState().mode !== 'jezero') { void goJezero(meta).then(() => useShell.getState().setTool('plan')); return; }
       useShell.getState().setTool('plan');
@@ -1131,6 +1212,85 @@ function dispatch(text: string, meta: AskMeta) {
 let suppressUntil = 0;
 
 /** Subscribe everything. Returns one cleanup function. */
+/* ------------------------------------------------------------------ scenario end state (QA round 3) */
+
+function showScenarioEnd(o: ScenarioOutcome) {
+  const pb = usePlayback.getState();
+  if (useWalkUi.getState().helmet) return;
+  const endT = formatMissionTime(pb.durationS);
+  const tone = o.tone as Tone;
+  const word = o.verdict;
+  const estimated = o.label !== o.verdict;
+  const landing = H().landing;
+  if (o.kind === 'landing' && landing) {
+    const st = o.stats, sc = useSession.getState().scenario;
+    const inJez = insideBounds(useWorld.getState().bounds, landing.site.lon, landing.site.lat);
+    const n = begin({ text: 'Landing simulation finished', origin: 'tool', at: landing.site });
+    n.note(`Simulation finished at ${endT}`);
+    if (o.rule) n.step({ kind: 'verdict', title: `Landing verdict: ${o.label}`, durMs: 0, text: o.reason, code: [o.rule], tone, raw: o });
+    const rows: Row[] = [
+      { label: 'Touchdowns simulated', value: nf(st?.samples ?? sc?.samples ?? 0), tone: 'info' },
+      { label: `Within ${st?.maxSlopeDeg ?? landing.maxSlopeDeg}° slope`, value: `${fmt(st?.okPercent ?? sc?.okPercent ?? 0, 1)} %`, tone },
+      { label: 'Median / 95th pct slope', value: `${sc?.slopeP50Deg ?? 0}° / ${st?.slopeP95Deg ?? sc?.slopeP95Deg ?? 0}°`, tone: 'info' },
+      { label: 'Rover at touchdown point', value: ll2(landing.site), tone: 'info' },
+    ];
+    end(n, {
+      lead: { text: 'Landing complete.', tone },
+      why: { word, tone, lines: [{ text: o.reason, step: 'Landing verdict' }, ...(o.rule ? [{ text: o.rule }] : []), ...(estimated ? [{ text: '(includes estimates)' }] : [])].slice(0, 4) },
+      text: `The descent ended at ${endT} with the rover on the ground at ${ll2(landing.site)}. Replay it, step through the EDL phases, or go plan a walk.`,
+      rows, mood: tone === 'go' ? 'idle' : 'warning',
+      card: card({ word: { text: word, tone }, title: `Landing complete. ${o.reason.replace(/\.$/, '')}${estimated ? ' (includes estimates)' : ''}`, sub: `Finished at ${endT}`, rows, point: landing.site, actions: [act(V.replay, 'rotate-ccw'), act(V.phases, 'list-ordered'), inJez ? act(V.planHere, 'route') : act(V.jezero, 'navigation')], askHint: 'Ask about this landing' }),
+    });
+    return;
+  }
+  if (o.kind === 'walk' || o.kind === 'rover-walk') {
+    const tl = timelineNow(), route = activeRoute();
+    if (!tl || !route) return;
+    const ops = getOps(route.id);
+    const s = tl.summary;
+    const label = o.kind === 'rover-walk' ? 'Rover-assisted walk complete' : 'Walk complete';
+    const n = begin({ text: `${o.kind === 'rover-walk' ? 'Rover assist' : 'Walk'} finished`, origin: 'tool', at: route.to });
+    n.note(`Simulation finished at ${endT}`);
+    const rows: Row[] = [
+      { label: 'Distance walked', value: kmStr(tl.distM), tone: 'info' },
+      { label: 'EVA time', value: hmin(tl.durationS / 60), tone: 'info' },
+      { label: 'Battery at return', value: `${fmt(100 - s.batteryUsedPct, 1)} %`, tone: 100 - s.batteryUsedPct >= 20 ? 'go' : 'nogo' },
+      { label: 'Verdict', value: o.label, tone },
+    ];
+    end(n, {
+      lead: { text: `${label}.`, tone }, why: ops ? { ...whyRoute(ops)!, word, tone } : { word, tone, lines: [{ text: o.reason }] },
+      text: `The crew is back at base at ${endT}. ${o.reason} Replay it, step through the stops, or check the walk from the helmet.`,
+      rows, mood: tone === 'go' ? 'idle' : 'warning',
+      card: card({ word: { text: word, tone }, title: `${label}. ${o.reason.replace(/\.$/, '')}`, sub: `${kmStr(tl.distM)} round trip, back at ${endT}`, rows, point: route.to, actions: [act(V.replay, 'rotate-ccw'), act(V.phases, 'list-ordered'), act(V.helmet, 'scan-eye'), act(V.cuff, 'clipboard-list')], askHint: 'Ask about this walk' }),
+    });
+    return;
+  }
+  if (o.kind === 'base-camp') {
+    const b = world.snapshot().base;
+    if (!b) return;
+    const n = begin({ text: 'Base camp reach finished', origin: 'tool', at: b });
+    n.note('Base camp reach finished');
+    end(n, {
+      lead: { text: 'Base camp reach complete.', tone }, why: { word, tone, lines: [{ text: o.reason }, ...(estimated ? [{ text: '(includes estimates)' }] : [])] },
+      text: o.reason,
+      card: card({ word: { text: word, tone }, title: `Base camp reach complete. ${o.reason.replace(/\.$/, '')}`, sub: ll2(b), rows: [], point: b, actions: [act(V.plan, 'route'), act(V.walkHere, 'footprints')], askHint: 'Ask about the reach' }),
+    });
+  }
+}
+
+/** "Step through phases": jump to the next EDL phase (landing) or the next stop (walk) after the playhead, pausing there. */
+function stepPhase() {
+  const pb = usePlayback.getState();
+  const times = pb.kind === 'landing'
+    ? (useGlobal.getState().gs?.edlPhases() ?? []).map((p) => p.tStartS)
+    : (timelineNow()?.markers ?? []).map((m) => m.tS);
+  const ts = [...new Set(times.filter((x) => x >= 0 && x <= pb.durationS))].sort((a, b) => a - b);
+  if (!ts.length) return;
+  const next = ts.find((x) => x > pb.t + 0.5) ?? ts[0];
+  C().closeBubble();
+  pb.pause(); pb.seek(next);
+}
+
 export function startFlow(): () => void {
   const offs: (() => void)[] = [];
   offs.push(onGlobePick((p) => { if (p.kind === 'click' && useGlobeStore.getState().mode === 'globe') void onGlobeClick(p); }));
@@ -1156,6 +1316,9 @@ export function startFlow(): () => void {
     }
   }));
   offs.push(useGlobeStore.subscribe((s, prev) => { if (s.scatterShown !== prev.scatterShown) syncScatter(); }));
+  // a clear end state: the simulations emit one end event per run (landing after its testing phase, walk and rover at
+  // the end of the playback, base camp reach when its plans are done); each gets a completion turn and card
+  offs.push(onScenarioEnd(showScenarioEnd));
   // changing a limit or the mast height replans the route MarsAgent is talking about, as one turn that names the change
   let timer = 0;
   const describe = (prevC: Record<string, unknown>, nextC: Record<string, unknown>) => Object.keys(nextC).filter((k) => nextC[k] !== prevC[k]).map((k) => `${k} ${String(prevC[k])} to ${String(nextC[k])}`).join(', ');

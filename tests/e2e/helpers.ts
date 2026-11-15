@@ -67,6 +67,8 @@ export async function baseScreen(page: Page): Promise<Pt> {
 /** Press, drag in small steps (so the live preview fires) and release; waits for the plan turn. */
 export async function dragPlan(page: Page, from: Pt, to: Pt, steps = 10) {
   const before = await turnCount(page);
+  // left-drag navigates by default; drawing a route needs the Plan tool (the rail button sets the same state)
+  await page.evaluate("window.__mw.shell.getState().setTool('plan')");
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   for (let i = 1; i <= steps; i++) { await page.mouse.move(from.x + ((to.x - from.x) * i) / steps, from.y + ((to.y - from.y) * i) / steps); await page.waitForTimeout(90); }

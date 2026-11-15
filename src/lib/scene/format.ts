@@ -9,7 +9,7 @@ export const fmtMin = (min: number) => {
 export const fmtDeg = (d: number) => `${d.toFixed(1)}°`;
 export const fmtLat = (lat: number) => `${Math.abs(lat).toFixed(5)}° ${lat >= 0 ? 'N' : 'S'}`;
 export const fmtLon = (lon: number) => `${Math.abs(lon).toFixed(5)}° ${lon >= 0 ? 'E' : 'W'}`;
-export const fmtElev = (e: number | null) => (e == null ? 'no data' : `${Math.round(e)} m`);
+export const fmtElev = (e: number | null) => (e == null ? '—' : `${Math.round(e)} m`);
 
 /** Horizontal distance (m) between two nearby points. */
 export function groundM(a: LonLat, b: LonLat): number {

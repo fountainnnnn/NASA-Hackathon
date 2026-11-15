@@ -72,8 +72,10 @@ export function explainTool(name: string, args: unknown, result: unknown): Expla
     }
     case 'check_landing_site': {
       const rows = (r.criteria ?? []) as Obj[];
-      for (const c of rows) e.calcs.push(degSign(`${c.label}: ${c.value == null ? 'no data' : `${fmt(c.value, 2)} ${c.unit ?? ''}`.trim()} vs limit ${c.limit} → ${String(c.result).toUpperCase()}`));
-      e.kv.push(['verdict', String(r.verdict ?? '')], ['criteria', `${rows.filter((c) => c.result === 'pass').length} pass, ${rows.filter((c) => c.result === 'fail').length} fail, ${rows.filter((c) => c.result === 'no data').length} no data`]);
+      const tag = (c: Obj) => (c.provenance === 'estimate' ? ' est.' : c.provenance === 'mock' ? ' mock' : '');
+      for (const c of rows) e.calcs.push(degSign(`${c.label}: ${`${fmt(c.value ?? 0, 2)} ${c.unit ?? ''}`.trim()}${tag(c)} vs limit ${c.limit} → ${String(c.result).toUpperCase()}${c.method ? `  (${c.method})` : ''}`));
+      const nEst = rows.filter((c) => c.provenance === 'estimate' || c.provenance === 'mock').length;
+      e.kv.push(['verdict', String(r.verdict ?? '')], ['criteria', `${rows.filter((c) => c.result === 'pass').length} pass, ${rows.filter((c) => c.result === 'fail').length} fail${nEst ? `, ${nEst} estimated or mock` : ''}`]);
       const seen = new Set<string>();
       for (const c of rows) if (c.sourceTitle && !seen.has(c.sourceTitle)) { seen.add(c.sourceTitle); e.sources.push({ title: c.sourceTitle, url: c.sourceUrl }); }
       break;
@@ -85,6 +87,8 @@ export function explainTool(name: string, args: unknown, result: unknown): Expla
         e.calcs.push(`ok fraction = N_ok ÷ N = ${fmt(ok, 0)} ÷ ${fmt(r.samples, 0)} = ${fmt(r.okPercent, 1)} % (N_ok recovered from the reported percentage)`);
       }
       if (r.ellipse) e.calcs.push(`dispersion = truncated 2-D Gaussian, 3σ = semi-axes ${r.ellipse.semiMajorKm} × ${r.ellipse.semiMinorKm} km, azimuth ${r.ellipse.azimuthDeg}°`);
+      // GO / HOLD / NO GO rule with the real numbers (lib/scenario/verdict.ts)
+      if (r.verdict && Array.isArray(r.verdict.calc)) for (const c of r.verdict.calc) e.calcs.push(String(c));
       e.kv.push(['terrain', String(r.terrainModel ?? '')], ['engine', String(r.engine ?? '')], ['slope limit', `${r.maxSlopeDeg}° (assumption)`]);
       e.sources.push({ title: String(r.terrainModel ?? 'terrain model') });
       break;

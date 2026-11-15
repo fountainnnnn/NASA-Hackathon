@@ -6,6 +6,7 @@
  * the discarded hardware falls away. None of these appear as facts on screen.
  */
 import type { EdlPhase } from '../../lib/globeContracts';
+import { MC_START_S, PULLBACK_S, TOUCHDOWN_HOLD_S as HOLD_S } from '../../lib/scenario/playback';
 import { clamp, smoothstep } from './planetMath';
 
 export const ENTRY_ALT_KM = 125;             // assumption: top of the sensible atmosphere
@@ -95,12 +96,21 @@ export function chaseCamera(t: number, ev: Events): { rangeM: number; pitchDeg: 
   return { rangeM: logLerp(CHUTE_RANGE_M, CRANE_RANGE_M, k), pitchDeg: -14 + 5 * k };
 }
 
-/** Seconds the camera holds on the rover after touchdown before pulling back. */
-export const TOUCHDOWN_HOLD_S = 10;
-/** The touchdown scatter and the ellipse start to appear this long after touchdown: halfway through the pull-back, never in the close-up. */
-export const REVEAL_DELAY_S = TOUCHDOWN_HOLD_S + 20;
-/** Blend of the post-touchdown pull-back to the wide view of the ellipse: 0 until 10 s after touchdown, 1 about 40 s later. */
-export const pullBack = (t: number, ev: Events) => smoothstep(ev.touchdown + TOUCHDOWN_HOLD_S, ev.touchdown + TOUCHDOWN_HOLD_S + 40, t);
+/** Seconds the camera holds on the rover after touchdown before pulling back (lib/scenario/playback.ts owns the post-touchdown timing). */
+export const TOUCHDOWN_HOLD_S = HOLD_S;
+/** The Monte-Carlo testing phase (touchdowns dropping onto the ellipse) starts this long after touchdown, as the pull-back settles. */
+export const REVEAL_DELAY_S = MC_START_S;
+/** Blend of the post-touchdown pull-back to the wide view of the ellipse: 0 until TOUCHDOWN_HOLD_S after touchdown, 1 PULLBACK_S later. */
+export const pullBack = (t: number, ev: Events) => smoothstep(ev.touchdown + TOUCHDOWN_HOLD_S, ev.touchdown + TOUCHDOWN_HOLD_S + PULLBACK_S, t);
+
+/**
+ * Drawn height (m) of a point `altM` above the ground when the vehicle is drawn `k` times true size (lib/scenario/drawScale).
+ * Below the sky crane hover height the whole scene is a k-times replica (stage, cords, rover and their heights above the
+ * ground), so the rover still touches down exactly when the cords are fully out; above it the drawn height is the true
+ * height plus a constant (k - 1) × 20 m, negligible at the kilometre altitudes of the parachute and powered descent.
+ * The captions always report the true altitude.
+ */
+export const drawAltM = (altM: number, k = 1) => altM + (k - 1) * Math.min(Math.max(altM, 0), SKYCRANE_HOVER_M);
 
 /** True for phases NASA defines by an altitude window rather than a clock time (edl_mars2020.json "trigger": "altitude"). */
 export const isAltitudePhase = (p: EdlPhase) => (p as EdlPhase & { trigger?: string }).trigger === 'altitude';
@@ -180,6 +190,8 @@ export function groundFraming(top: [number, number, number], bottom: [number, nu
   const floor = Math.min(GROUND_CAM_FLOOR_DEG, lo - 1.5);
   if (pitch - vfov / 2 < floor) pitch = floor + vfov / 2;
   if (hi > pitch + vfov / 2 - 1) { vfov = clamp(hi - floor + 2, vfov, GROUND_CAM_VFOV_MAX_DEG); pitch = floor + vfov / 2; }
+  // a vehicle high above a close eye: look further up rather than lose the top of it (the bottom edge only rises)
+  if (hi > pitch + vfov / 2 - 1) pitch = Math.min(hi - vfov / 2 + 1, lo + vfov / 2);
   // heading: towards the middle of what is framed (horizontal mean of the two points)
   const az = elevAz((top[0] + bottom[0]) / 2, (top[1] + bottom[1]) / 2, 0).az;
   return { headingDeg: az, pitchDeg: Math.min(pitch, 85), vfovDeg: vfov };
@@ -190,3 +202,52 @@ export const groundCamActive = (t: number, ev: Events) => t >= ev.backshellSep &
 
 /** Vehicle altitude (m) under which the faint approach arc is hidden: near the ground it would drop through the frame as a line. */
 export const ARC_HIDE_BELOW_M = 2000;
+
+/* ------------------------------------------------------------------ sky crane and touchdown framing (QA round 3, P0-2 and P0-3) */
+
+/** Stage top above the stage origin (what the tracking camera frames as the top of the vehicle). */
+export const STAGE_TOP_M = 1.6;
+/** Sky crane: the horizon sits this far down the frame, so the ground fills the lower part behind the hanging rover. */
+export const CRANE_HORIZON_FRAC = 0.35;
+/** Blend from the low, looking-up tracking camera (vehicle above 120 m) to the sky crane framing (30 m and under). */
+export const craneBlend = (altM: number) => 1 - smoothstep(30, 120, altM);
+/**
+ * Tracking camera eye height above the ground for a stage `altM` up with the rover `hangM` below it (true metres; `k` the
+ * drawing scale of the vehicle): 2 m while the vehicle
+ * is high, rising for the sky crane to a tenth of the vehicle's height under the stage top, so the stage sits on the horizon
+ * and the bridles and the rover hang against real ground, clear of the bottom edge.
+ */
+export const groundCamEyeM = (altM: number, hangM: number, k = 1) => {
+  // k: the vehicle is drawn k times true size (drawAltM); altM and hangM are the true values
+  const top = drawAltM(altM, k) + k * STAGE_TOP_M, span = k * (STAGE_TOP_M + hangM);
+  return GROUND_CAM_EYE_M + craneBlend(altM) * Math.max(0, top - 0.1 * span - GROUND_CAM_EYE_M);
+};
+
+/**
+ * Sky crane framing from a raised eye: the lens fills GROUND_CAM_FILL of the frame with the vehicle (at least 250 px on a
+ * 725 px stage), the camera pitches down so the horizon sits at CRANE_HORIZON_FRAC of the height, and everything framed stays
+ * inside the frame. `k` blends from groundFraming (0) to this framing (1); both contain the vehicle, so every blend does.
+ * The imagery here is CTX (about 5 m per pixel), so the ground behind the vehicle reads as soft relief at any range.
+ */
+export function craneFraming(top: [number, number, number], bottom: [number, number, number], k: number): { headingDeg: number; pitchDeg: number; vfovDeg: number } {
+  const g = groundFraming(top, bottom);
+  if (k <= 0) return g;
+  const hi = Math.max(elevAz(...top).elev, elevAz(...bottom).elev), lo = Math.min(elevAz(...top).elev, elevAz(...bottom).elev);
+  const vfov = clamp(Math.max(hi - lo, 0.05) / GROUND_CAM_FILL, GROUND_CAM_VFOV_MIN_DEG, GROUND_CAM_VFOV_MAX_DEG);
+  const margin = Math.min(1, vfov * 0.04);
+  let pitch = -(0.5 - CRANE_HORIZON_FRAC) * vfov;
+  if (hi > pitch + vfov / 2 - margin) pitch = hi - vfov / 2 + margin;
+  if (lo < pitch - vfov / 2 + margin) pitch = lo + vfov / 2 - margin;
+  return { headingDeg: g.headingDeg, pitchDeg: g.pitchDeg + (pitch - g.pitchDeg) * k, vfovDeg: g.vfovDeg + (vfov - g.vfovDeg) * k };
+}
+
+/** Lens held after touchdown (wide: no zoom onto coarse imagery). */
+export const TOUCHDOWN_VFOV_DEG = 28;
+/** After touchdown the middle of the rover sits this far down the frame: clear of the attribution strip, ground below and around it. */
+export const TOUCHDOWN_AT_FRAC = 0.6;
+/** Touchdown hold from the 2 m eye: the camera aims above the rover so the rover sits at TOUCHDOWN_AT_FRAC of the height. */
+export function touchdownFraming(top: [number, number, number], bottom: [number, number, number]): { headingDeg: number; pitchDeg: number; vfovDeg: number } {
+  const g = groundFraming(top, bottom, TOUCHDOWN_VFOV_DEG);
+  const mid = (elevAz(...top).elev + elevAz(...bottom).elev) / 2;
+  return { headingDeg: g.headingDeg, pitchDeg: mid + (TOUCHDOWN_AT_FRAC - 0.5) * g.vfovDeg, vfovDeg: g.vfovDeg };
+}

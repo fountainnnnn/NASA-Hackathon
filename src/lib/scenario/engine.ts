@@ -9,7 +9,7 @@
 import { R_MARS } from '../contracts';
 import type { LandingScenarioRequest, LandingScenarioResult } from '../globeContracts';
 import { createRng } from './prng';
-import type { ScenarioOptions, SlopeSource } from './types';
+import type { RunningCounts, ScenarioOptions, SlopeSource } from './types';
 
 const D2R = Math.PI / 180;
 export const MAX_RENDER_POINTS = 2000;
@@ -55,7 +55,7 @@ function percentile(sorted: Float32Array, n: number, q: number): number {
   return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
 }
 
-export function runScenarioTs(req: LandingScenarioRequest, source: SlopeSource, opts: ScenarioOptions = {}): LandingScenarioResult {
+export function runScenarioTs(req: LandingScenarioRequest, source: SlopeSource, opts: ScenarioOptions = {}): LandingScenarioResult & { running: RunningCounts } {
   const t0 = typeof performance !== 'undefined' ? performance.now() : Date.now();
   const distribution = opts.distribution ?? 'gaussian';
   const n = Math.max(1, Math.floor(req.samples));
@@ -64,6 +64,8 @@ export function runScenarioTs(req: LandingScenarioRequest, source: SlopeSource, 
   const keep = Math.min(n, MAX_RENDER_POINTS);
   const points = new Float32Array(keep * 3);
   const valid = new Float32Array(n);
+  // running tallies at each kept point, so the playback counter is exact (playback.ts)
+  const running: RunningCounts = { runs: new Uint32Array(keep), ok: new Uint32Array(keep), nodata: new Uint32Array(keep) };
   let nValid = 0, nOk = 0, nNodata = 0;
   // keep an evenly spaced subset of draws for rendering, so the picture is an unbiased sample
   for (let i = 0; i < n; i++) {
@@ -76,6 +78,7 @@ export function runScenarioTs(req: LandingScenarioRequest, source: SlopeSource, 
     if (slot > Math.floor((i * keep) / n)) {
       const k = (slot - 1) * 3;
       points[k] = p.lon; points[k + 1] = p.lat; points[k + 2] = has ? (s as number) : NaN;
+      running.runs[slot - 1] = i + 1; running.ok[slot - 1] = nOk; running.nodata[slot - 1] = nNodata;
     }
   }
   const sorted = valid.subarray(0, nValid);
@@ -91,5 +94,6 @@ export function runScenarioTs(req: LandingScenarioRequest, source: SlopeSource, 
     engine: 'ts',
     computeMs: now - t0,
     demResM: source.demResM,
+    running,
   };
 }

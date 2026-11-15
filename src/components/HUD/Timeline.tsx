@@ -1,5 +1,6 @@
 'use client';
-import { Pause, Play } from 'lucide-react';
+import { useShell } from '@/state/shell';
+import { Pause, Play, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useWalkTimeline } from '@/components/Ops/useWalk';
 import { sunElevationAt } from '@/components/Ops/routeOps';
@@ -60,6 +61,7 @@ export function Timeline() {
   useEffect(() => () => { drag.current = false; }, []);
 
   const hx = x(t);
+  const ended = !playing && durationS > 0 && t >= durationS - 1e-6;
   const hy = curve && sunAt ? curve.y(sunAt(t)) : 14;
   const onKey = (e: React.KeyboardEvent) => {
     const p = usePlayback.getState();
@@ -72,8 +74,9 @@ export function Timeline() {
 
   return (
     <footer className={s.time} role="group" aria-label="Timeline" data-avoid>
-      <button type="button" className={s.play} onClick={() => usePlayback.getState().toggle()} aria-label={playing ? 'Pause' : 'Play'}>
-        {playing ? <Pause size={14} strokeWidth={1.5} aria-hidden /> : <Play size={14} strokeWidth={1.5} aria-hidden />}
+      {/* at the end the play button becomes Replay, so a finished run never reads as a stalled one */}
+      <button type="button" className={s.play} onClick={() => { const p = usePlayback.getState(); if (ended) { p.seek(0); p.play(); } else p.toggle(); }} aria-label={ended ? 'Replay' : playing ? 'Pause' : 'Play'} title={ended ? 'Replay' : undefined} data-ended={ended || undefined}>
+        {ended ? <RotateCcw size={14} strokeWidth={1.5} aria-hidden /> : playing ? <Pause size={14} strokeWidth={1.5} aria-hidden /> : <Play size={14} strokeWidth={1.5} aria-hidden />}
       </button>
       <div
         ref={track} className={s.track} tabIndex={0} role="slider" aria-label={landing ? 'Time since atmospheric entry' : 'EVA time, drag the sun'}
@@ -99,7 +102,7 @@ export function Timeline() {
         {markers.map((m, i) => <span key={i} title={`${formatMissionTime(m.tS)}  ${m.label}`} aria-hidden style={{ position: 'absolute', left: `calc(${(x(m.tS) / W) * 100}% - 4px)`, bottom: 0, width: 8, height: 10 }} />)}
       </div>
       <span className={s.tclock}>{formatMissionTime(t)}</span>
-      <span className={s.tlabel}>{landing ? 'since entry' : 'sun arc, local time'}</span>
+      <span className={s.tlabel}>{ended ? 'finished' : landing ? `since entry, of ${formatMissionTime(durationS)}` : 'sun arc, local time'}</span>
       <div className={s.speed} role="group" aria-label="Playback speed">
         {SPEEDS.map((v) => <button key={v} type="button" aria-pressed={speed === v} aria-label={`${v} times speed`} onClick={() => usePlayback.getState().setSpeed(v)}>{v}×</button>)}
       </div>
@@ -110,6 +113,7 @@ export function Timeline() {
 /** The slim line under the map when no simulation is loaded: one hint or message, and the data credit. */
 export function StatusLine() {
   const mode = useGlobeStore((g) => g.mode);
+  const tool = useShell((sh) => sh.tool);
   const rt = useRuntime((r) => r.rt);
   const toasts = useWorld((w) => w.toasts);
   const progress = useHud((h) => h.reachProgress);
@@ -125,8 +129,10 @@ export function StatusLine() {
   else if (progress) { kind = 'progress'; text = `Base camp reach: ${progress}`; }
   else if (mode === 'jezero' && !rt) { kind = 'loading'; text = 'Loading the 20 m terrain'; }
   else if (mode === 'globe' && !gs && !gErr) { kind = 'loading'; text = 'Loading the global datasets'; }
-  else text = mode === 'jezero' ? 'Drag from the base to plan. Shift-drag to lasso. Right-drag to orbit.' : 'Click the planet to ask about a place. Drag to turn it, scroll to zoom.';
-  const short = kind === 'hint' ? (mode === 'jezero' ? 'Drag from the base to plan.' : 'Click the planet to ask.') : text;
+  else if (mode === 'jezero' && tool === 'plan') text = 'Drag from the base to a target to plan a round trip. Esc stops.';
+  else if (mode === 'jezero' && tool === 'lasso') text = 'Draw a loop on the ground to read the area. Esc stops.';
+  else text = mode === 'jezero' ? 'Drag to orbit, right-drag to pan. Plan tool draws a route.' : 'Click the planet to ask about a place. Drag to turn it, scroll to zoom.';
+  const short = kind === 'hint' ? (mode === 'jezero' ? (tool === 'plan' ? 'Drag from the base to plan. Esc stops.' : tool === 'lasso' ? 'Draw a loop. Esc stops.' : 'Drag to orbit. Plan tool draws routes.') : 'Click the planet to ask.') : text;
   return (
     <footer className={s.status} data-avoid>
       <span className={`${s.hint} ${s.long}`} data-kind={kind} role={kind === 'hint' ? undefined : 'status'}>{text}</span>

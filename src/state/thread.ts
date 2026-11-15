@@ -72,8 +72,12 @@ export interface MapCard {
   science?: ScienceNote | null;
 }
 
+/** "Why <VERDICT>": the verdict word and 2 to 4 plain lines; a line with `step` links to the working step whose title matches it (regex source). */
+export interface Why { word: string; tone: Tone; lines: { text: string; step?: string }[] }
+
 export interface Answer {
   /** 'info' is a neutral lead (no verdict), e.g. "Coarse terrain only." */
+  why?: Why | null;
   lead?: { text: string; tone: Tone | 'info' } | null;
   text: string;
   rows?: Row[];

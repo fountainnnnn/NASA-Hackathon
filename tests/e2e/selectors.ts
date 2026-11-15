@@ -34,7 +34,7 @@ export const panel = (p: Page): Locator => p.locator('#marsagent-panel');
 export const thread = (p: Page): Locator => panel(p).getByRole('log', { name: 'MarsAgent thread' });
 export const lastTurn = (p: Page): Locator => thread(p).locator('article').last();
 export const composer = (p: Page): Locator => p.getByRole('textbox', { name: 'Ask MarsAgent about the plan or the maths' });
-export const reportOpen = (p: Page): Locator => lastTurn(p).getByRole('button', { name: 'Open', exact: true });
+export const reportOpen = (p: Page): Locator => lastTurn(p).getByRole('button', { name: 'Open report', exact: true });
 export const reportViewer = (p: Page): Locator => p.getByRole('dialog', { name: 'Mission planning report' });
 
 export const VERDICT = /^(GO|HOLD|NO GO)$/;

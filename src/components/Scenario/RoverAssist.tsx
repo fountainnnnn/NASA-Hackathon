@@ -75,7 +75,7 @@ export function RoverAssist({ timeline, ground, scale = 'auto' }: RoverAssistPro
     const y = ground.y(smp.x, smp.z, smp.h);
     const dist = camera.position.distanceTo(new THREE.Vector3(smp.x, y, smp.z));
     const ui = useWalkUi.getState();
-    const s = scale === 'auto' ? visibleScale(dist, ui.helmet || ui.followCrew) : scale;
+    const s = scale === 'auto' ? visibleScale(dist, ui.followCrew, ui.helmet) : scale;
     g.visible = true;
     g.position.set(smp.x, y, smp.z);
     heading.current = t <= 0 ? smp.headingRad : angLerp(heading.current, smp.headingRad, 1 - Math.exp(-10 * Math.min(0.1, dt)));

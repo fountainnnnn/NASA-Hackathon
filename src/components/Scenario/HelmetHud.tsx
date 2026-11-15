@@ -175,7 +175,7 @@ export function HelmetHud({ timeline, sunElevationDeg = null, commsVisible = nul
           <span className={css.v}>{stop ? Math.round(stop.distM) : 0}<span className={css.u}>m</span></span>
         </div>
         <div className={css.n}>
-          <span className={css.k}>Slope, next 100 m</span>
+          <span className={css.k}>Slope over next 100 m</span>
           <span className={`${css.v} ${slope.meanDeg > c.maxSlopeDeg ? css.low : ''}`}>{slope.meanDeg.toFixed(1)}<span className={css.deg}>°</span></span>
         </div>
         <div className={css.n}>

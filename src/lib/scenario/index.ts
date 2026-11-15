@@ -15,6 +15,10 @@ export { enableScenarioWasm } from './wasmAdapter';
 export { walkScenario } from './walk';
 export type { WalkScenarioResult, DemBounds } from './walk';
 export { putScenario, getScenario, clearScenarios } from './store';
+export * from './verdict';
+export * from './outcome';
+export * from './playback';
+export * from './drawScale';
 export type { StoredScenario } from './store';
 
 const sources: { jezero20m?: SlopeSource; global?: SlopeSource } = {};

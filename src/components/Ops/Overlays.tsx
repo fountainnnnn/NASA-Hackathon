@@ -14,6 +14,7 @@ import { REVEAL_DELAY_S } from '@/components/Planet/descent';
 import { LANDING_LEGEND_TOP_PX, jezeroLegendRows, landingLegendRows } from './legendRows';
 import { useGlobeStore } from '@/state/globe';
 import { useWorld } from '@/state/world';
+import { drawScaleNote, useDrawScale } from '@/lib/scenario/drawScale';
 import { YIELDING_LABELS, blockedByHud } from '@/components/HUD/blocks';
 import { projectJezero } from './projector';
 import { downloadCuff, openCuff } from './cuffExport';
@@ -141,6 +142,8 @@ export function Legend() {
   const edlEnd = useMemo(() => edlEndS(gs?.edlPhases() ?? []), [gs]);
   const t = useThrottledT(2);
   const kind = usePlayback((p) => p.kind);
+  // honest note when scenario objects are drawn larger than life (lib/scenario/drawScale)
+  const scaleNote = useDrawScale((d) => drawScaleNote(d, mode));
   if (popover || sheet || helmet) return null;
   if (mode === 'globe') {
     if (!landing) return null;
@@ -152,6 +155,7 @@ export function Legend() {
         {rows.dots && <div className={sh.row}><span className={sh.dotSw} style={{ background: '#d9423b' }} />Touchdown over the limit</div>}
         <div className={sh.src}>Terrain: Mars Trek, EDL: Mars 2020</div>
         <div className={sh.src}>Imagery: CTX 5 m on Viking 232 m per pixel</div>
+        {scaleNote && <div className={sh.src}>{scaleNote}</div>}
       </div>
     );
   }
@@ -163,6 +167,7 @@ export function Legend() {
       {rows.traverse && <div className={sh.row}><span className={sh.sw} style={{ borderColor: 'rgba(236,231,225,0.45)' }} />Perseverance traverse</div>}
       <div className={sh.src}>MRO CTX DEM 20 m, JPL Mars Trek</div>
       {rows.imagery && <div className={sh.src}>{rows.imagery}</div>}
+      {scaleNote && <div className={sh.src}>{scaleNote}</div>}
     </div>
   );
 }

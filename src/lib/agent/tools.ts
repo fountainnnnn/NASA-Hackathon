@@ -10,6 +10,7 @@ import type {
 import type { GlobeCommand, LandingScenarioRequest } from '../globeContracts';
 import { JEZERO_BBOX } from '../globalSci';
 import { hasScenarioSource, putScenario, registerScenarioSources, runLandingScenario } from '../scenario';
+import { landingVerdict, landingVerdictCalc } from '../scenario/verdict';
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -117,7 +118,7 @@ const EllipseOverrideSchema = z.object({
 
 function needGlobal(deps: ToolDeps) {
   if (!deps.globalSci || !deps.globalSci.loaded) {
-    throw new ToolError('global_data_unavailable', 'The global Mars dataset is not loaded. No verified data available.');
+    throw new ToolError('global_data_unavailable', 'The global Mars dataset is still loading or failed to load; try again.');
   }
   return deps.globalSci;
 }
@@ -137,15 +138,15 @@ function conditionsBrief(c: import('../globeContracts').SiteConditions, deps: To
     elevationNote: 'metres above the Mars areoid (MOLA)',
     slopeDeg: rv(c.slopeDeg, r1),
     slopeNote: 'Regional slope from the coarse global DEM; it says nothing about boulders or rover-scale terrain.',
-    geology: c.geology ? { symbol: c.geology.symbol, name: c.geology.name, description: clip(c.geology.description, 240), source: c.geology.source } : null,
-    layers: c.layers.map((l) => ({ id: l.id, label: l.label, value: rv(l.value, sig3), unit: l.unit, source: l.source })),
+    geology: c.geology ? { symbol: c.geology.symbol, name: c.geology.name, description: clip(c.geology.description, 240), source: c.geology.source, ...(c.geology.distanceKm ? { distanceKm: c.geology.distanceKm } : {}) } : null,
+    layers: c.layers.map((l) => ({ id: l.id, label: l.label, value: rv(l.value, sig3), unit: l.unit, source: l.source, provenance: l.provenance ?? 'observed', ...(l.method && l.provenance !== 'observed' ? { method: l.method } : {}) })),
     nearestSites: c.nearestSites.slice(0, 3).map((s) => ({ name: s.name, kind: s.kind, distanceKm: r0(s.distanceKm), bearingDeg: r0(s.bearingDeg) })),
     insideJezeroHighRes: c.insideJezeroHighRes,
     notes: c.notes.slice(0, 6),
     provenance: {
-      elevation: c.elevationM == null ? prov('unavailable', m?.dem.title ?? 'MOLA global DEM') : prov('observed', m?.dem.title ?? 'MOLA global DEM'),
-      slope: c.slopeDeg == null ? prov('unavailable', 'global DEM') : prov('computed', `Horn slope on ${m?.dem.title ?? 'global DEM'} (~${m?.dem.resKm ?? '?'} km posting)`),
-      geology: c.geology ? prov('observed', c.geology.source) : prov('unavailable', 'global geologic map'),
+      elevation: c.fills?.elevation ? prov(c.fills.elevation.provenance as Provenance, c.fills.elevation.method) : prov('observed', m?.dem.title ?? 'MOLA global DEM'),
+      slope: c.fills?.slope ? prov(c.fills.slope.provenance as Provenance, c.fills.slope.method) : prov('computed', `Horn slope on ${m?.dem.title ?? 'global DEM'} (~${m?.dem.resKm ?? '?'} km posting)`),
+      geology: c.geology ? (c.geology.distanceKm ? prov('estimate', `nearest mapped unit, ${c.geology.distanceKm} km away (${c.geology.source})`) : prov('observed', c.geology.source)) : prov('unavailable', 'global geologic map'),
     },
   };
 }
@@ -156,8 +157,10 @@ function checkBrief(chk: import('../globalSci').LandingCheckResult) {
     verdict: chk.verdict,
     criteria: chk.criteria.map((c) => ({
       id: c.id, label: c.label, value: rv(c.value, (v) => Math.round(v * 100) / 100), unit: c.unit, limit: c.limit,
-      result: c.pass === null ? 'no data' : c.pass ? 'pass' : 'fail', sourceTitle: c.source.title, sourceUrl: c.source.url,
+      result: c.pass === false ? 'fail' : 'pass', sourceTitle: c.source.title, sourceUrl: c.source.url,
+      provenance: c.provenance ?? 'observed', ...(c.provenance && c.provenance !== 'observed' ? { method: c.method } : {}),
     })),
+    estimated: !!chk.estimated,
     ellipse: {
       semiMajorKm: chk.ellipse.semiMajorKm, semiMinorKm: chk.ellipse.semiMinorKm, azimuthDeg: chk.ellipse.azimuthDeg,
       sourceTitle: chk.ellipse.source.title, sourceUrl: chk.ellipse.source.url,
@@ -169,13 +172,16 @@ function checkBrief(chk: import('../globalSci').LandingCheckResult) {
 }
 
 /** Plain words for a landing verdict (never the raw "fails-some" code). */
-export function plainVerdict(chk: { verdict: string; criteria: { label: string; pass: boolean | null }[] }): string {
-  if (chk.verdict === 'meets-all') return 'Meets every listed criterion';
-  if (chk.verdict === 'fails-some') {
-    const fails = chk.criteria.filter((c) => c.pass === false);
-    return `Fails ${fails.length} of ${chk.criteria.length} criteria: ${fails.map((c) => c.label).join(', ')}`;
-  }
-  return 'Not enough data';
+export function plainVerdict(chk: { verdict: string; estimated?: boolean; criteria: { label: string; pass: boolean | null }[] }): string {
+  const est = chk.estimated ? ' (includes estimates)' : '';
+  const fails = chk.criteria.filter((c) => c.pass === false);
+  if (fails.length) return `Fails ${fails.length} of ${chk.criteria.length} criteria: ${fails.map((c) => c.label).join(', ')}${est}`;
+  return `Meets every listed criterion${est}`;
+}
+/** Short verdict for the map tag next to the ellipse: "Meets criteria, est." or "Fails 1 of 8". */
+export function tagVerdict(chk: { estimated?: boolean; criteria: { pass: boolean | null }[] }): string {
+  const f = chk.criteria.filter((c) => c.pass === false).length;
+  return f ? `Fails ${f} of ${chk.criteria.length}${chk.estimated ? ', est.' : ''}` : `Meets criteria${chk.estimated ? ', est.' : ''}`;
 }
 
 const toneOf = (v: string): 'ok' | 'warn' | 'bad' => (v === 'meets-all' ? 'ok' : v === 'fails-some' ? 'bad' : 'warn');
@@ -198,7 +204,7 @@ function resolvePoint(t: Target, deps: ToolDeps, label?: string): WorldPoint {
     return snap.base;
   }
   if (!inBounds(snap, t)) {
-    throw new ToolError('out_of_bounds', 'That coordinate is outside the loaded terrain tile. No verified data available there.', { demBounds: snap.demBounds });
+    throw new ToolError('out_of_bounds', 'That coordinate is outside the loaded terrain tile; use get_site_conditions for the global layers there.', { demBounds: snap.demBounds });
   }
   return deps.world.makePoint(t.lon, t.lat, 'agent', label);
 }
@@ -349,7 +355,7 @@ export const TOOLS: ToolDef[] = [
         nearestRoverTraverse: trav ? { sol: trav.sol, distanceM: r0(trav.distanceM), lon: rc(trav.lon), lat: rc(trav.lat) } : null,
         coverage: inside
           ? 'Inside the loaded terrain tile (20 m DEM posting).'
-          : 'Outside the loaded terrain tile. No verified data available.',
+          : 'Outside the loaded terrain tile: the global layers (get_site_conditions) cover it.',
         missing: [
           p.elevationM == null ? 'elevation' : null, geo ? null : 'geology', trav ? null : 'traverse',
         ].filter(Boolean),
@@ -379,7 +385,7 @@ export const TOOLS: ToolDef[] = [
           id: s.id, name: s.name, lon: rc(s.lon), lat: rc(s.lat), distanceKm: r1(s.distanceKm), objectives: s.objectives,
           summary: clip(s.summary, 240), sourceTitle: s.sourceTitle, sourceUrl: s.sourceUrl, mission: s.mission,
         })),
-        note: sites.length ? undefined : 'No verified data available (no curated science site in this radius).',
+        note: sites.length ? undefined : 'None found (no curated science site in this radius).',
         provenance: { sites: sites.length ? prov('observed', 'NASA mission publications (see sourceTitle)') : prov('unavailable', 'curated science sites'), geology: geo ? prov('observed', geo.source.title || SRC_GEO) : prov('unavailable', SRC_GEO) },
       };
     },
@@ -393,7 +399,7 @@ export const TOOLS: ToolDef[] = [
       const p = resolvePoint(target, deps);
       const res = await deps.science.roverImagesNear(ll(p), maxDistanceM, 6);
       if (!res || res.images.length === 0) {
-        return { images: [], note: 'No verified data available (no rover images within that distance).', provenance: prov('unavailable', 'Perseverance raw images') };
+        return { images: [], note: 'None found (no rover images within that distance).', provenance: prov('unavailable', 'Perseverance raw images') };
       }
       const images = res.images.map((i) => ({ id: i.id, url: i.url, pageUrl: i.pageUrl, sol: i.sol, earthDate: i.earthDate, camera: i.camera, credit: i.credit }));
       return {
@@ -456,7 +462,7 @@ export const TOOLS: ToolDef[] = [
         stops: stops.map((s) => ({
           label: s.label, lon: rc(s.lon), lat: rc(s.lat), distanceKm: r1(s.distanceKm), why: clip(s.why, 200), unit: s.unit, siteId: s.siteId, sourceUrl: s.sourceUrl,
         })),
-        note: stops.length ? undefined : 'No verified data available (no candidate within that range).',
+        note: stops.length ? undefined : 'None found (no candidate within that range).',
         provenance: stops.length ? prov('observed', 'USGS SIM 3464 units and curated NASA science sites') : prov('unavailable', 'science stops'),
       };
     },
@@ -534,7 +540,7 @@ export const TOOLS: ToolDef[] = [
           leg: h.leg, startIdx: h.startIdx, endIdx: h.endIdx, lengthM: r0(h.lengthM), meanSlopeDeg: r1(h.meanSlopeDeg), maxSlopeDeg: r1(h.maxSlopeDeg),
           kind: h.kind, start: { lon: rc(h.start.lon), lat: rc(h.start.lat) }, end: { lon: rc(h.end.lon), lat: rc(h.end.lat) },
         })),
-        note: hz.length ? undefined : 'No verified data available (no hazard segments returned).',
+        note: hz.length ? undefined : 'None found (no hazard segments returned).',
         provenance: prov('computed', `segment slopes from ${SRC_DEM}`),
       };
     },
@@ -626,7 +632,7 @@ export const TOOLS: ToolDef[] = [
       const g = needGlobal(deps);
       const chk = g.checkLandingSite(lon, lat);
       const cmds: GlobeCommand[] = [
-        { type: 'globe_marker', id: 'landing-marker', lon: chk.site.lon, lat: chk.site.lat, label: plainVerdict(chk), kind: 'landing' },
+        { type: 'globe_marker', id: 'landing-marker', lon: chk.site.lon, lat: chk.site.lat, label: tagVerdict(chk), kind: 'landing' },
       ];
       if (Number.isFinite(chk.ellipse.semiMajorKm)) {
         cmds.push({
@@ -663,7 +669,9 @@ export const TOOLS: ToolDef[] = [
       };
       const res = await runLandingScenario(req);
       const rec = putScenario(req, res);
-      const tone = res.okFraction >= 0.95 ? 'ok' : res.okFraction >= 0.8 ? 'warn' : 'bad';
+      // GO / HOLD / NO GO from the one documented rule (lib/scenario/verdict.ts)
+      const verdict = landingVerdict(res, ell, a.maxSlopeDeg);
+      const tone = verdict.verdict === 'GO' ? 'ok' : verdict.verdict === 'HOLD' ? 'warn' : 'bad';
       const pct = (x: number) => Math.round(x * 1000) / 10;
       const globe = applyGlobe(deps, [
         { type: 'globe_ellipse', id: 'landing-ellipse', lon: a.lon, lat: a.lat, semiMajorKm: ell.semiMajorKm, semiMinorKm: ell.semiMinorKm, azimuthDeg: ell.azimuthDeg, label: `${pct(res.okFraction)}% within ${a.maxSlopeDeg}°`, tone },
@@ -682,6 +690,7 @@ export const TOOLS: ToolDef[] = [
         ellipse: { ...ell, usedDefault: !a.ellipse },
         terrainModel: dem === 'jezero20m' ? `Jezero CTX DEM, ${res.demResM} m posting` : `global DEM, ~${m?.dem.resKm ?? '?'} km posting`,
         engine: res.engine, computeMs: r0(res.computeMs), seed: req.seed,
+        verdict: { word: verdict.verdict, label: verdict.label, tone: verdict.tone, reason: verdict.reason, rule: verdict.rule, estimated: verdict.estimated, calc: landingVerdictCalc(res, verdict) },
         note: dem === 'global'
           ? 'Coarse global DEM: slopes are averaged over kilometres and miss boulders and small craters, so this is an optimistic regional view. Pick a site inside Jezero for 20 m terrain.'
           : '20 m DEM: boulders and sub-20 m slopes are not resolved.',
@@ -699,7 +708,7 @@ export const TOOLS: ToolDef[] = [
     run: ({ lon, lat }, deps) => {
       const g = needGlobal(deps);
       const phases = g.edlPhases();
-      if (!phases.length) throw new ToolError('no_edl', 'No verified data available (EDL timeline not loaded).');
+      if (!phases.length) throw new ToolError('no_edl', 'The EDL timeline is still loading; try again.');
       // Schematic approach track: 40 km long, from the west. NASA's pages give no ground track, so it is illustrative.
       const dLon = 40 / ((Math.PI / 180) * 3396.19 * Math.max(Math.cos((lat * Math.PI) / 180), 0.05));
       const from = { lon: Math.max(-180, lon - dLon), lat };

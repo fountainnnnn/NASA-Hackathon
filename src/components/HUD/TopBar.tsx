@@ -52,7 +52,9 @@ export function TopBar() {
   // a simulation counts only while its timeline is on screen; when it collapses the mission clock returns to T+00:00:00
   const simOn = useSimLoaded();
   // mission instant: EVA start plus scenario time while a walk plays, otherwise now
-  const when = simOn && walkOn && kind !== 'landing' ? start + t * 1000 : now;
+  // landing: the descent is timed to touch down at 10:00 local solar time at the site (daylight), entry + scenario time
+  const landStart = useHud((h) => h.landing?.startUtcMs);
+  const when = simOn && walkOn && kind !== 'landing' ? start + t * 1000 : simOn && kind === 'landing' && landStart ? landStart + t * 1000 : now;
   let ltst = '', sun = '';
   if (now && site) try {
     ltst = formatHms(ltstHours(marsState(when), site.lon)).slice(0, 5);

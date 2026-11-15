@@ -23,7 +23,7 @@ const KIND_LABEL: Record<WorkStep['kind'], string | null> = { input: null, model
 function Step({ st }: { st: WorkStep }) {
   const [raw, setRaw] = useState(false);
   return (
-    <li className={s.step} data-kind={st.kind} data-tone={st.tone}>
+    <li className={s.step} id={`step-${st.id}`} data-kind={st.kind} data-tone={st.tone}>
       <span className={s.pin} aria-hidden />
       <div className={s.stepT}>
         <b>{st.title}</b>
@@ -45,21 +45,47 @@ function Step({ st }: { st: WorkStep }) {
   );
 }
 
-/** The full report card: one row of actions (Open, then the four exports). Shown on the latest turn that changed the plan. */
+/**
+ * The report call to action (QA round 3): a full-width card with an ochre border, one prominent "Open report" button and
+ * the four exports as a secondary row. Shown on the latest turn that changed the plan.
+ */
 export function ReportCard() {
   return (
-    <div className={s.rep}>
+    <div className={s.rep} data-cta>
       <div className={s.repTop}>
-        <FileText size={18} strokeWidth={1.5} aria-hidden />
-        <div><b>Mission planning report</b><small>8 sections, every formula, inputs, sources and the full agent trace</small></div>
+        <FileText size={20} strokeWidth={1.5} aria-hidden />
+        <div><b>Mission planning report</b><small>8 sections, every formula, inputs, sources and the agent trace</small></div>
       </div>
-      <div className={s.acts}>
-        <button type="button" className={s.act} data-pri onClick={() => openReport()}><FileSearch size={12} strokeWidth={1.75} aria-hidden />Open</button>
+      <button type="button" className={s.repOpen} onClick={() => openReport()}><FileSearch size={15} strokeWidth={1.75} aria-hidden />Open report</button>
+      <div className={s.acts} aria-label="Export the report">
         <button type="button" className={s.act} title="Print the report to PDF" onClick={() => exportReport('pdf')}>PDF</button>
-        <button type="button" className={s.act} title="Download the report as Markdown" onClick={() => exportReport('md')}>MD</button>
+        <button type="button" className={s.act} title="Download the report as Markdown" onClick={() => exportReport('md')}>Markdown</button>
         <button type="button" className={s.act} title="Download every input, tool call and formula as JSON" onClick={() => exportReport('json')}>JSON</button>
         <button type="button" className={s.act} title="Download the route legs with per-vertex elevation" onClick={() => exportReport('geojson')}>GeoJSON</button>
       </div>
+    </div>
+  );
+}
+
+/** "Why GO": the verdict word (display face, coloured) and 2 to 4 plain lines, each linked to its step in the working. */
+function WhyBlock({ t }: { t: Turn }) {
+  const why = t.answer!.why!;
+  const open = (pat: string) => {
+    const re = new RegExp(pat, 'i');
+    const st = t.steps.find((x) => re.test(x.title));
+    const turn = document.getElementById(`turn-${t.id}`);
+    const det = turn?.querySelector('details');
+    if (det) det.open = true;
+    const el = st ? document.getElementById(`step-${st.id}`) : det;
+    const log = turn?.closest('[role=log]') as HTMLElement | null;
+    if (el && log) requestAnimationFrame(() => { log.scrollTop = Math.max(0, el.getBoundingClientRect().top - log.getBoundingClientRect().top + log.scrollTop - 8); });
+  };
+  return (
+    <div className={s.why} aria-label={`Why ${why.word}`}>
+      <div className={s.whyHd}>Why <span className={s.whyWord} data-tone={why.tone}>{why.word}</span></div>
+      <ul>{why.lines.map((l, i) => <li key={i}>{l.step && t.steps.some((x) => new RegExp(l.step!, 'i').test(x.title))
+        ? <button type="button" className={s.whyLink} onClick={() => open(l.step!)} title="Show the calculation in How I worked it out">{l.text}</button>
+        : l.text}</li>)}</ul>
     </div>
   );
 }
@@ -104,7 +130,7 @@ function TurnView({ t, flash, fullReport }: { t: Turn; flash: boolean; fullRepor
         )}
         {r.complete && t.recompute && (
           <div className={s.recompute}>
-            <h4><Calculator size={13} strokeWidth={1.5} aria-hidden />{t.recompute.title}<span className={s.n}>deterministic</span></h4>
+            <h4><Calculator size={13} strokeWidth={1.5} aria-hidden />{t.recompute.title}<span className={s.n}>fixed code</span></h4>
             <Code lines={t.recompute.code} label={t.recompute.title} />
           </div>
         )}
@@ -114,6 +140,7 @@ function TurnView({ t, flash, fullReport }: { t: Turn; flash: boolean; fullRepor
             <Rich text={t.answer.text} unverified={t.answer.unverified} />
           </p>
         )}
+        {r.complete && t.answer?.why && <WhyBlock t={t} />}
         {r.complete && t.answer?.unverified && t.answer.unverified.length > 0 && <p className={s.src}>Underlined numbers were not found in any tool result.</p>}
         {r.complete && t.answer?.rows && t.answer.rows.length > 0 && (
           <div className={s.mini} role="table" aria-label="Key numbers">
@@ -176,6 +203,7 @@ export function Panel() {
     const t = [...done].reverse().find((x) => x.report);
     return t && (t.card?.word || t.id === done.at(-1)?.id) ? t.id : null;
   }, [turns]);
+  const hasReport = turns.some((t) => t.report && t.status !== 'working');
   const narrLen = turns.reduce((n, t) => n + t.narration.length + (t.status === 'working' ? 0 : 1), 0) * 1000 + shown;
 
   // follow the conversation: keep the newest turn in view while it streams (only scroll the thread, never the page)
@@ -198,6 +226,7 @@ export function Panel() {
     <aside id="marsagent-panel" className={s.panel} aria-label="MarsAgent" hidden={!open} data-log data-avoid>
       <div className={s.head}>
         <h2>MarsAgent</h2>
+        {hasReport && <button type="button" className={s.headRep} onClick={() => openReport()} title="Open the latest mission planning report"><FileText size={13} strokeWidth={1.5} aria-hidden />Report</button>}
         <button type="button" className={s.voice} role="switch" aria-checked={narrate} onClick={() => useShell.getState().setNarrate(!narrate)} title="Reads each narration line with your browser's speech synthesis">
           {narrate ? <Volume2 size={14} strokeWidth={1.5} aria-hidden /> : <VolumeX size={14} strokeWidth={1.5} aria-hidden />}
           <span>Narrate aloud<small>synthetic voice</small></span>

@@ -20,6 +20,14 @@ export interface ScenarioGrid {
   demResM: number;
 }
 
+/**
+ * Running tallies recorded by the TS engine at each kept (rendered) point, in draw order: after `runs[k]` draws,
+ * `ok[k]` were at or under the slope limit and `nodata[k]` had no slope data. The Monte-Carlo playback uses them so the
+ * live counter is exact. The WASM engine does not record them (the playback then estimates from the kept points).
+ */
+export interface RunningCounts { runs: Uint32Array; ok: Uint32Array; nodata: Uint32Array }
+export type LandingScenarioResultWithRunning = LandingScenarioResult & { running?: RunningCounts };
+
 export interface ScenarioOptions {
   /** 'gaussian' (default): 2-D Gaussian with 3 sigma = ellipse semi-axes, truncated at the ellipse.
    *  'uniform': uniform over the ellipse area. */

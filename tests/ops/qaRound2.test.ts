@@ -145,3 +145,13 @@ describe('view from the ground: Perseverance frame choice', () => {
     expect(selectImages([a, b], 2)).toHaveLength(1); // 31 s apart: one look
   });
 });
+
+describe('view from the ground: one frame per sol and camera (QA round 3, P2-11)', () => {
+  const im = (id: string, sol: number, camera: string, sclk: number, az: number): RoverImage => ({
+    id, sol, earthDate: '2022-01-01', camera, cameraFull: camera, url: `https://mars.nasa.gov/${id}.jpg`, credit: 'NASA/JPL-Caltech', sclk, mastElDeg: -4, mastAzDeg: az,
+  });
+  it('drops a second frame from the same sol and camera, even in another direction', () => {
+    expect(selectImages([im('a', 538, 'NAVCAM_LEFT', 0, 30), im('b', 538, 'NAVCAM_RIGHT', 5000, 200)], 2)).toHaveLength(1);
+    expect(selectImages([im('a', 538, 'NAVCAM_LEFT', 0, 30), im('b', 539, 'NAVCAM_LEFT', 90000, 200)], 2)).toHaveLength(2);
+  });
+});

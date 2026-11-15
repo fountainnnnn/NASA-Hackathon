@@ -113,7 +113,7 @@ test.describe('HeyMars', () => {
     const f = S.lastTurn(page);
     await expect(f).toContainText('Asked in the panel');
     await expect(f).toContainText('Recomputed battery at 300 W');
-    await expect(f).toContainText('deterministic');
+    await expect(f).toContainText('fixed code');
     await expect(f.getByLabel('Recomputed battery at 300 W', { exact: true })).toContainText('used = P × t ÷ C = 300 W');
     expect(allowed(log.errors), log.errors.join('\n')).toEqual([]);
   });

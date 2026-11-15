@@ -89,17 +89,21 @@ function PointerTools({ onPlan, onLasso, preview, clearPreview }: JezeroLayerPro
       return Math.hypot(dN, dE) < 400 ? { lon: b.lon, lat: b.lat } : p;
     };
 
-    // touch: one finger plans (or lassos with the Lasso tool); a second finger hands the gesture to orbit and zoom
+    // drawing happens only with the Plan or Lasso tool on (rail); without one, every drag is camera navigation.
+    // Touch: with a tool on, one finger draws and a second finger hands the gesture to orbit and zoom
     const touches = new Set<number>();
     let owner = -1;
+    const toolNow = () => useShell.getState().tool;
     const onDown = (e: PointerEvent) => {
+      const tool = toolNow();
+      if (tool !== 'plan' && tool !== 'lasso') return;
       if (e.pointerType === 'touch') {
         touches.add(e.pointerId);
         if (touches.size > 1) { if (mode !== 'none') onCancel(); return; }
       } else if (e.button !== 0 || e.pointerType !== 'mouse') return;
       owner = e.pointerId;
       down = { x: e.clientX, y: e.clientY }; moved = false;
-      if (e.shiftKey || useShell.getState().tool === 'lasso') { mode = 'lasso'; poly = [{ x: e.clientX, y: e.clientY }]; return; }
+      if (tool === 'lasso') { mode = 'lasso'; poly = [{ x: e.clientX, y: e.clientY }]; return; }
       const g = pick(e.clientX, e.clientY);
       if (g && insideBounds(bounds(), g.lon, g.lat)) { mode = 'plan'; start = snapToBase(g); } else mode = 'none';
     };
@@ -136,23 +140,34 @@ function PointerTools({ onPlan, onLasso, preview, clearPreview }: JezeroLayerPro
       if (m === 'plan' && start) {
         const g = pick(e.clientX, e.clientY);
         cb.current.clearPreview();
-        if (g && insideBounds(bounds(), g.lon, g.lat)) cb.current.onPlan(start, g);
+        // a committed plan returns the map to navigation
+        if (g && insideBounds(bounds(), g.lon, g.lat)) { cb.current.onPlan(start, g); useShell.getState().setTool(null); }
       } else if (m === 'lasso') {
         const step = Math.max(1, Math.floor(poly.length / 32));
         const ll = poly.filter((_, i) => i % step === 0).map((q) => pick(q.x, q.y)).filter((q): q is LonLat => !!q);
         useHud.getState().patch({ lasso: null, lassoLabel: null });
-        if (ll.length >= 3) { setLassoOutline(ll); cb.current.onLasso(ll, polygonAreaKm2(ll)); }
+        if (ll.length >= 3) { setLassoOutline(ll); cb.current.onLasso(ll, polygonAreaKm2(ll)); useShell.getState().setTool(null); }
       }
       start = null;
     };
     function onCancel() { window.clearTimeout(timer); mode = 'none'; moved = false; useHud.getState().patch({ dragging: false, lasso: null, lassoLabel: null }); cb.current.clearPreview(); }
     const onTouchGone = (e: PointerEvent) => { touches.delete(e.pointerId); if (e.pointerId === owner) onCancel(); };
 
+    // Esc leaves the tool; the cursor shows which mode the left button is in
+    const onKey = (e: KeyboardEvent) => {
+      const t = toolNow();
+      if (e.key === 'Escape' && (t === 'plan' || t === 'lasso')) { if (mode !== 'none') onCancel(); useShell.getState().setTool(null); }
+    };
+    const setCursor = (t: string | null) => { el.style.cursor = t === 'plan' || t === 'lasso' ? 'crosshair' : 'grab'; el.dataset.tool = t ?? 'navigate'; };
+    setCursor(toolNow());
+    const unsub = useShell.subscribe((st) => setCursor(st.tool));
     el.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     el.addEventListener('pointercancel', onTouchGone);
+    window.addEventListener('keydown', onKey);
     return () => {
+      unsub(); window.removeEventListener('keydown', onKey); el.style.cursor = ''; delete el.dataset.tool;
       window.clearTimeout(timer);
       el.removeEventListener('pointerdown', onDown);
       window.removeEventListener('pointermove', onMove);

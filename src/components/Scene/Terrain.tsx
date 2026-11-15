@@ -9,6 +9,10 @@ import { useRuntime } from '@/state/services';
 import { useHover } from '@/state/ui';
 import { useWorld } from '@/state/world';
 import { useWalkUi } from '@/components/Scenario/walkStore';
+import { sampleAtTime } from '@/components/Scenario/model';
+import { useWalkTimeline } from '@/components/Ops/useWalk';
+import { useHud } from '@/state/hud';
+import { usePlayback } from '@/state/playback';
 import { createTerrainMaterial } from './terrainMaterial';
 import { PATCH_BLEND_M } from './contextGrid';
 import { hoverPoint, pickPoint } from './pick';
@@ -95,6 +99,8 @@ function useHirise(uniforms: ReturnType<typeof createTerrainMaterial>['uniforms'
   const { rt, grid } = useScene();
   const { camera, gl } = useThree();
   const st = useRef({ meta: null as HiriseMeta | null, state: 'idle' as 'idle' | 'loading' | 'ready' | 'failed', tex: [] as THREE.Texture[] });
+  const tl = useWalkTimeline();
+  const tlRef = useRef(tl); tlRef.current = tl;
   useEffect(() => { void loadHiriseMeta().then((m) => { st.current.meta = m; }); }, []);
   useEffect(() => () => { st.current.tex.forEach((t) => t.dispose()); }, []);
   useFrame((_, dt) => {
@@ -117,9 +123,12 @@ function useHirise(uniforms: ReturnType<typeof createTerrainMaterial>['uniforms'
     const want = s.state === 'ready' ? 1 - Math.min(1, Math.max(0, (h - HIRISE_FULL_BELOW_M) / (HIRISE_NONE_ABOVE_M - HIRISE_FULL_BELOW_M))) : 0;
     const cur = uniforms.uHiriseMix.value;
     uniforms.uHiriseMix.value = cur + Math.max(-dt / 0.5, Math.min(dt / 0.5, want - cur));
-    // the legend names HiRISE while the ground under the camera is draped with it
-    const r = uniforms.uHiriseRect.value, x = camera.position.x, z = camera.position.z;
-    useWalkUi.getState().setHirise(uniforms.uHiriseMix.value > 0.5 && x > r.x && x < r.x + r.z && z > r.y && z < r.y + r.w);
+    // the legend names HiRISE only while the camera, and during a walk the crew, are inside the fully draped part of the
+    // patch (120 m in from its edge, where it fades to CTX); anywhere else it names CTX (QA round 3, P2-12)
+    const r = uniforms.uHiriseRect.value, IN = 120;
+    const inside = (x: number, z: number) => x > r.x + IN && x < r.x + r.z - IN && z > r.y + IN && z < r.y + r.w - IN;
+    const crew = useHud.getState().walkOn && tlRef.current ? sampleAtTime(tlRef.current, usePlayback.getState().t) : null;
+    useWalkUi.getState().setHirise(uniforms.uHiriseMix.value > 0.5 && inside(camera.position.x, camera.position.z) && (!crew || inside(crew.x, crew.z)));
   });
 }
 

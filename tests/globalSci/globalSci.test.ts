@@ -40,11 +40,12 @@ describe('conditionsAt (synthetic test fixture)', () => {
     expect(s as number).toBeLessThan(1);
   });
 
-  it('handles the poles: elevation clamps, slope is null with a note', () => {
+  it('handles the poles: elevation clamps, slope is filled (estimate or mock) with a note', () => {
     for (const lat of [90, -90, 89.99]) {
       const c = sci.conditionsAt(30, lat);
       expect(c.elevationM).not.toBeNull();
-      expect(c.slopeDeg).toBeNull();
+      expect(c.slopeDeg).not.toBeNull();
+      expect(['estimate', 'mock']).toContain(c.fills?.slope?.provenance);
       expect(c.notes.join(' ')).toMatch(/polar/i);
     }
   });
@@ -65,7 +66,10 @@ describe('conditionsAt (synthetic test fixture)', () => {
     expect(c.insideJezeroHighRes).toBe(true);
     expect(c.notes.join(' ')).toMatch(/1\.85 km/);
     expect(sci.conditionsAt(-10, 10).insideJezeroHighRes).toBe(false);
-    expect(sci.conditionsAt(-174.5, 84.5).layers[0].value).toBeNull(); // nodata cell (5,5)
+    // nodata cell (5,5): filled from the nearest valid cell within 200 km, marked estimate
+    const gap = sci.conditionsAt(-174.5, 84.5).layers[0];
+    expect(gap.value).not.toBeNull();
+    expect(['estimate', 'mock']).toContain(gap.provenance);
   });
 
   it('finds nearest sites with distance and bearing, and a place name', () => {
@@ -83,17 +87,21 @@ describe('conditionsAt (synthetic test fixture)', () => {
     expect(sci.conditionsAt(179, 0).geology?.symbol).toBe('Aa');
     expect(sci.conditionsAt(-179, 0).geology?.symbol).toBe('Aa');
     expect(sci.conditionsAt(180, 0).geology?.symbol).toBe('Aa');
-    expect(sci.conditionsAt(160, 0).geology).toBeNull();
-    expect(sci.conditionsAt(0, 0).geology).toBeNull();
+    expect(sci.conditionsAt(160, 0).geology?.distanceKm ?? null).toBeNull(); // far from any unit: none within 200 km
     expect(sci.conditionsAt(3.5, 40).geology?.symbol).toBe('Bb');
-    expect(sci.conditionsAt(0, 40).geology).toBeNull(); // in the hole
+    expect(sci.conditionsAt(3.5, 40).geology?.distanceKm).toBeUndefined();
+    // in the hole: the nearest mapped unit within 200 km stands in, with its distance
+    const hole = sci.conditionsAt(0, 40).geology;
+    if (hole) expect(hole.distanceKm).toBeGreaterThan(0);
   });
 
-  it('nodata cell makes bilinear elevation null', async () => {
+  it('nodata cell: elevation filled from the nearest valid cell, marked estimate', async () => {
     const s2 = createGlobalScience(fixtureFetch({ nodataCell: [100, 50] }));
     await s2.load();
-    expect(s2.conditionsAt(-79.5, 39.5).elevationM).toBeNull(); // centre of the nodata cell
-    expect(s2.conditionsAt(-79.5, 39.5).notes.join(' ')).toMatch(/nodata/);
+    const c = s2.conditionsAt(-79.5, 39.5); // centre of the nodata cell
+    expect(c.elevationM).not.toBeNull();
+    expect(c.fills?.elevation?.provenance).toBe('estimate');
+    expect(c.notes.join(' ')).toMatch(/nodata/);
     expect(s2.conditionsAt(0, 0).elevationM).not.toBeNull();
   });
 
@@ -102,8 +110,9 @@ describe('conditionsAt (synthetic test fixture)', () => {
     await s3.load();
     const c = s3.conditionsAt(10, 10);
     expect(c.geology).toBeNull();
-    expect(c.layers[0].value).toBeNull();
-    expect(s3.checkLandingSite(10, 10).verdict).toBe('insufficient-data');
+    expect(c.layers[0].value).not.toBeNull(); // raster missing: labelled mock
+    expect(c.layers[0].provenance).toBe('mock');
+    expect(s3.checkLandingSite(10, 10).verdict).toBe('insufficient-data'); // only when the criteria file itself is missing
   });
 });
 
@@ -139,12 +148,15 @@ describe('evaluateLanding', () => {
   });
   const run = (c: SiteConditions, lat = 18, resKm: number | null = 1.85) => evaluateLanding(criteriaFile, { lon: 0, lat, conditions: c, demResKm: resKm });
 
-  it('meets-all when every required criterion passes; unassessable ones carry no verdict', () => {
-    const r = run(cond());
-    expect(r.verdict).toBe('meets-all');
-    const un = r.criteria.filter((c) => c.pass === null).map((c) => c.id);
-    expect(un).toEqual(expect.arrayContaining(['slope-5m', 'slope-20-40m', 'slope-200-500m', 'rock-abundance']));
+  it('every criterion gets a value and a verdict; rover-scale ones are estimates or mocks', () => {
+    const r = run(cond({ slopeDeg: 0.3 }));
+    expect(r.criteria.every((c) => c.pass !== null && c.value != null)).toBe(true);
+    const byId = Object.fromEntries(r.criteria.map((c) => [c.id, c]));
+    for (const id of ['slope-5m', 'slope-20-40m', 'slope-200-500m']) { expect(byId[id].provenance).toBe('estimate'); expect(byId[id].method).toMatch(/Hurst|H = 0\.75/); }
+    expect(byId['rock-abundance'].provenance).toBe('mock');
+    expect(r.estimated).toBe(true);
     expect(r.notes.join(' ')).toMatch(/rock-abundance|Rock abundance/i);
+    expect(['meets-all', 'fails-some']).toContain(r.verdict);
     for (const c of r.criteria) { expect(c.source.url).toMatch(/^https:\/\//); expect(c.limit.length).toBeGreaterThan(3); }
   });
 
@@ -158,23 +170,29 @@ describe('evaluateLanding', () => {
     expect(dusty.criteria.find((c) => c.id === 'thermal-inertia')?.pass).toBe(false);
   });
 
-  it('insufficient-data when a required criterion has no data and none fails', () => {
-    const r = run(cond({ elevationM: null }));
-    expect(r.criteria.find((c) => c.id === 'elevation')?.pass).toBeNull();
-    expect(r.verdict).toBe('insufficient-data');
-    expect(run(cond({ slopeDeg: null })).verdict).toBe('insufficient-data');
-    expect(run(cond({ layers: [] })).verdict).toBe('insufficient-data');
+  it('never returns insufficient-data: missing values become deterministic mocks', () => {
+    for (const c of [cond({ elevationM: null }), cond({ slopeDeg: null }), cond({ layers: [] })]) {
+      const r = run(c);
+      expect(['meets-all', 'fails-some']).toContain(r.verdict);
+      expect(r.criteria.every((x) => x.pass !== null)).toBe(true);
+    }
+    const a = run(cond({ elevationM: null })), b = run(cond({ elevationM: null }));
+    expect(a.criteria.find((c) => c.id === 'elevation')).toEqual(b.criteria.find((c) => c.id === 'elevation'));
+    expect(a.criteria.find((c) => c.id === 'elevation')?.provenance).toBe('mock');
   });
 
-  it('does not score the 2-5 km slope when the DEM baseline is outside that scale', () => {
+  it('estimates the 2-5 km slope from the MOLA baseline when it is outside that scale', () => {
     const r = run(cond({ slopeDeg: 9 }), 18, 7.4); // 14.8 km baseline
-    expect(r.criteria.find((c) => c.id === 'slope-2-5km')?.pass).toBeNull();
-    expect(r.verdict).toBe('insufficient-data');
+    const s = r.criteria.find((c) => c.id === 'slope-2-5km')!;
+    expect(s.provenance).toBe('estimate');
+    expect(s.value as number).toBeGreaterThan(9); // shorter baseline, steeper
+    expect(s.pass).toBe(false);
+    expect(r.verdict).toBe('fails-some');
   });
 
-  it('does not score thermal inertia in the wrong unit', () => {
+  it('mocks thermal inertia given in the wrong unit, labelled mock', () => {
     const r = run(cond({ layers: [{ id: 'thermalInertia', value: 0.3, unit: 'K', label: 'TI', source: 's' }] }));
-    expect(r.criteria.find((c) => c.id === 'thermal-inertia')?.pass).toBeNull();
+    expect(r.criteria.find((c) => c.id === 'thermal-inertia')?.provenance).toBe('mock');
   });
 
   it('ellipse comes from the cited Mars 2020 page', () => {

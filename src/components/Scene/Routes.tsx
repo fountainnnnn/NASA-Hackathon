@@ -11,7 +11,7 @@ import { GroundRibbon } from './GroundRibbon';
 import { useWalkTimeline } from '@/components/Ops/useWalk';
 import { useThrottledT } from '@/state/playback';
 import { MarkLine } from './MarkLine';
-import { setNearFade } from './lineFx';
+import { setFarDim, setNearFade } from './lineFx';
 import { lineY, renderedGroundAt, trueHeight, useScene } from './sceneCtx';
 import type { SceneCtxValue } from './sceneCtx';
 import { getOps } from '@/app/opsCache';
@@ -167,6 +167,10 @@ export function Routes() {
   // helmet view: marks fade in between 6 m and 30 m from the eye. Seen from eye height the path ahead projects onto the
   // middle of the view; faded like this it starts as a short ground line below the horizon instead of a bar from the boots up
   useEffect(() => { setNearFade(helmet ? 6 : 0, helmet ? 30 : 0); }, [helmet]);
+  // rover assist, chase view: route legs farther than 300 m from the camera drop to 30 % opacity (QA round 3, P1-7)
+  const walkOn = useHud((h) => h.walkOn), riding = useWalkUi((w) => w.roverFraction > 0);
+  const roverChase = walkOn && riding && !helmet;
+  useEffect(() => { setFarDim(roverChase ? 300 : 0, 0.3); return () => setFarDim(0); }, [roverChase]);
   const highlights = annotations.filter((a) => a.kind === 'highlight' && a.highlight);
   const ribbon = useHelmetLeg(helmet);
   const activeId = useHud((h) => h.activeRouteId);

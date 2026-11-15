@@ -46,7 +46,7 @@ export function SourcesSheet() {
     { title: manifest.dem.title.split(' (')[0], credit: manifest.dem.credit, url: manifest.dem.sourceUrl },
     ...manifest.layers.map((l) => ({ title: l.title, credit: l.credit, url: l.sourceUrl, flag: l.simulated ? 'Simulated, not NASA data.' : undefined })),
     ...(manifest.geology && !manifest.layers.some((l) => l.id === 'geology') ? [{ title: manifest.geology.title, credit: `${manifest.geology.authors} (${manifest.geology.year}), scale ${manifest.geology.scale}`, url: manifest.geology.url }] : []),
-  ] : [{ title: 'Global dataset not loaded', flag: 'No verified data is shown for the whole planet.' }];
+  ] : [{ title: 'Global dataset not loaded', flag: 'Reload the page to load the planet-wide layers.' }];
   const jezeroItems: Item[] = [
     ...(meta ? [{ title: demTitle(meta.productLabel, meta.nominalResM), credit: `${meta.datum}. ${meta.nominalResM} m posting.`, note: `File: ${meta.productLabel}`, url: meta.sourceUrl }] : []),
     ...(layers ?? []).map((l) => ({ title: l.title, credit: `${l.mission}, ${l.instrument}. ${l.credit}`, url: l.sourceUrl, note: l.note, flag: l.simulated ? 'Simulated, not NASA data.' : undefined })),

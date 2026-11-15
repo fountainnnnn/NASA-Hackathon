@@ -1,0 +1,17 @@
+/* Monte-Carlo testing counter (Planet/landing.ts): top right of the stage, mono, tabular. The phase caption and the legend
+   own the top left, the data credit the bottom right. On a phone stage it sits at the bottom left, above the credit. */
+.counter {
+  position: absolute; z-index: 5; pointer-events: none; box-sizing: border-box;
+  top: 8px; right: calc(var(--stage-right, var(--log-w, 0px)) + 8px); max-width: calc(100% - 300px); /* the caption (under 280 px) keeps the top left */
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: flex-end; column-gap: 18px; row-gap: 2px;
+  padding: 7px 10px; border-radius: 6px; background: var(--chip, rgba(6, 5, 5, 0.88)); border: 1px solid var(--line, rgba(236, 231, 225, 0.1));
+  font: 400 12px/1.4 var(--font-mono, "Martian Mono", ui-monospace, monospace); font-variant-numeric: tabular-nums;
+  color: var(--text-1, #ece7e1);
+}
+.counter > * { white-space: nowrap; }
+.ok { color: var(--text-1, #ece7e1); }
+.word { font: 400 12px/1.4 var(--font-display, "Michroma", sans-serif); letter-spacing: 0.04em; }
+.word:empty { display: none; }
+@media (max-width: 640px) {
+  .counter { top: auto; right: auto; left: 8px; bottom: calc(var(--inset, 0px) + 34px); justify-content: flex-start; max-width: calc(100% - 16px); }
+}

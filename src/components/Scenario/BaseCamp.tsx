@@ -9,6 +9,9 @@ import { computeReach, contourLevels, contourPolygon, reachAreaKm2 } from './rea
 import type { PlanRoundTrip, ReachResult } from './reach';
 import { blockedByHud } from '@/components/HUD/blocks';
 import { createRover } from './RoverAssist';
+import { BASE_DRAW_SCALE, useDrawScale } from '@/lib/scenario/drawScale';
+import { emitScenarioEnd } from '@/lib/scenario/outcome';
+import { reachVerdict } from '@/lib/scenario/verdict';
 import css from './scenario.module.css';
 
 /* ------------------------------------------------------------------ async reach hook (DOM or canvas side) */
@@ -147,6 +150,14 @@ export function BaseCamp({ centre, ground, reach = null, contourMinutes, scale =
   const rover = useMemo(createRover, []);
   const s0 = useRef(1);
   const lift = 1.2 * ground.exag;
+  useEffect(() => () => useDrawScale.getState().set('base', null), []);
+
+  // the reach run is complete (all plans in, not cancelled): its verdict for the shell's completion card, once per result
+  useEffect(() => {
+    if (!reach || reach.cancelled || !(reach.ms > 0) || !reach.samples.length) return;
+    const far = Math.max(...reach.samples.map((x) => x.radiusM));
+    emitScenarioEnd({ kind: 'base-camp', id: 'reach', ...reachVerdict(reachAreaKm2(reach.samples), far) });
+  }, [reach]);
 
   useFrame((_, dt) => {
     const g = root.current;
@@ -154,10 +165,11 @@ export function BaseCamp({ centre, ground, reach = null, contourMinutes, scale =
     const y = ground.y(local.x, local.z, null);
     const d = camera.position.distanceTo(new THREE.Vector3(local.x, y, local.z));
     // from the default reach camera (10 to 20 km out) the base is enlarged so it reads as a habitat (about 20 px across);
-    // true size from close range. Positions and contours are never scaled.
-    const target = scale === 'auto' ? Math.min(60, Math.max(1, d / 180)) : scale;
+    // at least BASE_DRAW_SCALE close up (the legend says how much). Positions and contours are never scaled.
+    const target = scale === 'auto' ? Math.min(60, Math.max(BASE_DRAW_SCALE, d / 180)) : scale;
     s0.current += (target - s0.current) * (1 - Math.exp(-8 * Math.min(0.1, dt)));
     const s = s0.current;
+    if (models) useDrawScale.getState().set('base', s);
     g.position.set(local.x, y, local.z);
     g.scale.setScalar(s);
     // each model stands on the real ground at its own offset

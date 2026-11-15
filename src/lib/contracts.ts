@@ -56,7 +56,7 @@ export interface LayerInfo {
 }
 export type LayerId = 'ctx' | 'themisDay' | 'themisNight' | 'geology' | 'slope' | 'traverse' | 'ellipse';
 
-export type Provenance = 'observed' | 'computed' | 'assumption' | 'unavailable';
+export type Provenance = 'observed' | 'computed' | 'assumption' | 'unavailable' | 'estimate' | 'mock';
 
 /** public/data/geology.json — USGS SIM 3464 units reprojected to lon/lat (east-positive). */
 export interface GeologyFile {

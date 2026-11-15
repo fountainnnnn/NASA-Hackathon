@@ -4,11 +4,21 @@
  */
 import type { LonLat } from '../../lib/contracts';
 import type { EdlPhase } from '../../lib/globeContracts';
+import type { RunningCounts } from '../../lib/scenario/types';
 import { landingDurationS } from '../Scenario/landing';
 import { usePlayback, type PlaybackSpeed } from '../../state/playback';
 import { useGlobal } from '../../state/services';
 
-export interface LandingSimResult { points: Float32Array; okFraction?: number }
+/**
+ * The Monte-Carlo result behind the touchdowns. Only `points` is required; the rest makes the live counter and the verdict
+ * exact when the run is not in the scenario store (the landing layer reads the stored result by scenario id otherwise).
+ */
+export interface LandingSimResult {
+  points: Float32Array; okFraction?: number;
+  samples?: number; nodataFraction?: number; slopeP95?: number; demResM?: number; running?: RunningCounts;
+  /** Stored scenario id ("S1", ...), when the result came from runLandingScenario + putScenario. */
+  scenarioId?: string;
+}
 export interface LandingSimOptions {
   maxSlopeDeg?: number;
   ellipse?: { semiMajorKm: number; semiMinorKm: number; azimuthDeg: number };
@@ -17,7 +27,7 @@ export interface LandingSimOptions {
   /** Draw the phase caption inside the planet view (default true; the HUD's own caption is not used on this path). */
   caption?: boolean;
 }
-export interface LandingSimSpec {
+export interface LandingSimSpec extends Omit<LandingSimResult, 'points'> {
   id: string; site: LonLat; points: Float32Array; maxSlopeDeg: number;
   ellipse?: LandingSimOptions['ellipse']; phases: EdlPhase[]; caption: boolean;
 }
@@ -46,7 +56,7 @@ export async function loadEdlPhases(): Promise<EdlPhase[]> {
 export async function startLandingSimulation(site: LonLat, result: LandingSimResult, opts: LandingSimOptions = {}): Promise<void> {
   const phases = await loadEdlPhases();
   const id = `sim-${++seq}`;
-  current = { id, site, points: result.points, maxSlopeDeg: opts.maxSlopeDeg ?? 15, ellipse: opts.ellipse, phases, caption: opts.caption ?? true };
+  current = { ...result, id, site, points: result.points, maxSlopeDeg: opts.maxSlopeDeg ?? 15, ellipse: opts.ellipse, phases, caption: opts.caption ?? true };
   usePlayback.getState().load({ scenarioId: `landing-${id}`, kind: 'landing', durationS: landingDurationS(phases), autoplay: true, speed: opts.speed ?? 60 });
   emit();
 }
