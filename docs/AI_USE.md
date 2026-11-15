@@ -10,7 +10,7 @@ The participant chose the challenge and wrote the brief: a map you point at and 
 
 | Tool | Purpose | How it was used | Human check | Limits |
 | --- | --- | --- | --- | --- |
-| Claude Code with Claude Opus 5.5 (Anthropic) | Coding orchestrator and builder | Planned modules, wrote and integrated code, ran tests, browser QA and deploys | The participant reviewed the running app and screenshots and approved each direction. TODO(verify): whether you also reviewed code line by line | Can write plausible but wrong code. Claims in the docs are tied to a test, a data file or a screenshot, or marked TODO |
+| Claude Code with Claude Opus 5.5 (Anthropic) | Coding orchestrator and builder | Planned modules, wrote and integrated code, ran tests, browser QA and deploys | The participant reviewed the architecture, the science and maths modules and their outputs, the running app and screenshots, and approved each direction. Most UI code was checked through tests and browser QA rather than line by line | Can write plausible but wrong code. Claims in the docs are tied to a test, a data file or a screenshot, or marked TODO |
 | Claude Sonnet subagents | Module implementation | Each owned separate files against shared interfaces (`src/lib/contracts.ts`, `src/lib/globeContracts.ts`) | Integrated and tested by the orchestrator | Same as above |
 | Claude Fable 5.2 | QA reviewer | Reviewed screenshots, the live app and docs against the requirements | Findings fixed and re-tested | Review can miss problems |
 | Codex CLI (OpenAI) | Early SVG art | Wrote 13 art files (12 SVG and a PNG favicon: a mascot, markers, wordmark) from text prompts, listed in `public/art/CREDITS.json` | Reviewed, then dropped from the UI | Not shown in the app now (see below) |
@@ -33,7 +33,7 @@ The server has a fallback model setting (`AGENT_FALLBACK_MODEL`) used only if th
 - **App.** No AI-generated images are shown. The MarsAgent reticle and map symbols are drawn in code. Icons are Lucide. The lander, parachute, heat shield, back shell, rover and astronauts are simple 3D models built in code. The favicon is the Next.js default. Rover photos are NASA/JPL-Caltech raw images, shown unaltered with credit.
 - **Leftover art.** `public/art/` still holds the 13 Codex art files and their prompts. The app does not reference them.
 - **Video.** No AI-generated images or video. Footage is a real screen capture of the app. Illustrations are HTML, CSS and SVG with Lucide icons.
-- **Audio.** The video's music bed is synthesised by a Python script (`deliverables/video/tools/music.py`, NumPy) written with AI assistance. No generative audio model was used, there is no voice, and nothing is sampled. TODO(verify): add an AI-assistance note to the video file's metadata (for example the comment tag) at final render.
+- **Audio.** The video's music bed is synthesised by a Python script (`deliverables/video/tools/music.py`, NumPy) written with AI assistance. No generative audio model was used, there is no voice, and nothing is sampled. The final MP4 carries this note in its comment metadata tag.
 - **Narrate aloud.** Off by default. It uses the browser's built-in speech synthesis and is labelled "synthetic voice".
 
 ## Rules we follow
