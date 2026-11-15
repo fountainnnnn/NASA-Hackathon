@@ -432,87 +432,73 @@
     </script>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="29" data-width="1920" data-height="1080">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="29.6" data-width="1920" data-height="1080">
       <div id="stage-ground" style="position: absolute; inset: 0; background: var(--stage, #17171a); opacity: 0"></div>
-      <div id="el-s01" class="scene" data-composition-id="s01" data-composition-src="scenes/s01-title.html" data-start="0.000" data-duration="2.2" data-track-index="0" data-width="1920" data-height="1080"></div>
-      <div id="el-s02" class="scene" data-composition-id="s02" data-composition-src="scenes/s02-hook.html" data-start="1.800" data-duration="3.2" data-track-index="1" data-width="1920" data-height="1080"></div>
-      <div id="el-s03" class="scene" data-composition-id="s03" data-composition-src="scenes/s03-orbit.html" data-start="4.600" data-duration="3" data-track-index="0" data-width="1920" data-height="1080"></div>
-      <div id="el-s04" class="scene" data-composition-id="s04" data-composition-src="scenes/s04-click.html" data-start="7.200" data-duration="4.4" data-track-index="1" data-width="1920" data-height="1080"></div>
-      <div id="el-s05" class="scene" data-composition-id="s05" data-composition-src="scenes/s05-agent.html" data-start="11.200" data-duration="2.6" data-track-index="0" data-width="1920" data-height="1080"></div>
-      <div id="el-s06" class="scene" data-composition-id="s06" data-composition-src="scenes/s06-steps.html" data-start="13.400" data-duration="3.2" data-track-index="1" data-width="1920" data-height="1080"></div>
-      <div id="el-s07" class="scene" data-composition-id="s07" data-composition-src="scenes/s07-replan.html" data-start="16.200" data-duration="3.8" data-track-index="0" data-width="1920" data-height="1080"></div>
-      <div id="el-s08" class="scene" data-composition-id="s08" data-composition-src="scenes/s08-sims.html" data-start="19.600" data-duration="4.4" data-track-index="1" data-width="1920" data-height="1080"></div>
-      <div id="el-s09" class="scene" data-composition-id="s09" data-composition-src="scenes/s09-report.html" data-start="23.600" data-duration="3.4" data-track-index="0" data-width="1920" data-height="1080"></div>
-      <div id="el-s10" class="scene" data-composition-id="s10" data-composition-src="scenes/s10-close.html" data-start="26.600" data-duration="2.4" data-track-index="1" data-width="1920" data-height="1080"></div>
-      <audio id="el-bgm" src="assets/bgm/bed-cut.wav" data-start="0" data-duration="29" data-track-index="10" data-volume="0.3"></audio>
+      <div id="el-s02" class="scene" data-composition-id="s02" data-composition-src="scenes/s02-hook.html" data-start="0.000" data-duration="2.8" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="el-s03" class="scene" data-composition-id="s03" data-composition-src="scenes/s03-orbit.html" data-start="2.400" data-duration="4.8" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s04" class="scene" data-composition-id="s04" data-composition-src="scenes/s04-click.html" data-start="6.800" data-duration="4.4" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="el-s06" class="scene" data-composition-id="s06" data-composition-src="scenes/s06-steps.html" data-start="10.800" data-duration="3" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s07" class="scene" data-composition-id="s07" data-composition-src="scenes/s07-replan.html" data-start="13.400" data-duration="5.6" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="el-s08" class="scene" data-composition-id="s08" data-composition-src="scenes/s08-sims.html" data-start="18.600" data-duration="5.2" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <div id="el-s09" class="scene" data-composition-id="s09" data-composition-src="scenes/s09-report.html" data-start="23.400" data-duration="3.2" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="el-s10" class="scene" data-composition-id="s10" data-composition-src="scenes/s10-close.html" data-start="26.200" data-duration="3.4" data-track-index="1" data-width="1920" data-height="1080"></div>
+      <!-- SI disclosure required by the Space Apps rules: small, constant, bottom right, clear of the caption band and credit -->
+      <div id="ai-mark" style="position: absolute; right: 28px; bottom: 22px; z-index: 50; padding: 5px 10px; border-radius: 4px; background: rgba(6, 5, 5, 0.5); color: rgba(236, 231, 225, 0.7); font: 500 17px/1.2 'Schibsted Grotesk', system-ui, sans-serif; letter-spacing: 0.01em; white-space: nowrap; pointer-events: none;">Made with AI assistance</div>
+      <audio id="el-bgm" src="assets/bgm/bed-cut.wav" data-start="0" data-duration="29.6" data-track-index="10" data-volume="0.3"></audio>
 
     </div>
     <script>
       const main = gsap.timeline({ paused: true });
-      main.fromTo("#s01-root", { scale: 1 }, { scale: 1.012, duration: 2.2, ease: "none", immediateRender: false }, 0);
-      main.fromTo("#s02-root", { scale: 1 }, { scale: 1.012, duration: 3.2, ease: "none", immediateRender: false }, 1.8);
-      main.set("#stage-ground", { opacity: 1 }, 1.8);
-      main.fromTo("#el-s01", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 1.8);
-      main.fromTo("#el-s01", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 1.8);
-      main.set("#el-s02", { opacity: 0, scale: 0.92 }, 1.8);
-      main.fromTo("#el-s02", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 1.98);
-      main.fromTo("#el-s02", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 1.98);
-      main.fromTo("#s03-root", { scale: 1 }, { scale: 1.012, duration: 3, ease: "none", immediateRender: false }, 4.6);
-      main.set("#stage-ground", { opacity: 1 }, 4.6);
-      main.fromTo("#el-s02", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 4.6);
-      main.fromTo("#el-s02", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 4.6);
-      main.set("#el-s03", { opacity: 0, scale: 1.08 }, 4.6);
-      main.fromTo("#el-s03", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 4.78);
-      main.fromTo("#el-s03", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 4.78);
-      main.fromTo("#s04-root", { scale: 1 }, { scale: 1.012, duration: 4.4, ease: "none", immediateRender: false }, 7.2);
-      main.set("#stage-ground", { opacity: 1 }, 7.2);
-      main.fromTo("#el-s03", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 7.2);
-      main.fromTo("#el-s03", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 7.2);
-      main.set("#el-s04", { opacity: 0, scale: 0.92 }, 7.2);
-      main.fromTo("#el-s04", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 7.38);
-      main.fromTo("#el-s04", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 7.38);
-      main.fromTo("#s05-root", { scale: 1 }, { scale: 1.012, duration: 2.6, ease: "none", immediateRender: false }, 11.2);
-      main.set("#stage-ground", { opacity: 1 }, 11.2);
-      main.fromTo("#el-s04", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 11.2);
-      main.fromTo("#el-s04", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 11.2);
-      main.set("#el-s05", { opacity: 0, scale: 1.08 }, 11.2);
-      main.fromTo("#el-s05", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 11.38);
-      main.fromTo("#el-s05", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 11.38);
-      main.fromTo("#s06-root", { scale: 1 }, { scale: 1.012, duration: 3.2, ease: "none", immediateRender: false }, 13.4);
+      main.fromTo("#s02-root", { scale: 1 }, { scale: 1.012, duration: 2.8, ease: "none", immediateRender: false }, 0);
+      main.fromTo("#s03-root", { scale: 1 }, { scale: 1.012, duration: 4.8, ease: "none", immediateRender: false }, 2.4);
+      main.set("#stage-ground", { opacity: 1 }, 2.4);
+      main.fromTo("#el-s02", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 2.4);
+      main.fromTo("#el-s02", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 2.4);
+      main.set("#el-s03", { opacity: 0, scale: 1.08 }, 2.4);
+      main.fromTo("#el-s03", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 2.58);
+      main.fromTo("#el-s03", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 2.58);
+      main.fromTo("#s04-root", { scale: 1 }, { scale: 1.012, duration: 4.4, ease: "none", immediateRender: false }, 6.8);
+      main.set("#stage-ground", { opacity: 1 }, 6.8);
+      main.fromTo("#el-s03", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 6.8);
+      main.fromTo("#el-s03", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 6.8);
+      main.set("#el-s04", { opacity: 0, scale: 0.92 }, 6.8);
+      main.fromTo("#el-s04", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 6.98);
+      main.fromTo("#el-s04", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 6.98);
+      main.fromTo("#s06-root", { scale: 1 }, { scale: 1.012, duration: 3, ease: "none", immediateRender: false }, 10.8);
+      main.set("#stage-ground", { opacity: 1 }, 10.8);
+      main.fromTo("#el-s04", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 10.8);
+      main.fromTo("#el-s04", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 10.8);
+      main.set("#el-s06", { opacity: 0, scale: 0.92 }, 10.8);
+      main.fromTo("#el-s06", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 10.98);
+      main.fromTo("#el-s06", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 10.98);
+      main.fromTo("#s07-root", { scale: 1 }, { scale: 1.012, duration: 5.6, ease: "none", immediateRender: false }, 13.4);
       main.set("#stage-ground", { opacity: 1 }, 13.4);
-      main.fromTo("#el-s05", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 13.4);
-      main.fromTo("#el-s05", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 13.4);
-      main.set("#el-s06", { opacity: 0, scale: 0.92 }, 13.4);
-      main.fromTo("#el-s06", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 13.58);
-      main.fromTo("#el-s06", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 13.58);
-      main.fromTo("#s07-root", { scale: 1 }, { scale: 1.012, duration: 3.8, ease: "none", immediateRender: false }, 16.2);
-      main.set("#stage-ground", { opacity: 1 }, 16.2);
-      main.fromTo("#el-s06", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 16.2);
-      main.fromTo("#el-s06", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 16.2);
-      main.set("#el-s07", { opacity: 0, scale: 1.08 }, 16.2);
-      main.fromTo("#el-s07", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 16.38);
-      main.fromTo("#el-s07", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 16.38);
-      main.fromTo("#s08-root", { scale: 1 }, { scale: 1.012, duration: 4.4, ease: "none", immediateRender: false }, 19.6);
-      main.set("#stage-ground", { opacity: 1 }, 19.6);
-      main.fromTo("#el-s07", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 19.6);
-      main.fromTo("#el-s07", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 19.6);
-      main.set("#el-s08", { opacity: 0, scale: 0.92 }, 19.6);
-      main.fromTo("#el-s08", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 19.78);
-      main.fromTo("#el-s08", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 19.78);
-      main.fromTo("#s09-root", { scale: 1 }, { scale: 1.012, duration: 3.4, ease: "none", immediateRender: false }, 23.6);
-      main.set("#stage-ground", { opacity: 1 }, 23.6);
-      main.fromTo("#el-s08", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 23.6);
-      main.fromTo("#el-s08", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 23.6);
-      main.set("#el-s09", { opacity: 0, scale: 1.08 }, 23.6);
-      main.fromTo("#el-s09", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 23.78);
-      main.fromTo("#el-s09", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 23.78);
-      main.fromTo("#s10-root", { scale: 1 }, { scale: 1.012, duration: 2.4, ease: "none", immediateRender: false }, 26.6);
-      main.set("#stage-ground", { opacity: 1 }, 26.6);
-      main.fromTo("#el-s09", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 26.6);
-      main.fromTo("#el-s09", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 26.6);
-      main.set("#el-s10", { opacity: 0, scale: 1.08 }, 26.6);
-      main.fromTo("#el-s10", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 26.78);
-      main.fromTo("#el-s10", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 26.78);
+      main.fromTo("#el-s06", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 13.4);
+      main.fromTo("#el-s06", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 13.4);
+      main.set("#el-s07", { opacity: 0, scale: 1.08 }, 13.4);
+      main.fromTo("#el-s07", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 13.58);
+      main.fromTo("#el-s07", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 13.58);
+      main.fromTo("#s08-root", { scale: 1 }, { scale: 1.012, duration: 5.2, ease: "none", immediateRender: false }, 18.6);
+      main.set("#stage-ground", { opacity: 1 }, 18.6);
+      main.fromTo("#el-s07", { scale: 1 }, { scale: 1.08, duration: 0.24, ease: RK.E.in, immediateRender: false }, 18.6);
+      main.fromTo("#el-s07", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 18.6);
+      main.set("#el-s08", { opacity: 0, scale: 0.92 }, 18.6);
+      main.fromTo("#el-s08", { scale: 0.92 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 18.78);
+      main.fromTo("#el-s08", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 18.78);
+      main.fromTo("#s09-root", { scale: 1 }, { scale: 1.012, duration: 3.2, ease: "none", immediateRender: false }, 23.4);
+      main.set("#stage-ground", { opacity: 1 }, 23.4);
+      main.fromTo("#el-s08", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 23.4);
+      main.fromTo("#el-s08", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 23.4);
+      main.set("#el-s09", { opacity: 0, scale: 1.08 }, 23.4);
+      main.fromTo("#el-s09", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 23.58);
+      main.fromTo("#el-s09", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 23.58);
+      main.fromTo("#s10-root", { scale: 1 }, { scale: 1.012, duration: 3.4, ease: "none", immediateRender: false }, 26.2);
+      main.set("#stage-ground", { opacity: 1 }, 26.2);
+      main.fromTo("#el-s09", { scale: 1 }, { scale: 0.93, duration: 0.24, ease: RK.E.in, immediateRender: false }, 26.2);
+      main.fromTo("#el-s09", { opacity: 1 }, { opacity: 0, duration: 0.18, ease: RK.E.in, immediateRender: false }, 26.2);
+      main.set("#el-s10", { opacity: 0, scale: 1.08 }, 26.2);
+      main.fromTo("#el-s10", { scale: 1.08 }, { scale: 1, duration: 0.56, ease: RK.E.out, immediateRender: false }, 26.38);
+      main.fromTo("#el-s10", { opacity: 0 }, { opacity: 1, duration: 0.24, ease: RK.E.out, immediateRender: false }, 26.38);
       window.__timelines["main"] = main;
     </script>
   </body>

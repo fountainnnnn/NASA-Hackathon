@@ -10,17 +10,18 @@
     [data-composition-id="s03"] .hm-slate b { font-size: 56px; font-weight: 600; color: var(--text-2); letter-spacing: 0.02em; }
     [data-composition-id="s03"] .hm-slate span { font-size: 30px; line-height: 1.35; color: var(--text-3); white-space: normal; }
   </style>
-  <div id="s03-root" class="rk-scene on-stage" data-composition-id="s03" data-width="1920" data-height="1080" data-duration="3" data-qa-hold="3" data-qa-endhold="3">
-    <div id="s03-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3" data-track-index="0"></div>
+  <div id="s03-root" class="rk-scene on-stage" data-composition-id="s03" data-width="1920" data-height="1080" data-duration="4.8" data-qa-hold="4.8" data-qa-endhold="4.8">
+    <div id="s03-ground" class="rk-ground is-stage clip" data-start="0" data-duration="4.8" data-track-index="0"></div>
     <div id="s03-cam" class="hm-cam" style="transform: translate(0px, 0px) scale(1.3333);">
-      <video id="s03-m0" class="hm-media" src="footage/c03.mp4" data-start="0" data-duration="3" data-track-index="1" muted playsinline></video>
+      <video id="s03-m0" class="hm-media" src="footage/c03.mp4" data-start="0" data-duration="1.8" data-track-index="1" muted playsinline></video>
+      <video id="s03-m1" class="hm-media" src="footage/c03b.mp4" data-start="1.8" data-duration="3" data-track-index="2" muted playsinline></video>
     </div>
     <div id="s03-scrim" class="hm-scrim" data-qa-ignore></div>
     <div id="s03-word" class="hm-wordmark" style="top: 300px;">HEYMARS</div>
     <div id="s03-tag" class="hm-tagline" style="top: 500px;">Point at Mars. Ask. It plans.</div>
     <div id="s03-band" class="hm-band"></div>
-    <div id="s03-cap0" class="hm-cap">The whole real Mars, from orbit to the ground.</div>
-    <div id="s03-credit" class="hm-credit">NASA imagery and terrain via JPL Mars Trek</div>
+    <div id="s03-cap0" class="hm-cap">Real NASA terrain, from orbit down to the canyon walls.</div>
+    <div id="s03-credit" class="hm-credit">NASA terrain and imagery via JPL Mars Trek. Relief drawn 2.5x.</div>
   </div>
   <script>
     (() => {
@@ -28,7 +29,9 @@
       const tl = gsap.timeline({ paused: true });
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
       tl.set($("s03-cam"), { x: 0, y: 0, scale: 1.3333, transformOrigin: "0 0" }, 0);
-      tl.fromTo($("s03-cam"), { x: 0, y: 0, scale: 1.3333 }, { x: -76.8, y: -143.2, scale: 1.44, duration: 2.8, ease: "none", immediateRender: false }, 0.2);
+      tl.fromTo($("s03-cam"), { x: 0, y: 0, scale: 1.3333 }, { x: -48, y: -127, scale: 1.4, duration: 1.6, ease: "none", immediateRender: false }, 0.2);
+      tl.fromTo($("s03-cam"), { x: -48, y: -127, scale: 1.4 }, { x: -108.47, y: -422.28, scale: 1.8745, duration: 0.01, ease: RK.E.io, immediateRender: false }, 1.8);
+      tl.fromTo($("s03-cam"), { x: -108.47, y: -422.28, scale: 1.8745 }, { x: -259.8, y: -537.95, scale: 2.1031, duration: 2.9, ease: "none", immediateRender: false }, 1.85);
       tl.fromTo($("s03-scrim"), { opacity: 0.72 }, { opacity: 0, duration: 0.5, ease: RK.E.in, immediateRender: false }, 1.35);
       RK.rise(tl, $("s03-word"), 0.0, { y: 14, dur: 0.6, fade: 0.2 });
       RK.words(tl, $("s03-tag"), 0.3, { stagger: 0.07 });

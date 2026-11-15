@@ -816,7 +816,7 @@ const validation = validate(dem, trav, { ctx: ctx.edges, themisDay: themisDay.ed
 
 fs.writeFileSync(
   path.join(DATA, 'source_manifest.json'),
-  JSON.stringify({ generatedBy: 'scripts/prepare-data.mjs', generatedOn: new Date().toISOString(), licence: LICENCE, files: manifest }, null, 2),
+  JSON.stringify({ generatedBy: 'scripts/prepare-data.mjs', generatedOn: new Date().toISOString(), aiAssistance: 'Processing code written with AI assistance (Claude Code); the data values are unmodified NASA/USGS products. See docs/AI_USE.md.', licence: LICENCE, files: manifest }, null, 2),
 );
 const total = fs.readdirSync(OUT).filter((f) => fs.statSync(path.join(OUT, f)).isFile()).reduce((n, f) => n + fs.statSync(path.join(OUT, f)).size, 0);
 log(`done. public/data total (this script's files + others) ${(total / 1e6).toFixed(2)} MB; layers ${layers.length}; validation n=${validation.count}`);

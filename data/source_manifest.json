@@ -1,6 +1,7 @@
 {
   "generatedBy": "scripts/prepare-data.mjs",
   "generatedOn": "2026-11-14T13:17:59.920Z",
+  "aiAssistance": "Processing code written with AI assistance (Claude Code); the data values are unmodified NASA/USGS products. See docs/AI_USE.md.",
   "licence": "NASA data: generally not copyrighted; cite source. USGS data: public domain, cite publication.",
   "files": {
     "public/data/dem.i16": {

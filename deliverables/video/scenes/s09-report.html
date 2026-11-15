@@ -10,15 +10,15 @@
     [data-composition-id="s09"] .hm-slate b { font-size: 56px; font-weight: 600; color: var(--text-2); letter-spacing: 0.02em; }
     [data-composition-id="s09"] .hm-slate span { font-size: 30px; line-height: 1.35; color: var(--text-3); white-space: normal; }
   </style>
-  <div id="s09-root" class="rk-scene on-stage" data-composition-id="s09" data-width="1920" data-height="1080" data-duration="3.4" data-qa-hold="3.4" data-qa-endhold="3.4">
-    <div id="s09-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3.4" data-track-index="0"></div>
+  <div id="s09-root" class="rk-scene on-stage" data-composition-id="s09" data-width="1920" data-height="1080" data-duration="3.2" data-qa-hold="3.2" data-qa-endhold="3.2">
+    <div id="s09-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3.2" data-track-index="0"></div>
     <div id="s09-cam" class="hm-cam" style="transform: translate(-507.31px, -28.63px) scale(1.7552);">
-      <video id="s09-m0" class="hm-media" src="footage/c09.mp4" data-start="0" data-duration="3.4" data-track-index="1" muted playsinline></video>
+      <video id="s09-m0" class="hm-media" src="footage/c09.mp4" data-start="0" data-duration="3.2" data-track-index="1" muted playsinline></video>
     </div>
-    <div id="s09-co0-ul" data-qa-ignore style="position: absolute; left: 188.59px; top: 706.87px; width: 1542.88px; height: 5px; background: var(--hm-accent); transform-origin: 0 50%; transform: scaleX(0);"></div>
+    <div id="s09-co0-ul" data-qa-ignore style="position: absolute; left: 352.74px; top: 716.31px; width: 1214.6px; height: 5px; background: var(--hm-accent); transform-origin: 0 50%; transform: scaleX(0);"></div>
     <div id="s09-band" class="hm-band"></div>
-    <div id="s09-cap0" class="hm-cap">A full report mission planners can check and export.</div>
-    <div id="s09-cap1" class="hm-cap">Terrain agrees with <span class="hm-mono">708</span> Perseverance waypoints, median <span class="hm-mono">1.1</span> m.</div>
+    <div id="s09-cap0" class="hm-cap">A full report you can check and export.</div>
+    <div id="s09-cap1" class="hm-cap">Checked against <span class="hm-mono">708</span> Perseverance waypoints.</div>
     <div id="s09-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
   </div>
   <script>
@@ -28,10 +28,10 @@
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
       tl.set($("s09-cam"), { x: -507.31, y: -28.63, scale: 1.7552, transformOrigin: "0 0" }, 0);
       tl.fromTo($("s09-cam"), { x: -507.31, y: -28.63, scale: 1.7552 }, { x: -903.91, y: -237.79, scale: 2.2296, duration: 0.7, ease: RK.E.io, immediateRender: false }, 1.5);
-      tl.fromTo($("s09-co0-ul"), { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: RK.E.out, immediateRender: false }, 2.3);
+      tl.fromTo($("s09-co0-ul"), { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: RK.E.out, immediateRender: false }, 2.1);
       RK.words(tl, $("s09-cap0"), 0.3, { stagger: 0.05, dur: 0.45 });
       tl.set($("s09-cap1"), { opacity: 0 }, 0);
-      RK.swap(tl, $("s09-cap0"), $("s09-cap1"), 1.75, { words: true, stagger: 0.05, dur: 0.45 });
+      RK.swap(tl, $("s09-cap0"), $("s09-cap1"), 1.6, { words: true, stagger: 0.05, dur: 0.45 });
       window.__timelines["s09"] = tl;
     })();
   </script>

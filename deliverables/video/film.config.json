@@ -14,35 +14,29 @@
  },
  "scenes": [
   {
-   "id": "s01",
-   "kind": "file",
-   "file": "scenes/s01-title.html",
-   "duration": 2.2
-  },
-  {
    "id": "s02",
    "kind": "file",
    "file": "scenes/s02-hook.html",
-   "duration": 3.2,
-   "in": "zoom-in"
+   "duration": 2.8
   },
   {
    "id": "s03",
    "kind": "footage",
    "name": "orbit",
-   "duration": 3.0,
+   "duration": 4.8,
    "in": "zoom-out",
    "clips": [
     {
      "at": 0,
-     "clip": "c03",
-     "pending": {
-      "slate": "Real Mars globe from orbit, then the camera falls to Jezero Crater (Cesium, JPL Mars Trek terrain)"
-     }
+     "clip": "c03"
+    },
+    {
+     "at": 1.8,
+     "clip": "c03b"
     }
    ],
    "overlay": "wordmark",
-   "credit": "NASA imagery and terrain via JPL Mars Trek",
+   "credit": "NASA terrain and imagery via JPL Mars Trek. Relief drawn 2.5x.",
    "cam": [
     {
      "at": 0,
@@ -50,16 +44,39 @@
     },
     {
      "at": 0.2,
-     "dur": 2.8,
+     "dur": 1.6,
      "fill": true,
-     "zoom": 1.08,
+     "zoom": 1.05,
+     "ease": "none"
+    },
+    {
+     "at": 1.8,
+     "dur": 0.01,
+     "box": [
+      110,
+      250,
+      920,
+      420
+     ],
+     "pad": 0.001
+    },
+    {
+     "at": 1.85,
+     "dur": 2.9,
+     "box": [
+      170,
+      280,
+      820,
+      370
+     ],
+     "pad": 0.001,
      "ease": "none"
     }
    ],
    "captions": [
     {
      "at": 1.65,
-     "text": "The whole real Mars, from orbit to the ground."
+     "text": "Real NASA terrain, from orbit down to the canyon walls."
     }
    ]
   },
@@ -72,10 +89,7 @@
    "clips": [
     {
      "at": 0,
-     "clip": "c04",
-     "pending": {
-      "still": "map"
-     }
+     "clip": "c04"
     }
    ],
    "cam": [
@@ -120,7 +134,7 @@
    ],
    "callouts": [
     {
-     "at": 2.0,
+     "at": 1.8,
      "until": 2.9,
      "box": "card@clicked",
      "anchor": "l",
@@ -131,25 +145,15 @@
    ]
   },
   {
-   "id": "s05",
-   "kind": "file",
-   "file": "scenes/s05-agent.html",
-   "duration": 2.6,
-   "in": "zoom-out"
-  },
-  {
    "id": "s06",
    "kind": "footage",
    "name": "steps",
-   "duration": 3.2,
+   "duration": 3.0,
    "in": "zoom-in",
    "clips": [
     {
      "at": 0,
-     "clip": "c06",
-     "pending": {
-      "still": "steps"
-     }
+     "clip": "c06"
     }
    ],
    "cam": [
@@ -159,8 +163,8 @@
      "pad": 0.06
     },
     {
-     "at": 1.5,
-     "dur": 0.8,
+     "at": 1.0,
+     "dur": 0.6,
      "box": "formula@steps",
      "pad": 0.1
     }
@@ -168,12 +172,12 @@
    "captions": [
     {
      "at": 0.3,
-     "text": "Every answer is computed, and every step is shown."
+     "text": "Every step and formula is shown."
     }
    ],
    "callouts": [
     {
-     "at": 2.35,
+     "at": 1.65,
      "box": "formula@steps",
      "anchor": "l",
      "side": "left",
@@ -186,81 +190,31 @@
    "id": "s07",
    "kind": "footage",
    "name": "replan",
-   "duration": 3.8,
+   "duration": 5.6,
    "in": "zoom-out",
    "clips": [
     {
      "at": 0,
-     "clip": "c07",
-     "pending": {
-      "still": "map"
-     }
+     "clip": "c07"
+    },
+    {
+     "at": 3.2,
+     "clip": "c08b"
     }
    ],
    "cam": [
     {
      "at": 0,
      "box": [
-      40,
-      40,
-      960,
-      450
-     ]
-    }
-   ],
-   "captions": [
-    {
-     "at": 0.3,
-     "text": "NO GO: 1.0 km of the walk is out of radio contact."
+      56,
+      44,
+      720,
+      330
+     ],
+     "pad": 0.03
     },
     {
-     "at": 2.0,
-     "text": "Raise the mast to 20 m. It replans: GO."
-    }
-   ],
-   "callouts": [
-    {
-     "at": 0.6,
-     "until": 1.8,
-     "box": "headline@route",
-     "anchor": "r",
-     "side": "right",
-     "len": 110,
-     "text": "The limiting reason"
-    }
-   ]
-  },
-  {
-   "id": "s08",
-   "kind": "footage",
-   "name": "sims",
-   "duration": 4.4,
-   "in": "zoom-in",
-   "clips": [
-    {
-     "at": 0,
-     "clip": "c08a",
-     "pending": {
-      "slate": "Sky crane lowers the lander onto the real terrain, seen from the ground-level tracking camera (Cesium)"
-     }
-    },
-    {
-     "at": 2.2,
-     "clip": "c08b",
-     "pending": {
-      "slate": "Chase camera behind the two astronauts walking the planned route at 600x"
-     }
-    }
-   ],
-   "overlay": "edl",
-   "overlayUntil": 2.2,
-   "cam": [
-    {
-     "at": 0,
-     "fill": true
-    },
-    {
-     "at": 2.2,
+     "at": 3.2,
      "dur": 0.01,
      "box": [
       360,
@@ -274,23 +228,89 @@
    "captions": [
     {
      "at": 0.3,
-     "text": "Perseverance's landing steps, down to the sky crane."
+     "text": "NO GO: 1 km out of radio contact."
     },
     {
-     "at": 2.3,
-     "text": "Two crew walk the route at 600\u00d7 speed."
+     "at": 1.95,
+     "text": "Raise the mast. It replans: GO."
+    },
+    {
+     "at": 3.35,
+     "text": "Two crew walk it at 600\u00d7 speed."
     }
    ],
    "callouts": [
     {
-     "at": 2.7,
+     "at": 0.6,
+     "until": 1.6,
+     "box": "headline@route",
+     "anchor": "r",
+     "side": "right",
+     "len": 110,
+     "text": "The limiting reason"
+    },
+    {
+     "at": 3.8,
      "box": "speed@walk",
      "anchor": "t",
      "side": "above",
      "len": 120,
      "text": "600\u00d7 playback"
     }
+   ]
+  },
+  {
+   "id": "s08",
+   "kind": "footage",
+   "name": "sims",
+   "duration": 5.2,
+   "in": "zoom-in",
+   "clips": [
+    {
+     "at": 0,
+     "clip": "c08a"
+    },
+    {
+     "at": 2.6,
+     "clip": "c08c"
+    }
    ],
+   "overlay": "edl",
+   "overlayUntil": 2.6,
+   "cam": [
+    {
+     "at": 0,
+     "box": [
+      110,
+      130,
+      920,
+      420
+     ],
+     "pad": 0.001
+    },
+    {
+     "at": 2.6,
+     "dur": 0.01,
+     "box": [
+      110,
+      215,
+      920,
+      420
+     ],
+     "pad": 0.001
+    }
+   ],
+   "captions": [
+    {
+     "at": 0.3,
+     "text": "Perseverance's real landing steps, on real terrain."
+    },
+    {
+     "at": 2.7,
+     "text": "Then 10,000 test landings: 100 % within the slope limit."
+    }
+   ],
+   "callouts": [],
    "edl": {
     "from": 334,
     "to": 420
@@ -300,22 +320,12 @@
    "id": "s09",
    "kind": "footage",
    "name": "report",
-   "duration": 3.4,
+   "duration": 3.2,
    "in": "zoom-out",
    "clips": [
     {
      "at": 0,
-     "clip": "c09",
-     "pending": {
-      "still": "report"
-     }
-    },
-    {
-     "at": 1.5,
-     "clip": null,
-     "pending": {
-      "still": "report2"
-     }
+     "clip": "c09"
     }
    ],
    "cam": [
@@ -345,16 +355,16 @@
    "captions": [
     {
      "at": 0.3,
-     "text": "A full report mission planners can check and export."
+     "text": "A full report you can check and export."
     },
     {
-     "at": 1.75,
-     "text": "Terrain agrees with 708 Perseverance waypoints, median 1.1 m."
+     "at": 1.6,
+     "text": "Checked against 708 Perseverance waypoints."
     }
    ],
    "callouts": [
     {
-     "at": 2.3,
+     "at": 2.1,
      "kind": "underline",
      "box": "validationNote@report2"
     }
@@ -364,7 +374,7 @@
    "id": "s10",
    "kind": "file",
    "file": "scenes/s10-close.html",
-   "duration": 2.4,
+   "duration": 3.4,
    "in": "zoom-out"
   }
  ],
@@ -426,7 +436,7 @@
      "sharp-0.4"
     ]
    ],
-   "maxSpeed": 1.6
+   "maxSpeed": 2.2
   },
   "c04": {
    "shot": "click",
@@ -459,7 +469,7 @@
   "c08a": {
    "shot": "landing",
    "from": "slow",
-   "to": "slow+9.2",
+   "to": "touchdown+0.3",
    "skip": [
     [
      "slow+1.6",
@@ -484,6 +494,24 @@
      "validation-0.3"
     ]
    ]
+  },
+  "c03b": {
+   "shot": "tilt",
+   "from": "press-0.2",
+   "to": "sharp+1.6",
+   "skip": [
+    [
+     "tilted+0.4",
+     "sharp-0.3"
+    ]
+   ],
+   "maxSpeed": 1.3
+  },
+  "c08c": {
+   "shot": "landing",
+   "from": "mc-0.3",
+   "to": "mcdone+1.0",
+   "maxSpeed": 3.4
   }
  }
 }

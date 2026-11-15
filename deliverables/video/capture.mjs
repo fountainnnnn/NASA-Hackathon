@@ -221,6 +221,24 @@ if (want("orbit")) {
   await stop();
 }
 
+// c03b tilt: Coprates Chasma (Valles Marineris) top-down, then the app's Tilt (T) swings down to the canyon walls
+if (want("tilt")) {
+  await page.evaluate(() => window.__planet.view(-66, -13.5, 120, { pitchDeg: -89, headingDeg: 270, instant: true }));
+  await page.waitForFunction(() => window.__planet.stats().tilesLoaded, null, { timeout: 60000 }).catch(() => {});
+  await pause(2.0);
+  await park();
+  await start("tilt");
+  await pause(0.4);
+  mark("press");
+  await page.keyboard.press("t");
+  await pause(1.3);
+  mark("tilted");
+  await page.waitForFunction(() => window.__planet.stats().tilesLoaded, null, { timeout: 20000 }).catch(() => {});
+  mark("sharp");
+  await pause(2.0);
+  await stop();
+}
+
 // c08a landing: click the planet, "Landing check", "Run landing simulation". At 60x until the back shell separates
 // (340 s after entry), then 10x so the sky crane is seen from the ground-level tracking camera.
 if (want("landing")) {
@@ -244,7 +262,15 @@ if (want("landing")) {
   mark("slow"); M.simT.slow = await simT();
   await page.waitForFunction(() => window.__mw.playback.getState().t >= 420, null, { timeout: 30000 }).catch(() => {});
   mark("touchdown"); M.simT.touchdown = await simT();
-  await pause(2.5);
+  await pause(2.0);
+  // then the 10,000 seeded test landings fall into the ellipse (115 to 535 s after touchdown), at 60x
+  await soft("60x", () => speedBtn(60).click());
+  await page.waitForFunction(() => window.__mw.playback.getState().t >= 420 + 105, null, { timeout: 30000 }).catch(() => {});
+  mark("mc"); M.simT.mc = await simT();
+  await page.waitForFunction(() => window.__mw.playback.getState().t >= 420 + 540, null, { timeout: 30000 }).catch(() => console.warn("  WARN test landings did not finish"));
+  mark("mcdone"); M.simT.mcdone = await simT();
+  await pause(1.5);
+  await boxes("mc", { counter: [["[data-done]"]] });
   await stop();
   await waitTurn(b, 30000).catch(() => {});
   await closeAll();

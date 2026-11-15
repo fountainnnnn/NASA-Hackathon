@@ -10,19 +10,24 @@
     [data-composition-id="s07"] .hm-slate b { font-size: 56px; font-weight: 600; color: var(--text-2); letter-spacing: 0.02em; }
     [data-composition-id="s07"] .hm-slate span { font-size: 30px; line-height: 1.35; color: var(--text-3); white-space: normal; }
   </style>
-  <div id="s07-root" class="rk-scene on-stage" data-composition-id="s07" data-width="1920" data-height="1080" data-duration="3.8" data-qa-hold="3.8" data-qa-endhold="3.8">
-    <div id="s07-ground" class="rk-ground is-stage clip" data-start="0" data-duration="3.8" data-track-index="0"></div>
-    <div id="s07-cam" class="hm-cam" style="transform: translate(0px, 0px) scale(1.5326);">
-      <video id="s07-m0" class="hm-media" src="footage/c07.mp4" data-start="0" data-duration="3.8" data-track-index="1" muted playsinline></video>
+  <div id="s07-root" class="rk-scene on-stage" data-composition-id="s07" data-width="1920" data-height="1080" data-duration="5.6" data-qa-hold="5.6" data-qa-endhold="5.6">
+    <div id="s07-ground" class="rk-ground is-stage clip" data-start="0" data-duration="5.6" data-track-index="0"></div>
+    <div id="s07-cam" class="hm-cam" style="transform: translate(0px, -33.21px) scale(2.2642);">
+      <video id="s07-m0" class="hm-media" src="footage/c07.mp4" data-start="0" data-duration="3.2" data-track-index="1" muted playsinline></video>
+      <video id="s07-m1" class="hm-media" src="footage/c08b.mp4" data-start="3.2" data-duration="2.4" data-track-index="2" muted playsinline></video>
     </div>
-    <div id="s07-co0-tag" class="hm-tag" data-qa="box" style="left: 647.94px; top: 171.65px; opacity: 0;">The limiting reason</div>
+    <div id="s07-co0-tag" class="hm-tag" data-qa="box" style="left: 904.73px; top: 224.91px; opacity: 0;">The limiting reason</div>
+    <div id="s07-co1-tag" class="hm-tag" data-qa="box" style="left: 1415.7px; top: 713.41px; opacity: 0;"><span class="hm-mono">600</span>× playback</div>
     <svg class="hm-lines" data-qa-ignore width="1920" height="1080" viewBox="0 0 1920 1080">
-      <circle id="s07-co0-ring" cx="537.94" cy="171.65" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
-      <line id="s07-co0-line" opacity="0" x1="647.94" y1="171.65" x2="553.94" y2="171.65" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="94 94"/>
+      <circle id="s07-co0-ring" cx="794.73" cy="224.91" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s07-co0-line" opacity="0" x1="904.73" y1="224.91" x2="810.73" y2="224.91" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="94 94"/>
+      <circle id="s07-co1-ring" cx="1415.7" cy="833.41" r="16" opacity="0" fill="none" stroke="#ece7e1" stroke-width="2.5"/>
+      <line id="s07-co1-line" opacity="0" x1="1415.7" y1="713.41" x2="1415.7" y2="817.41" stroke="#ece7e1" stroke-width="2.5" stroke-dasharray="104 104"/>
     </svg>
     <div id="s07-band" class="hm-band"></div>
-    <div id="s07-cap0" class="hm-cap">NO GO: <span class="hm-mono">1.0</span> km of the walk is out of radio contact.</div>
-    <div id="s07-cap1" class="hm-cap">Raise the mast to <span class="hm-mono">20</span> m. It replans: GO.</div>
+    <div id="s07-cap0" class="hm-cap">NO GO: <span class="hm-mono">1</span> km out of radio contact.</div>
+    <div id="s07-cap1" class="hm-cap">Raise the mast. It replans: GO.</div>
+    <div id="s07-cap2" class="hm-cap">Two crew walk it at <span class="hm-mono">600</span>× speed.</div>
     <div id="s07-credit" class="hm-credit">NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons</div>
   </div>
   <script>
@@ -30,17 +35,26 @@
       const $ = (i) => document.getElementById(i);
       const tl = gsap.timeline({ paused: true });
       // camera (app CSS px -> frame px): translate then scale, origin 0 0
-      tl.set($("s07-cam"), { x: 0, y: 0, scale: 1.5326, transformOrigin: "0 0" }, 0);
+      tl.set($("s07-cam"), { x: 0, y: -33.21, scale: 2.2642, transformOrigin: "0 0" }, 0);
+      tl.fromTo($("s07-cam"), { x: 0, y: -33.21, scale: 2.2642 }, { x: -84.09, y: -262.86, scale: 1.4109, duration: 0.01, ease: RK.E.io, immediateRender: false }, 3.2);
       gsap.set($("s07-co0-tag"), { xPercent: 0, yPercent: -50 });
-      // callout 0: "The limiting reason" at (537.94, 171.65)
+      // callout 0: "The limiting reason" at (794.73, 224.91)
       tl.set([$("s07-co0-ring"), $("s07-co0-line"), $("s07-co0-tag")], { opacity: 0 }, 0);
-      tl.fromTo($("s07-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "537.94px 171.65px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.6);
+      tl.fromTo($("s07-co0-ring"), { opacity: 0, scale: 0.6, transformOrigin: "794.73px 224.91px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.6);
       tl.fromTo($("s07-co0-line"), { opacity: 1, strokeDashoffset: 94 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 0.68);
       RK.rise(tl, $("s07-co0-tag"), 0.82, { y: 10, dur: 0.45, fade: 0.12 });
-      tl.to([$("s07-co0-ring"), $("s07-co0-line"), $("s07-co0-tag")], { opacity: 0, duration: 0.2, ease: RK.E.in }, 1.8);
+      tl.to([$("s07-co0-ring"), $("s07-co0-line"), $("s07-co0-tag")], { opacity: 0, duration: 0.2, ease: RK.E.in }, 1.6);
+      gsap.set($("s07-co1-tag"), { xPercent: -50, yPercent: -100 });
+      // callout 1: "600× playback" at (1415.7, 833.41)
+      tl.set([$("s07-co1-ring"), $("s07-co1-line"), $("s07-co1-tag")], { opacity: 0 }, 0);
+      tl.fromTo($("s07-co1-ring"), { opacity: 0, scale: 0.6, transformOrigin: "1415.7px 833.41px" }, { opacity: 1, scale: 1, duration: 0.35, ease: RK.E.out, immediateRender: false }, 3.8);
+      tl.fromTo($("s07-co1-line"), { opacity: 1, strokeDashoffset: 104 }, { opacity: 1, strokeDashoffset: 0, duration: 0.35, ease: RK.E.out, immediateRender: false }, 3.88);
+      RK.rise(tl, $("s07-co1-tag"), 4.02, { y: 10, dur: 0.45, fade: 0.12 });
       RK.words(tl, $("s07-cap0"), 0.3, { stagger: 0.05, dur: 0.45 });
       tl.set($("s07-cap1"), { opacity: 0 }, 0);
-      RK.swap(tl, $("s07-cap0"), $("s07-cap1"), 2, { words: true, stagger: 0.05, dur: 0.45 });
+      RK.swap(tl, $("s07-cap0"), $("s07-cap1"), 1.95, { words: true, stagger: 0.05, dur: 0.45 });
+      tl.set($("s07-cap2"), { opacity: 0 }, 0);
+      RK.swap(tl, $("s07-cap1"), $("s07-cap2"), 3.35, { words: true, stagger: 0.05, dur: 0.45 });
       window.__timelines["s07"] = tl;
     })();
   </script>

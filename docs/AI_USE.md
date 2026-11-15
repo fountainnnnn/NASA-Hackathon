@@ -32,7 +32,7 @@ The server has a fallback model setting (`AGENT_FALLBACK_MODEL`) used only if th
 
 - **App.** No AI-generated images are shown. The MarsAgent reticle and map symbols are drawn in code. Icons are Lucide. The lander, parachute, heat shield, back shell, rover and astronauts are simple 3D models built in code. The favicon is the Next.js default. Rover photos are NASA/JPL-Caltech raw images, shown unaltered with credit.
 - **Leftover art.** `public/art/` still holds the 13 Codex art files and their prompts. The app does not reference them.
-- **Video.** No AI-generated images or video. Footage is a real screen capture of the app. Illustrations are HTML, CSS and SVG with Lucide icons.
+- **Video.** No AI-generated images or video. Footage is a real screen capture of the app. Illustrations are HTML, CSS and SVG with Lucide icons. The edit, captions and transitions are code written with AI assistance, so a small "Made with AI assistance" mark is visible bottom right for the whole video.
 - **Audio.** The video's music bed is synthesised by a Python script (`deliverables/video/tools/music.py`, NumPy) written with AI assistance. No generative audio model was used, there is no voice, and nothing is sampled. The final MP4 carries this note in its comment metadata tag.
 - **Narrate aloud.** Off by default. It uses the browser's built-in speech synthesis and is labelled "synthetic voice".
 

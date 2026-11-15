@@ -1,5 +1,8 @@
 {
   "name": "space-apps-2026",
+  "description": "HeyMars: Mars mission planning map with an AI agent (MarsAgent) on NASA data. NASA Space Apps Challenge 2026. Code written with AI assistance (Claude Code); see docs/AI_USE.md.",
+  "license": "MIT",
+  "author": "Ng Yu Hang (team Ecliptical)",
   "version": "0.1.0",
   "private": true,
   "scripts": {

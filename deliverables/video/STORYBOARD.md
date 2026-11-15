@@ -1,34 +1,28 @@
-# HeyMars demo video, storyboard v3 (as captured from the live app, 15 Nov)
+# HeyMars demo video, storyboard v4 (re-cut 15 Nov, footage from heymars.ngyuhang.com)
 
-29.0 s, 1920x1080, 60 fps final (30 fps draft), 10 scenes, 0.4 s zoom joins, original music bed (synthesised in code,
-`tools/music.py`), no voice. Team: Ng Yu Hang, team Ecliptical. Challenge: Interplanetary Survival Guide: Martian Map.
+29.6 s, 1920x1080, 60 fps, 8 scenes, 0.4 s zoom joins, original music bed (synthesised in code, `tools/music.py`,
+drop at 4.0 s on the canyon reveal), no voice. A small "Made with AI assistance" mark sits bottom right for the whole
+film (Space Apps SI disclosure rule). Team: Ng Yu Hang, team Ecliptical (end card).
 
-Message the film must leave behind: **Point at Mars. Ask. It plans.** Every answer is computed from NASA data, shown
-step by step, with a GO / HOLD / NO GO verdict and its reason.
-
-Look: near-black stage (`#060505`), bone text, colour only when it means something (verdict colours, Earth cyan,
-Mars ochre). Schibsted Grotesk for captions, Martian Mono for numbers, Michroma only for the HEYMARS wordmark.
-Footage scenes: the real app (captured at 1440x810, 2x) framed by a camera that pushes in on what matters; one caption
-line per beat in a flat band at the bottom (56 px), the NASA data credit under it (30 px), callouts as a ring, a hairline
-and a flat label (34 px). Safe margins 96 px left and right. No logos, no AI imagery, no glow, no em dashes, no "·".
+v4 changes: the name card and the MarsAgent diagram are cut; the film opens on the hook; new footage of the Tilt
+side view over Coprates Chasma (relief drawn 2.5x, said in the credit line) and of the 10,000 test landings; the walk
+joins the replan scene; footage of the 3D view is cropped to the stage so the terrain fills the frame; UI scenes push
+in so card text is readable.
 
 ## Beat table (absolute times include the 0.4 s overlaps)
 
-| # | Scene | Start | Dur | Guide beat | Source |
-|---|---|---|---|---|---|
-| s01 | Name and team | 0.0 | 2.2 | 0:00 name + team | illustration |
-| s02 | 11 light-minutes | 1.8 | 3.2 | 0:02 challenge and why | illustration |
-| s03 | HEYMARS over the real planet | 4.6 | 3.0 | 0:05 title + tagline | footage c03 |
-| s04 | Click and ask | 7.2 | 4.4 | 0:07 how it works | footage c04 |
-| s05 | Click, MarsAgent, tools, verdict | 11.2 | 2.6 | how it works | illustration |
-| s06 | Steps and formulas | 13.4 | 3.2 | how it works, NASA data | footage c06 |
-| s07 | NO GO, replan, GO | 16.2 | 3.8 | how it works | footage c07 |
-| s08 | Lander, then crew at 600x | 19.6 | 4.4 | how it works / impact | footage c08a, c08b |
-| s09 | Report and validation | 23.6 | 3.4 | 0:20 impact | footage c09 |
-| s10 | First walks on Mars, end card | 26.6 | 2.4 | 0:27 future + link | illustration |
+| # | Scene | Start | Dur | Content |
+|---|---|---|---|---|
+| s02 | 11 light-minutes | 0.0 | 2.8 | hook: Earth to Mars light time, "nobody can plan your walk for you" |
+| s03 | HEYMARS, orbit, tilt | 2.4 | 4.8 | wordmark over the orbit flight, then Tilt (T) down to the canyon walls |
+| s04 | Click and ask | 6.8 | 4.4 | reticle, click, the MarsAgent card at the cursor |
+| s06 | Every step shown | 10.8 | 3.0 | narration, then a formula with real numbers |
+| s07 | NO GO, GO, walk | 13.4 | 5.6 | NO GO card (radio shadow), raise the mast, GO; two crew walk at 600x |
+| s08 | Landing | 18.6 | 5.2 | EDL steps to the sky crane on real terrain; 10,000 test landings, 100 % within the slope limit |
+| s09 | Report | 23.4 | 3.2 | the report, then section 6 and the 708-waypoint check |
+| s10 | End card | 26.2 | 3.4 | "Built for the first walks on Mars.", HEYMARS, heymars.ngyuhang.com, byline |
 
-End 29.0 s. Data credit line on every footage scene from 7.2 s to 27.0 s:
-"NASA data: MRO CTX, Mars Odyssey, USGS, Perseverance, JPL Horizons" (s03 carries its own imagery credit, see below).
+The scene notes below are from v3; s01 and s05 are no longer in the film.
 
 ## Scenes
 

@@ -115,6 +115,8 @@ ${rd("assets/kit/kit.js")}
     <div id="root" data-composition-id="main" data-start="0" data-duration="${total}" data-width="1920" data-height="1080">
       <div id="stage-ground" style="position: absolute; inset: 0; background: var(--stage, #17171a); opacity: 0"></div>
 ${clips.join("\n")}
+      <!-- SI disclosure required by the Space Apps rules: small, constant, bottom right, clear of the caption band and credit -->
+      <div id="ai-mark" style="position: absolute; right: 28px; bottom: 22px; z-index: 50; padding: 5px 10px; border-radius: 4px; background: rgba(6, 5, 5, 0.5); color: rgba(236, 231, 225, 0.7); font: 500 17px/1.2 'Schibsted Grotesk', system-ui, sans-serif; letter-spacing: 0.01em; white-space: nowrap; pointer-events: none;">Made with AI assistance</div>
 ${m ? `      <audio id="el-bgm" src="${cut}" data-start="0" data-duration="${total}" data-track-index="10" data-volume="${m.volume ?? 0.6}"></audio>` : ""}
 ${audio.join("\n")}
     </div>

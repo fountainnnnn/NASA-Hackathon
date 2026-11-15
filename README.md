@@ -120,7 +120,7 @@ This project is not affiliated with or endorsed by NASA or USGS and uses no NASA
 
 ## AI disclosure
 
-Built with AI coding assistants, and the app contains a runtime language-model agent. No AI-generated images are shown in the app. Details: [docs/AI_USE.md](docs/AI_USE.md).
+Built with AI assistance: the code, data scripts, docs and the demo video edit were written with Claude Code (Anthropic), and the app contains a runtime language-model agent. The video carries a visible "Made with AI assistance" mark. No AI-generated images are shown in the app. Details: [docs/AI_USE.md](docs/AI_USE.md).
 
 ## Documentation
 
