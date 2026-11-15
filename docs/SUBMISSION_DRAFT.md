@@ -29,7 +29,7 @@ References
 
 ## Link to Project Demo
 
-Video, 30 s or less: TODO(link)
+Video, 30 s or less: https://youtu.be/JLg3vAqIZdo
 
 ## Link to Final Project
 
@@ -49,10 +49,10 @@ Live app: https://heymars.ngyuhang.com. Code: https://github.com/fountainnnnn/NA
 HeyMars is a mission planning map for the first crews on Mars. It covers the whole planet and goes down to walking scale at Jezero Crater, where Perseverance landed.
 
 - **Whole planet.** A 3D globe with JPL Mars Trek terrain, the Viking MDIM 2.1 colour mosaic and the CTX global mosaic. You can turn on MOLA elevation and slope, the USGS geologic map of Mars, Mars Odyssey water-equivalent hydrogen, TES thermal inertia and TES dust cover.
-- **Click and ask.** A small reticle follows the cursor. Click a point and MarsAgent opens a card there: elevation, regional slope, geologic unit, orbital layers, nearby landing sites and named places. The same turn appears in the MarsAgent panel, which shows the full working.
+- **Click and ask.** A small reticle follows the cursor. Click a point and MarsAgent opens a card there; ask a question on it and the camera drops to an oblique view of that terrain. The card shows elevation, regional slope, geologic unit, orbital layers, nearby landing sites and named places. The same turn appears in the MarsAgent panel, which shows the full working.
 - **Could we land here?** MarsAgent checks 8 criteria from NASA's MSL landing-site engineering guide. Latitude, elevation and thermal inertia are scored from global data. The other 5 need finer terrain or rock data than exists globally, so MarsAgent fills them with a derived estimate (marked est.) or a fixed placeholder (marked mock) and always says so in the card, the reasoning and the report.
 - **Landing simulation.** 10,000 seeded Monte Carlo touchdowns in a 7.7 by 6.6 km ellipse, the size NASA gives for Perseverance. Then a 3D lander flies the Mars 2020 timeline on real terrain: parachute, heat shield separation, radar, Terrain-Relative Navigation, powered descent and sky crane.
-- **Plan a walk at Jezero.** Drag from the base to a target. MarsAgent plans a round trip on the 20 m terrain model and checks slope, suit battery, EVA time, daylight, radio line of sight to the base mast and terrain coverage. The verdict is GO, HOLD or NO GO with the one limiting reason.
+- **Plan a walk at Jezero.** Pick Plan and click a target (or drag from the base for a live preview). MarsAgent plans a round trip on the 20 m terrain model and checks slope, suit battery, EVA time, daylight, radio line of sight to the base mast and terrain coverage. The verdict is GO, HOLD or NO GO with the one limiting reason.
 - **Replan.** If there is no path, the card says why and offers the smallest slope limit that works or the nearest reachable point. If a radio shadow blocks the plan, it offers a taller mast. Each change replans with the same tools.
 - **See it.** Two astronauts walk the route with a chase camera at 1x to 600x. A helmet view shows heading, distance to the next stop, slope ahead and battery reserve. There is also rover assist, base camp reach contours, and a lasso that reports slope share and geology for an area.
 - **Science at the target.** The geologic unit from the USGS Jezero map, the nearest catalogued Perseverance science site, and the nearest Perseverance raw image as a view from the ground, with sol, camera and credit.
