@@ -83,7 +83,8 @@ test.describe('HeyMars', () => {
     await expect(turn.locator('ol li').first()).toContainText('Checked 8 landing criteria');
     // each line shows its OWN measured time, and none under 5 ms (instant work carries no number)
     const times = await turn.locator('ol[aria-label="What MarsAgent is doing"] li').evaluateAll((lis) => lis.map((li) => li.lastElementChild?.textContent ?? ''));
-    for (const t of times.filter((x) => /\d/.test(x) && /(ms|s)$/.test(x))) expect(t).toMatch(/^([5-9]|\d{2,}) ms$|^\d+(\.\d\d)? s$/);
+    // only the time cells (short "N ms" / "N.NN s" values); narration text without a time is skipped
+    for (const t of times.map((x) => x.trim()).filter((x) => /^[\d.,]+ (ms|s)$/.test(x))) expect(t).toMatch(/^([5-9]|\d{2,}) ms$|^\d+(\.\d\d)? s$/);
     await expect(turn.getByText('Mission planning report')).toBeVisible();
     const text = await page.locator('main').innerText();
     expect(text).not.toMatch(/fails-some|meets-all|insufficient-data/);
@@ -144,7 +145,8 @@ test.describe('HeyMars', () => {
     await scroller.hover();
     await page.mouse.wheel(0, 1800);
     await page.waitForTimeout(500);
-    expect(await scroller.evaluate((el) => el.scrollTop)).toBeGreaterThan(300);
+    // the document scrolls inside the viewer (the paper's own container or a scrolling ancestor within the viewer), never the page
+    await expect.poll(async () => viewer.evaluate((root) => Math.max(...[root, ...root.querySelectorAll('*')].map((el) => (el as HTMLElement).scrollTop))), { timeout: 3_000 }).toBeGreaterThan(300);
     expect(await page.evaluate('window.scrollY')).toBe(0);
     const toolbar = await viewer.getByRole('button', { name: 'Close' }).boundingBox();
     expect(toolbar!.y).toBeLessThan(52);
