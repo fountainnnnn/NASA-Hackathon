@@ -11,6 +11,7 @@ import { PAIR_SEPARATION_M, batteryLeftAt, sampleAtOdometer, sampleAtTime } from
 import type { GroundApi, Sample, Timeline } from './model';
 import { SUN_AZIMUTH_DEG, SUN_ELEVATION_DEG } from './sceneAdapter';
 import { useWalkUi } from './walkStore';
+import { useHud } from '@/state/hud';
 import { useDrawScale } from '@/lib/scenario/drawScale';
 import { emitScenarioEnd } from '@/lib/scenario/outcome';
 import { walkVerdict } from '@/lib/scenario/verdict';
@@ -266,6 +267,8 @@ export function Crew({ timeline, ground, scale = 'auto', tags = true, separation
   const initd = useRef(false);
   const { camera } = useThree();
   const helmetOn = useWalkUi((w) => w.helmet);
+  // a sheet (sources, cuff card) owns the screen: the crew tags step back so nothing peeks past its edge
+  const sheetOpen = useHud((h) => !!h.sheet);
   const puffs = useRef<THREE.InstancedMesh>(null);
   const puffState = useRef(Array.from({ length: PUFFS }, () => ({ age: 99, x: 0, y: 0, z: 0, size: 1 })));
   const puffHead = useRef(0);
@@ -423,7 +426,7 @@ export function Crew({ timeline, ground, scale = 'auto', tags = true, separation
       {A.map((a, i) => (
         <group key={i} ref={(g) => { outer.current[i] = g; }}>
           <primitive object={a.root} />
-          {tags && !helmetOn && (
+          {tags && !helmetOn && !sheetOpen && (
             <Html position={[0, a.height + 0.4, 0]} center zIndexRange={[20, 0]}>
               <Tag timeline={timeline} name={i === 0 ? 'Crew 1' : 'Crew 2'} scaleRef={scaleRef} reserveHint={i === 0} side={i === 0 ? 1 : -1} />
             </Html>
