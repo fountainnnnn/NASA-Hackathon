@@ -91,7 +91,7 @@ HeyMars is a mission planning map for the first crews on Mars. It covers the who
 
 **Validation.** The scripts sample the 20 m DEM at 708 Perseverance waypoints and compare it with each waypoint's recorded elevation: median offset -1.06 m, mean -0.89 m, standard deviation 3.25 m, 95th percentile of the absolute offset 6.44 m, largest 11.72 m on a steep slope. The global MOLA grid differs from the 20 m model by 11.3 m at the landing site. These show agreement between NASA products, not ground truth.
 
-**Testing.** 519 unit tests in 49 files pass (Vitest). They cover A* symmetry and limits, a brute-force Dijkstra cross-check, Horn slope on known planes, line of sight with curvature, Mars24 against NASA GISS, Horizons light time, go/no-go rules, the EDL timeline and Rust against TypeScript Monte Carlo. Playwright end-to-end tests drive the real app in a browser: 15 of 15 passed on the last recorded run. A layout QA script checks overlap, clipping, contrast and keyboard reach at 1440x810, 1280x720, 1024x768 and 390x844.
+**Testing.** 519 unit tests in 49 files pass (Vitest). They cover A* symmetry and limits, a brute-force Dijkstra cross-check, Horn slope on known planes, line of sight with curvature, Mars24 against NASA GISS, Horizons light time, go/no-go rules, the EDL timeline and Rust against TypeScript Monte Carlo. Playwright end-to-end tests drive the real app in a browser: 16 of 16 pass. A layout QA script checks overlap, clipping, contrast and keyboard reach in 29 app states.
 
 ### Tools and languages
 

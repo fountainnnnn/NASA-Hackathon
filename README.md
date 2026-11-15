@@ -98,7 +98,7 @@ Rail tools, card buttons and maths follow-ups run fixed code with no model. Free
 - Jezero terrain vs 708 Perseverance waypoints: median offset -1.06 m, mean -0.89 m, standard deviation 3.25 m, 95th percentile of the absolute offset 6.44 m (`data/validation.json`). Rover heights are a separate NASA product, so this is a cross-check, not ground truth.
 - Global MOLA grid vs the 20 m CTX model at the Perseverance landing site: 11.3 m (`data/global_validation.json`).
 - Mars24 sun and time code matches the NASA GISS worked examples (`tests/ops/mars24.test.ts`).
-- 519 unit tests in 49 files pass (`npm test`, 15 Nov 2026). Playwright: 15 of 15 e2e tests passed on the last recorded run, including the GO path (drag, NO GO for a radio shadow, raise the mast to 20 m, GO).
+- 519 unit tests in 49 files pass (`npm test`, 15 Nov 2026). Playwright: 16 of 16 e2e tests pass, including the GO path (drag, NO GO for a radio shadow, raise the mast to 20 m, GO).
 
 Details: [docs/SCIENCE_AND_VALIDATION.md](docs/SCIENCE_AND_VALIDATION.md).
 
