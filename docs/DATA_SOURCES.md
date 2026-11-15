@@ -83,7 +83,7 @@ Scripts in `scripts/`. Raw downloads are cached in `data/raw/` (gitignored). Out
 
 - The 20 m DEM cannot show boulders or metre-scale scarps. Planning slope is the maximum over 2x2 cells, so about 40 m.
 - CTX imagery is 6 m per pixel at best. Close views cannot show more than that, and the app does not add synthetic detail.
-- Outside Jezero, terrain and slope come from global products. The MOLA grid is about 7.4 km per cell, so the 2 to 5 km landing slope criterion is not scored and the landing Monte Carlo describes the region, not the touchdown spot.
+- Outside Jezero, terrain and slope come from global products. The MOLA grid is about 7.4 km per cell, so the 2 to 5 km landing slope criterion is an estimate scaled from that baseline (marked est.) and the landing Monte Carlo describes the region, not the touchdown spot.
 - The CTX global mosaic is uncontrolled, so seams and small offsets can show.
 - GRS hydrogen is about 300 km per bin and describes the upper metre at regional scale. High latitudes are not covered.
 - THEMIS brightness is relative. The TES dust layer is display only.
